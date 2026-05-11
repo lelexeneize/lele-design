@@ -76,7 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Si está en dashboard y no tiene sesión → login
   const isProtected = window.location.pathname.includes('dashboard.html') ||
-                       window.location.pathname.includes('generator.html');
+                       window.location.pathname.includes('generator.html') ||
+                       window.location.pathname.includes('admin.html');
   if (!user && isProtected) {
     window.location.href = 'login.html';
   }

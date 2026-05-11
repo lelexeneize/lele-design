@@ -110,7 +110,13 @@
     // ─── Admin: leer usuarios de localStorage ──────────────
 
     function renderUsers(filter = '') {
-      const users = JSON.parse(localStorage.getItem('lele_users') || '[]');
+      let users = JSON.parse(localStorage.getItem('lele_users') || '[]');
+      const currentUser = JSON.parse(localStorage.getItem('lele_user'));
+      // Incluir al usuario actual aunque no esté en el registro
+      if (currentUser && !users.some(u => u.email === currentUser.email)) {
+        users.push({ ...currentUser, registeredAt: Date.now() });
+        localStorage.setItem('lele_users', JSON.stringify(users));
+      }
       const tbody = document.getElementById('usersTableBody');
 
       document.getElementById('totalUsers').textContent = users.length;
@@ -189,7 +195,7 @@
     });
 
     renderUsers();
-  <script src="../js/auth.js"></script>
   </script>
+  <script src="../js/auth.js"></script>
 </body>
 </html>
