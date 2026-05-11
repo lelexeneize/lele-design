@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Lele Design</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#0a0a0f] text-white font-['Inter']">
+
+  <!-- SIDEBAR -->
+  <div class="fixed left-0 top-0 bottom-0 w-64 bg-white/[0.02] border-r border-white/[0.06] p-6 hidden lg:flex flex-col">
+    <a href="../index.html" class="text-xl font-black tracking-tight mb-10">
+      <span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span>
+      <span class="text-white/70 font-light">Design</span>
+      <span class="block text-[10px] uppercase tracking-[0.2em] text-amber-400 font-semibold">Admin</span>
+    </a>
+    <nav class="flex-1 space-y-1">
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-600/20 text-amber-300 text-sm font-medium">
+        <span>👥</span> Usuarios
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
+        <span>📊</span> Estadísticas
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
+        <span>💰</span> Suscripciones
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
+        <span>⚙️</span> Configuración
+      </a>
+    </nav>
+    <div class="pt-6 border-t border-white/[0.06] space-y-1">
+      <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white text-sm transition-all">
+        <span>←</span> Volver al panel
+      </a>
+      <a href="#" onclick="logout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-red-400 text-sm transition-all">
+        <span>🚪</span> Cerrar sesión
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="lg:pl-64">
+    <header class="h-16 border-b border-white/[0.06] flex items-center justify-between px-6 lg:px-10">
+      <h2 class="text-lg font-bold">Panel de Administración</h2>
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-white/40">Hola, <span id="userGreeting" class="text-white font-medium">Admin</span></span>
+        <div id="userAvatar" class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center text-sm font-bold">A</div>
+      </div>
+    </header>
+
+    <main class="p-6 lg:p-10 space-y-8">
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+          <p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Usuarios totales</p>
+          <p class="text-2xl font-black" id="totalUsers">0</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+          <p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Google</p>
+          <p class="text-2xl font-black" id="googleUsers">0</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+          <p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Email</p>
+          <p class="text-2xl font-black" id="emailUsers">0</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+          <p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Nuevos (7 días)</p>
+          <p class="text-2xl font-black" id="newUsers">0</p>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <h3 class="text-lg font-bold">Usuarios registrados</h3>
+        <div class="flex gap-2">
+          <input id="searchInput" type="text" placeholder="Buscar por nombre o email..." class="px-4 py-2 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white placeholder-white/20 focus:outline-none focus:border-amber-500/50 text-sm w-64">
+          <button id="exportBtn" class="px-4 py-2 rounded-xl bg-white/[0.05] border border-white/[0.08] text-sm text-white/60 hover:text-white transition">Exportar</button>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="overflow-x-auto rounded-2xl border border-white/[0.06]">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-white/[0.06] text-white/40 text-xs uppercase tracking-wider">
+              <th class="text-left p-4 font-medium">Usuario</th>
+              <th class="text-left p-4 font-medium">Email</th>
+              <th class="text-left p-4 font-medium">Registro</th>
+              <th class="text-left p-4 font-medium">Método</th>
+              <th class="text-left p-4 font-medium">Plan</th>
+              <th class="text-right p-4 font-medium">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr>
+              <td colspan="6" class="p-8 text-center text-white/30">Cargando usuarios...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // ─── Admin: leer usuarios de localStorage ──────────────
+
+    function renderUsers(filter = '') {
+      const users = JSON.parse(localStorage.getItem('lele_users') || '[]');
+      const tbody = document.getElementById('usersTableBody');
+
+      document.getElementById('totalUsers').textContent = users.length;
+      document.getElementById('googleUsers').textContent = users.filter(u => u.isGoogle).length;
+      document.getElementById('emailUsers').textContent = users.filter(u => !u.isGoogle).length;
+
+      const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      document.getElementById('newUsers').textContent = users.filter(u => u.registeredAt > weekAgo).length;
+
+      const filtered = filter
+        ? users.filter(u =>
+            u.name?.toLowerCase().includes(filter.toLowerCase()) ||
+            u.email?.toLowerCase().includes(filter.toLowerCase()))
+        : users;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-white/30">${
+          users.length === 0 ? 'Aún no hay usuarios registrados' : 'Sin resultados'
+        }</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((u, i) => `
+        <tr class="border-b border-white/[0.04] hover:bg-white/[0.02] transition-all">
+          <td class="p-4">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-xs font-bold shrink-0" ${
+                u.picture ? `style="background-image: url('${u.picture}'); background-size: cover;"` : ''
+              }>${u.picture ? '' : (u.name?.charAt(0) || '?').toUpperCase()}</div>
+              <span class="font-medium">${u.name || 'Sin nombre'}</span>
+            </div>
+          </td>
+          <td class="p-4 text-white/60">${u.email || '—'}</td>
+          <td class="p-4 text-white/40 text-xs">${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}</td>
+          <td class="p-4">
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${
+              u.isGoogle ? 'bg-blue-500/10 text-blue-400' : 'bg-violet-500/10 text-violet-400'
+            }">${u.isGoogle ? 'Google' : 'Email'}</span>
+          </td>
+          <td class="p-4">
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400">Gratis</span>
+          </td>
+          <td class="p-4 text-right">
+            <button onclick="removeUser(${i})" class="text-xs text-white/30 hover:text-red-400 transition">Eliminar</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function removeUser(index) {
+      if (!confirm('¿Eliminar este usuario?')) return;
+      const users = JSON.parse(localStorage.getItem('lele_users') || '[]');
+      users.splice(index, 1);
+      localStorage.setItem('lele_users', JSON.stringify(users));
+      renderUsers(document.getElementById('searchInput').value);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      renderUsers(e.target.value);
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const users = JSON.parse(localStorage.getItem('lele_users') || '[]');
+      const csv = [
+        'Nombre,Email,Registro,Método,Plan',
+        ...users.map(u =>
+          `"${u.name || ''}","${u.email || ''}","${new Date(u.registeredAt).toLocaleString()}","${u.isGoogle ? 'Google' : 'Email'}","Gratis"`
+        )
+      ].join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `usuarios_lele_${new Date().toISOString().slice(0,10)}.csv`;
+      link.click();
+    });
+
+    renderUsers();
+  <script src="../js/auth.js"></script>
+  </script>
+</body>
+</html>

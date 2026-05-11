@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login — Lele Design</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#0a0a0f] text-white font-['Inter'] min-h-screen flex items-center justify-center">
+
+  <div class="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-transparent to-orange-900/20"></div>
+
+  <div class="relative z-10 w-full max-w-sm mx-6">
+    <a href="../index.html" class="inline-block text-2xl font-black tracking-tight mb-10 text-center w-full">
+      <span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span>
+      <span class="text-white/70 font-light">Design</span>
+      <span class="block text-[10px] uppercase tracking-[0.2em] text-amber-400 font-semibold mt-1">Admin Panel</span>
+    </a>
+
+    <div class="p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+      <h1 class="text-2xl font-bold mb-2">Acceso admin</h1>
+      <p class="text-white/40 text-sm mb-8">Solo personal autorizado</p>
+
+      <form id="adminLoginForm" class="space-y-5">
+        <div>
+          <label class="text-sm font-medium text-white/60 block mb-2">Email</label>
+          <input id="adminEmail" type="email" value="admin@leledesign.com" class="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:bg-white/[0.08] transition-all text-sm">
+        </div>
+        <div>
+          <label class="text-sm font-medium text-white/60 block mb-2">Contraseña</label>
+          <input id="adminPass" type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:bg-white/[0.08] transition-all text-sm">
+        </div>
+        <button type="submit" class="w-full py-3 rounded-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-semibold text-sm transition-all shadow-lg shadow-amber-600/25">
+          Ingresar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('adminEmail').value.trim();
+      const pass = document.getElementById('adminPass').value.trim();
+
+      // Credenciales hardcodeadas para demo
+      if (email === 'admin@leledesign.com' && pass === 'admin123') {
+        localStorage.setItem('lele_admin', 'true');
+        window.location.href = 'admin.html';
+      } else {
+        alert('Credenciales incorrectas. Probá:\nEmail: admin@leledesign.com\nPass: admin123');
+      }
+    });
+  </script>
+</body>
+</html>

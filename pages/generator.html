@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador IA — Lele Design</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#0a0a0f] text-white font-['Inter']">
+
+  <!-- SIDEBAR -->
+  <div class="fixed left-0 top-0 bottom-0 w-64 bg-white/[0.02] border-r border-white/[0.06] p-6 hidden lg:flex flex-col">
+    <a href="../index.html" class="text-xl font-black tracking-tight mb-10">
+      <span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span>
+      <span class="text-white/70 font-light">Design</span>
+    </a>
+    <nav class="flex-1 space-y-1">
+      <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
+        <span>📊</span> Dashboard
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-violet-600/20 text-violet-300 text-sm font-medium">
+        <span>🤖</span> Generar con IA
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
+        <span>🎨</span> Mis proyectos
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
+        <span>📄</span> Mis diseños
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
+        <span>💳</span> Plan & facturación
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
+        <span>⚙️</span> Ajustes
+      </a>
+    </nav>
+    <div class="pt-6 border-t border-white/[0.06] space-y-1">
+      <a href="admin.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/20 hover:text-amber-400 text-xs transition-all">
+        <span>🔒</span> Admin
+      </a>
+      <a href="#" onclick="logout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-red-400 text-sm transition-all">
+        <span>🚪</span> Cerrar sesión
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="lg:pl-64">
+    <header class="h-16 border-b border-white/[0.06] flex items-center justify-between px-6 lg:px-10">
+      <h2 class="text-lg font-bold">Generador con IA</h2>
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-white/40" id="userGreeting">Hola, <span class="text-white font-medium">Usuario</span></span>
+        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-sm font-bold" id="userAvatar">U</div>
+      </div>
+    </header>
+
+    <main class="p-6 lg:p-10 space-y-8">
+
+      <!-- Prompt -->
+      <div class="p-8 rounded-2xl bg-gradient-to-br from-violet-600/10 via-fuchsia-600/5 to-cyan-600/10 border border-violet-500/20">
+        <h3 class="text-xl font-bold mb-2">Crea lo que imagines</h3>
+        <p class="text-white/40 text-sm mb-6">Describí lo que querés generar y elegí un estilo</p>
+
+        <textarea id="promptInput" rows="3" placeholder="Ej: un paisaje cyberpunk con neones violetas, lluvia y un dragón volando sobre rascacielos..." class="w-full px-5 py-4 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.08] transition-all text-sm resize-none"></textarea>
+
+        <div class="flex flex-wrap gap-3 mt-4">
+          <button data-style="realista" class="style-btn px-4 py-2 rounded-full bg-white/[0.05] border border-white/[0.08] text-sm text-white/60 hover:border-violet-500/30 hover:text-white transition-all">Realista</button>
+          <button data-style="arte" class="style-btn px-4 py-2 rounded-full bg-white/[0.05] border border-white/[0.08] text-sm text-white/60 hover:border-violet-500/30 hover:text-white transition-all">Arte digital</button>
+          <button data-style="animacion" class="style-btn px-4 py-2 rounded-full bg-white/[0.05] border border-white/[0.08] text-sm text-white/60 hover:border-violet-500/30 hover:text-white transition-all">Animación</button>
+          <button data-style="vaporwave" class="style-btn px-4 py-2 rounded-full bg-white/[0.05] border border-white/[0.08] text-sm text-white/60 hover:border-violet-500/30 hover:text-white transition-all">Vaporwave</button>
+          <button data-style="cyberpunk" class="style-btn px-4 py-2 rounded-full bg-white/[0.05] border border-white/[0.08] text-sm text-white/60 hover:border-violet-500/30 hover:text-white transition-all">Cyberpunk</button>
+          <button data-style="minimalista" class="style-btn px-4 py-2 rounded-full bg-white/[0.05] border border-white/[0.08] text-sm text-white/60 hover:border-violet-500/30 hover:text-white transition-all">Minimalista</button>
+        </div>
+
+        <div class="flex items-center gap-4 mt-6">
+          <button id="generateBtn" class="px-8 py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25 flex items-center gap-2">
+            <span id="btnIcon">✨</span>
+            <span id="btnText">Generar</span>
+          </button>
+          <span class="text-xs text-white/30" id="creditInfo">Te quedan 147 créditos</span>
+        </div>
+      </div>
+
+      <!-- Loader -->
+      <div id="loader" class="hidden text-center py-16">
+        <div class="inline-flex items-center gap-4 px-6 py-4 rounded-full bg-white/[0.03] border border-white/[0.06]">
+          <svg class="animate-spin h-5 w-5 text-violet-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          <span class="text-sm text-white/60">Creando tu imagen...</span>
+        </div>
+      </div>
+
+      <!-- Gallery -->
+      <div id="gallery" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-lg font-bold">Tus imágenes generadas</h3>
+          <button id="clearGallery" class="text-xs text-white/30 hover:text-red-400 transition">Limpiar todo</button>
+        </div>
+        <div id="galleryGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/generator.js"></script>
+</body>
+</html>
