@@ -19,18 +19,23 @@ async function dbGetUsers() {
 async function dbSaveUser(user) {
   const sb = getSupabaseClient();
   if (sb) {
-    if (user.id) {
-      // Check if user exists
-      const { data: existing } = await sb.from('profiles').select('id').eq('id', user.id).single();
-      if (existing) {
-        await sb.from('profiles').update({ name: user.name, picture: user.picture }).eq('id', user.id);
-        return;
-      }
+    try {
+      // Upsert: insert if not exists, update if exists (matched by email)
+      const { error } = await sb.from('profiles').upsert({
+        id: user.id || crypto.randomUUID(),
+        name: user.name || '',
+        email: user.email || '',
+        picture: user.picture || '',
+        plan: 'free',
+        credits: 10,
+        role: user.email === 'admin@leledesign.com' ? 'admin' : 'user'
+      }, { onConflict: 'email', ignoreDuplicates: false });
+      if (error) console.warn('Supabase upsert error:', error.message);
+    } catch (e) {
+      console.warn('Supabase save error, falling back:', e.message);
     }
-    // Insert via Supabase Auth (auto-creates profile via trigger)
     return;
   }
-  // localStorage fallback
   const users = JSON.parse(localStorage.getItem('lele_users') || '[]');
   const exists = users.some(u => u.email === user.email);
   if (!exists) {
