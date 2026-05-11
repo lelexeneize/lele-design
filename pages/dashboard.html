@@ -7,137 +7,116 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="../js/theme.js"></script>
 </head>
-<body class="bg-[#0a0a0f] text-white font-['Inter']">
+<body class="font-['Inter']">
 
-  <!-- SIDEBAR -->
-  <div class="fixed left-0 top-0 bottom-0 w-64 bg-white/[0.02] border-r border-white/[0.06] p-6 hidden lg:flex flex-col">
+  <!-- SIDEBAR DESKTOP -->
+  <div class="fixed left-0 top-0 bottom-0 w-64 sidebar-theme border-r p-6 hidden lg:flex flex-col z-50" style="background: var(--bg-primary);">
     <a href="../index.html" class="text-xl font-black tracking-tight mb-10">
       <span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span>
-      <span class="text-white/70 font-light">Design</span>
+      <span class="opacity-70 font-light">Design</span>
     </a>
     <nav class="flex-1 space-y-1">
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-violet-600/20 text-violet-300 text-sm font-medium">
-        <span>📊</span> Dashboard
-      </a>
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
-        <span>🎨</span> Mis proyectos
-      </a>
-      <a href="generator.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
-        <span>🤖</span> Generar con IA
-      </a>
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
-        <span>📄</span> Mis diseños
-      </a>
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
-        <span>💳</span> Plan & facturación
-      </a>
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all">
-        <span>⚙️</span> Ajustes
-      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-violet-600/20 text-violet-300 text-sm font-medium"><span>📊</span> Dashboard</a>
+      <a href="generator.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm transition-all"><span>🤖</span> Generar con IA</a>
+      <a href="trabajos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm transition-all"><span>🖼️</span> Galería</a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm transition-all"><span>💳</span> Plan & facturación</a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm transition-all"><span>⚙️</span> Ajustes</a>
     </nav>
     <div class="pt-6 border-t border-white/[0.06] space-y-1">
-      <a href="admin.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/20 hover:text-amber-400 text-xs transition-all">
-        <span>🔒</span> Admin
-      </a>
-      <a href="#" onclick="logout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-red-400 text-sm transition-all">
-        <span>🚪</span> Cerrar sesión
-      </a>
+      <a href="admin.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/20 hover:text-amber-400 text-xs transition-all"><span>🔒</span> Admin</a>
+      <a href="#" onclick="logout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-red-400 text-sm transition-all"><span>🚪</span> Cerrar sesión</a>
     </div>
   </div>
 
   <!-- MAIN CONTENT -->
   <div class="lg:pl-64">
     <!-- Top bar -->
-    <header class="h-16 border-b border-white/[0.06] flex items-center justify-between px-6 lg:px-10">
-      <h2 class="text-lg font-bold">Dashboard</h2>
+    <header class="h-16 border-b flex items-center justify-between px-6 lg:px-10" style="border-color: var(--border-color);">
       <div class="flex items-center gap-4">
-        <span class="text-sm text-white/40">Hola, <span id="userGreeting" class="text-white font-medium">Usuario</span></span>
-        <div id="userAvatar" class="w-9 h-9 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-sm font-bold">U</div>
+        <button id="menuBtn" class="lg:hidden text-xl">☰</button>
+        <h2 class="text-lg font-bold">Dashboard</h2>
+      </div>
+      <div class="flex items-center gap-4">
+        <div id="themeToggleContainer"></div>
+        <span class="text-sm text-white/40">Hola, <span id="userGreeting" class="font-medium">Usuario</span></span>
+        <div id="userAvatar" class="w-9 h-9 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-sm font-bold shrink-0">U</div>
       </div>
     </header>
 
     <!-- Content -->
     <main class="p-6 lg:p-10 space-y-8">
-
-      <!-- Stats -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-          <p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Proyectos</p>
-          <p class="text-2xl font-black">12</p>
-          <span class="text-xs text-emerald-400">+2 esta semana</span>
-        </div>
-        <div class="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-          <p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Diseños IA</p>
-          <p class="text-2xl font-black">48</p>
-          <span class="text-xs text-emerald-400">+8 esta semana</span>
-        </div>
-        <div class="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-          <p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Plan actual</p>
-          <p class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Pro</p>
-          <span class="text-xs text-white/30">Renovación en 23 días</span>
-        </div>
-        <div class="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-          <p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Créditos</p>
-          <p class="text-2xl font-black">147</p>
-          <span class="text-xs text-white/30">de 200 disponibles</span>
-        </div>
+        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Proyectos</p><p class="text-2xl font-black">12</p><span class="text-xs text-emerald-400">+2 esta semana</span></div>
+        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Diseños IA</p><p class="text-2xl font-black">48</p><span class="text-xs text-emerald-400">+8 esta semana</span></div>
+        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Plan actual</p><p class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Pro</p><span class="text-xs text-white/30">Renovación en 23 días</span></div>
+        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Créditos</p><p class="text-2xl font-black">147</p><span class="text-xs text-white/30">de 200 disponibles</span></div>
       </div>
 
-      <!-- Proyectos recientes -->
       <div>
         <h3 class="text-lg font-bold mb-4">Proyectos recientes</h3>
         <div class="space-y-3">
-          <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-between hover:bg-white/[0.06] transition-all">
-            <div class="flex items-center gap-4">
-              <span class="text-2xl">🤖</span>
-              <div>
-                <p class="font-medium text-sm">Branding IA - Serie Onírica</p>
-                <p class="text-xs text-white/40">Creado hace 2 días</p>
-              </div>
-            </div>
+          <div class="p-4 rounded-xl glass flex items-center justify-between hover:bg-white/[0.06] transition-all">
+            <div class="flex items-center gap-4"><span class="text-2xl">🤖</span><div><p class="font-medium text-sm">Branding IA - Serie Onírica</p><p class="text-xs text-white/40">Creado hace 2 días</p></div></div>
             <span class="text-xs px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-medium">Completado</span>
           </div>
-          <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-between hover:bg-white/[0.06] transition-all">
-            <div class="flex items-center gap-4">
-              <span class="text-2xl">🎬</span>
-              <div>
-                <p class="font-medium text-sm">Animación intro - TikTok</p>
-                <p class="text-xs text-white/40">Creado hace 5 días</p>
-              </div>
-            </div>
+          <div class="p-4 rounded-xl glass flex items-center justify-between hover:bg-white/[0.06] transition-all">
+            <div class="flex items-center gap-4"><span class="text-2xl">🎬</span><div><p class="font-medium text-sm">Animación intro - TikTok</p><p class="text-xs text-white/40">Creado hace 5 días</p></div></div>
             <span class="text-xs px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 font-medium">En revisión</span>
           </div>
-          <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-between hover:bg-white/[0.06] transition-all">
-            <div class="flex items-center gap-4">
-              <span class="text-2xl">🌐</span>
-              <div>
-                <p class="font-medium text-sm">Landing Page - FitFlow</p>
-                <p class="text-xs text-white/40">Creado hace 1 semana</p>
-              </div>
-            </div>
+          <div class="p-4 rounded-xl glass flex items-center justify-between hover:bg-white/[0.06] transition-all">
+            <div class="flex items-center gap-4"><span class="text-2xl">🌐</span><div><p class="font-medium text-sm">Landing Page - FitFlow</p><p class="text-xs text-white/40">Creado hace 1 semana</p></div></div>
             <span class="text-xs px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 font-medium">En progreso</span>
           </div>
         </div>
       </div>
 
-      <!-- Generador rápido -->
       <div class="p-8 rounded-2xl bg-gradient-to-br from-violet-600/10 via-fuchsia-600/5 to-cyan-600/10 border border-violet-500/20">
         <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <div>
-            <h3 class="text-xl font-bold">Genera con IA ahora</h3>
-            <p class="text-white/40 text-sm mt-1">Describe lo que necesitas y la IA lo crea en segundos</p>
-          </div>
-          <a href="generator.html" class="px-6 py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25 whitespace-nowrap">
-            Abrir generador
-          </a>
+          <div><h3 class="text-xl font-bold">Genera con IA ahora</h3><p class="text-white/40 text-sm mt-1">Describe lo que necesitas y la IA lo crea en segundos</p></div>
+          <a href="generator.html" class="px-6 py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25 whitespace-nowrap">Abrir generador</a>
         </div>
       </div>
-
     </main>
+  </div>
+
+  <!-- MOBILE SIDEBAR -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="sidebar-mobile p-6 flex flex-col" id="sidebarMobile">
+    <div class="flex items-center justify-between mb-8">
+      <span class="text-xl font-black tracking-tight"><span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span><span class="opacity-70 font-light">Design</span></span>
+      <button id="closeSidebar" class="text-xl opacity-60 hover:opacity-100">&times;</button>
+    </div>
+    <nav class="flex-1 space-y-1">
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-violet-600/20 text-violet-300 text-sm font-medium"><span>📊</span> Dashboard</a>
+      <a href="generator.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm transition-all"><span>🤖</span> Generar con IA</a>
+      <a href="trabajos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm transition-all"><span>🖼️</span> Galería</a>
+    </nav>
+    <div class="pt-6 border-t border-white/[0.06] space-y-1">
+      <a href="admin.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/20 hover:text-amber-400 text-xs transition-all"><span>🔒</span> Admin</a>
+      <a href="#" onclick="logout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-red-400 text-sm transition-all"><span>🚪</span> Cerrar sesión</a>
+    </div>
   </div>
 
   <script src="../js/main.js"></script>
   <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      leleTheme.applySavedTheme();
+      const tc = document.getElementById('themeToggleContainer');
+      if (tc && !tc.querySelector('.theme-toggle')) tc.appendChild(leleTheme.createToggle());
+    });
+    // Sidebar mobile
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebarMobile = document.getElementById('sidebarMobile');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const closeSidebar = document.getElementById('closeSidebar');
+    function openSidebar() { sidebarMobile?.classList.add('open'); sidebarOverlay?.classList.add('open'); }
+    function closeSidebarFn() { sidebarMobile?.classList.remove('open'); sidebarOverlay?.classList.remove('open'); }
+    menuBtn?.addEventListener('click', openSidebar);
+    closeSidebar?.addEventListener('click', closeSidebarFn);
+    sidebarOverlay?.addEventListener('click', closeSidebarFn);
+  </script>
 </body>
 </html>

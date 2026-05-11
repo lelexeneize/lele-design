@@ -7,11 +7,13 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="js/theme.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.12.0/tsparticles.slim.bundle.min.js"></script>
 </head>
-<body class="bg-[#0a0a0f] text-white font-['Inter']">
+<body class="font-['Inter']">
 
   <!-- NAVBAR -->
-  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl bg-[#0a0a0f]/70 border-b border-white/5">
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style="background: rgba(10,10,15,0.7);">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="#" class="text-2xl font-black tracking-tight">
         <span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span>
@@ -20,10 +22,12 @@
       <div class="hidden md:flex items-center gap-8 text-sm font-medium text-white/60">
         <a href="#servicios" class="hover:text-white transition">Servicios</a>
         <a href="#trabajos" class="hover:text-white transition">Trabajos</a>
+        <a href="pages/trabajos.html" class="hover:text-white transition">Galería</a>
         <a href="#precios" class="hover:text-white transition">Precios</a>
         <a href="#contacto" class="hover:text-white transition">Contacto</a>
       </div>
       <div class="flex items-center gap-3">
+        <div id="themeToggleContainer"></div>
         <a href="pages/login.html" class="text-sm text-white/70 hover:text-white transition">Ingresar</a>
         <a href="pages/register.html" class="text-sm px-4 py-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold transition-all shadow-lg shadow-violet-600/25">
           Registrarse
@@ -34,6 +38,7 @@
 
   <!-- HERO -->
   <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <div id="particles-canvas"></div>
     <div class="absolute inset-0 bg-gradient-to-br from-violet-900/20 via-transparent to-cyan-900/20"></div>
     <div class="absolute inset-0">
       <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-[120px] animate-pulse"></div>
@@ -58,8 +63,8 @@
         <a href="#servicios" class="px-8 py-4 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-base transition-all shadow-2xl shadow-violet-600/30 hover:shadow-violet-500/40 hover:-translate-y-0.5">
           Explorar servicios
         </a>
-        <a href="#trabajos" class="px-8 py-4 rounded-full border border-white/10 hover:border-white/20 text-white/70 hover:text-white font-medium text-base transition-all">
-          Ver trabajos →
+        <a href="pages/trabajos.html" class="px-8 py-4 rounded-full border border-white/10 hover:border-white/20 text-white/70 hover:text-white font-medium text-base transition-all">
+          Ver galería →
         </a>
       </div>
     </div>
@@ -73,38 +78,38 @@
     <div class="max-w-7xl mx-auto px-6">
       <div class="text-center mb-16">
         <span class="text-xs uppercase tracking-[0.2em] text-violet-400 font-semibold">Qué hacemos</span>
-        <h2 class="text-4xl md:text-5xl font-black mt-4">Servicios</h2>
+        <h2 class="text-4xl md:text-5xl font-black mt-4 text-white">Servicios</h2>
         <p class="text-white/40 mt-4 max-w-xl mx-auto">Todo lo que necesitas para llevar tu marca al siguiente nivel</p>
       </div>
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="group p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-violet-500/30 transition-all duration-500">
+        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center mb-5 text-xl">🎨</div>
-          <h3 class="text-xl font-bold mb-3">Imágenes con IA</h3>
+          <h3 class="text-xl font-bold mb-3 text-white">Imágenes con IA</h3>
           <p class="text-white/50 text-sm leading-relaxed">Generamos imágenes hiperrealistas y artísticas con inteligencia artificial para tus campañas y proyectos.</p>
         </div>
-        <div class="group p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-violet-500/30 transition-all duration-500">
+        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center mb-5 text-xl">✨</div>
-          <h3 class="text-xl font-bold mb-3">Animaciones</h3>
+          <h3 class="text-xl font-bold mb-3 text-white">Animaciones</h3>
           <p class="text-white/50 text-sm leading-relaxed">Motion graphics, animaciones 2D/3D y contenido dinámico que captura la atención al instante.</p>
         </div>
-        <div class="group p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-violet-500/30 transition-all duration-500">
+        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center mb-5 text-xl">🌐</div>
-          <h3 class="text-xl font-bold mb-3">Páginas Web</h3>
+          <h3 class="text-xl font-bold mb-3 text-white">Páginas Web</h3>
           <p class="text-white/50 text-sm leading-relaxed">Sitios web modernos, rápidos y optimizados. Desde landing pages hasta plataformas completas.</p>
         </div>
-        <div class="group p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-violet-500/30 transition-all duration-500">
+        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-600 to-pink-600 flex items-center justify-center mb-5 text-xl">📄</div>
-          <h3 class="text-xl font-bold mb-3">Flyers & Branding</h3>
+          <h3 class="text-xl font-bold mb-3 text-white">Flyers & Branding</h3>
           <p class="text-white/50 text-sm leading-relaxed">Diseños impactantes para redes sociales, flyers, brochures y identidad visual completa.</p>
         </div>
-        <div class="group p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-violet-500/30 transition-all duration-500">
+        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-600 to-rose-600 flex items-center justify-center mb-5 text-xl">📱</div>
-          <h3 class="text-xl font-bold mb-3">TikTok Designs</h3>
+          <h3 class="text-xl font-bold mb-3 text-white">TikTok Designs</h3>
           <p class="text-white/50 text-sm leading-relaxed">Contenido viral optimizado para TikTok: edición, efectos, transiciones y tendencias.</p>
         </div>
-        <div class="group p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-violet-500/30 transition-all duration-500">
+        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 to-cyan-600 flex items-center justify-center mb-5 text-xl">🚀</div>
-          <h3 class="text-xl font-bold mb-3">Consultoría Creativa</h3>
+          <h3 class="text-xl font-bold mb-3 text-white">Consultoría Creativa</h3>
           <p class="text-white/50 text-sm leading-relaxed">Asesoría personalizada para potenciar tu presencia digital con estrategias visuales.</p>
         </div>
       </div>
@@ -116,7 +121,7 @@
     <div class="max-w-7xl mx-auto px-6">
       <div class="text-center mb-16">
         <span class="text-xs uppercase tracking-[0.2em] text-fuchsia-400 font-semibold">Portafolio</span>
-        <h2 class="text-4xl md:text-5xl font-black mt-4">Trabajos destacados</h2>
+        <h2 class="text-4xl md:text-5xl font-black mt-4 text-white">Trabajos destacados</h2>
         <p class="text-white/40 mt-4 max-w-xl mx-auto">Proyectos que hablan por sí solos</p>
       </div>
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -124,23 +129,28 @@
           <div class="absolute inset-0 flex items-center justify-center text-6xl opacity-30 group-hover:opacity-50 transition">🤖</div>
           <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/80 to-transparent">
             <span class="text-xs text-violet-400 font-semibold">IA · 2025</span>
-            <h4 class="text-lg font-bold mt-1">Serie "Sueños Sintéticos"</h4>
+            <h4 class="text-lg font-bold mt-1 text-white">Serie "Sueños Sintéticos"</h4>
           </div>
         </div>
         <div class="group relative rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-br from-cyan-900/30 to-blue-900/30 border border-white/[0.06]">
           <div class="absolute inset-0 flex items-center justify-center text-6xl opacity-30 group-hover:opacity-50 transition">🎬</div>
           <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/80 to-transparent">
             <span class="text-xs text-cyan-400 font-semibold">Animación · 2025</span>
-            <h4 class="text-lg font-bold mt-1">Intro Viral TikTok</h4>
+            <h4 class="text-lg font-bold mt-1 text-white">Intro Viral TikTok</h4>
           </div>
         </div>
         <div class="group relative rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-br from-emerald-900/30 to-teal-900/30 border border-white/[0.06]">
           <div class="absolute inset-0 flex items-center justify-center text-6xl opacity-30 group-hover:opacity-50 transition">🌿</div>
           <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/80 to-transparent">
             <span class="text-xs text-emerald-400 font-semibold">Web · 2025</span>
-            <h4 class="text-lg font-bold mt-1">Landing EcoBrand</h4>
+            <h4 class="text-lg font-bold mt-1 text-white">Landing EcoBrand</h4>
           </div>
         </div>
+      </div>
+      <div class="text-center mt-10">
+        <a href="pages/trabajos.html" class="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25">
+          Ver galería completa →
+        </a>
       </div>
     </div>
   </section>
@@ -150,13 +160,13 @@
     <div class="max-w-7xl mx-auto px-6">
       <div class="text-center mb-16">
         <span class="text-xs uppercase tracking-[0.2em] text-cyan-400 font-semibold">Planes</span>
-        <h2 class="text-4xl md:text-5xl font-black mt-4">Precios claros, sin sorpresas</h2>
+        <h2 class="text-4xl md:text-5xl font-black mt-4 text-white">Precios claros, sin sorpresas</h2>
         <p class="text-white/40 mt-4 max-w-xl mx-auto">Elige el plan que mejor se adapte a tus necesidades</p>
       </div>
       <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-        <div class="p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-violet-500/20 transition-all">
-          <h3 class="text-lg font-semibold mb-2">Starter</h3>
-          <p class="text-3xl font-black mb-1">$99<span class="text-sm font-normal text-white/40">/mes</span></p>
+        <div class="p-8 rounded-2xl glass glass-hover transition-all">
+          <h3 class="text-lg font-semibold mb-2 text-white">Starter</h3>
+          <p class="text-3xl font-black mb-1 text-white">$99<span class="text-sm font-normal text-white/40">/mes</span></p>
           <p class="text-white/40 text-sm mb-6">Perfecto para empezar</p>
           <ul class="space-y-3 mb-8 text-sm text-white/60">
             <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> 5 diseños con IA</li>
@@ -164,12 +174,12 @@
             <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> 3 flyers</li>
             <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Soporte por email</li>
           </ul>
-          <a href="#" class="block text-center py-3 rounded-full border border-white/10 hover:border-white/20 text-sm font-medium transition-all">Elegir plan</a>
+          <a href="#" class="block text-center py-3 rounded-full border border-white/10 hover:border-white/20 text-sm font-medium transition-all text-white/60 hover:text-white">Elegir plan</a>
         </div>
         <div class="p-8 rounded-2xl bg-gradient-to-b from-violet-600/10 to-fuchsia-600/10 border border-violet-500/30 relative">
-          <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-xs font-semibold">Más popular</div>
-          <h3 class="text-lg font-semibold mb-2">Pro</h3>
-          <p class="text-3xl font-black mb-1">$249<span class="text-sm font-normal text-white/40">/mes</span></p>
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-xs font-semibold text-white">Más popular</div>
+          <h3 class="text-lg font-semibold mb-2 text-white">Pro</h3>
+          <p class="text-3xl font-black mb-1 text-white">$249<span class="text-sm font-normal text-white/40">/mes</span></p>
           <p class="text-white/40 text-sm mb-6">Para creadores en serio</p>
           <ul class="space-y-3 mb-8 text-sm text-white/60">
             <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> 20 diseños con IA</li>
@@ -178,11 +188,11 @@
             <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Contenido TikTok ilimitado</li>
             <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Soporte prioritario 24/7</li>
           </ul>
-          <a href="#" class="block text-center py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-sm font-semibold transition-all shadow-lg shadow-violet-600/25">Elegir plan</a>
+          <a href="#" class="block text-center py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25">Elegir plan</a>
         </div>
-        <div class="p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-violet-500/20 transition-all">
-          <h3 class="text-lg font-semibold mb-2">Enterprise</h3>
-          <p class="text-3xl font-black mb-1">$499<span class="text-sm font-normal text-white/40">/mes</span></p>
+        <div class="p-8 rounded-2xl glass glass-hover transition-all">
+          <h3 class="text-lg font-semibold mb-2 text-white">Enterprise</h3>
+          <p class="text-3xl font-black mb-1 text-white">$499<span class="text-sm font-normal text-white/40">/mes</span></p>
           <p class="text-white/40 text-sm mb-6">Para agencias y marcas</p>
           <ul class="space-y-3 mb-8 text-sm text-white/60">
             <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Diseños IA ilimitados</li>
@@ -191,7 +201,7 @@
             <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Todo incluido</li>
             <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Gerente de cuenta dedicado</li>
           </ul>
-          <a href="#" class="block text-center py-3 rounded-full border border-white/10 hover:border-white/20 text-sm font-medium transition-all">Elegir plan</a>
+          <a href="#" class="block text-center py-3 rounded-full border border-white/10 hover:border-white/20 text-sm font-medium transition-all text-white/60 hover:text-white">Elegir plan</a>
         </div>
       </div>
     </div>
@@ -201,7 +211,7 @@
   <section class="py-32 relative overflow-hidden">
     <div class="absolute inset-0 bg-gradient-to-r from-violet-600/10 via-fuchsia-600/10 to-cyan-600/10"></div>
     <div class="relative z-10 max-w-3xl mx-auto text-center px-6">
-      <h2 class="text-4xl md:text-5xl font-black mb-6">¿Listo para crear algo increíble?</h2>
+      <h2 class="text-4xl md:text-5xl font-black mb-6 text-white">¿Listo para crear algo increíble?</h2>
       <p class="text-white/40 text-lg mb-10">Hablemos de tu próximo proyecto. Sin compromisos.</p>
       <a href="#contacto" class="inline-block px-10 py-4 rounded-full bg-white text-[#0a0a0f] font-bold hover:bg-white/90 transition-all text-base">
         Empezar ahora →
@@ -209,7 +219,7 @@
     </div>
   </section>
 
-  <!-- CONTACTO / FOOTER -->
+  <!-- FOOTER -->
   <footer id="contacto" class="border-t border-white/[0.06] py-16">
     <div class="max-w-7xl mx-auto px-6">
       <div class="grid md:grid-cols-4 gap-10 mb-12">
@@ -223,7 +233,7 @@
           </p>
         </div>
         <div>
-          <h4 class="text-sm font-semibold mb-4">Servicios</h4>
+          <h4 class="text-sm font-semibold mb-4 text-white">Servicios</h4>
           <ul class="space-y-2 text-sm text-white/40">
             <li><a href="#" class="hover:text-white transition">Imágenes IA</a></li>
             <li><a href="#" class="hover:text-white transition">Animaciones</a></li>
@@ -233,7 +243,7 @@
           </ul>
         </div>
         <div>
-          <h4 class="text-sm font-semibold mb-4">Contacto</h4>
+          <h4 class="text-sm font-semibold mb-4 text-white">Contacto</h4>
           <ul class="space-y-2 text-sm text-white/40">
             <li>hola@leledesign.com</li>
             <li>@leledesign</li>
@@ -248,5 +258,51 @@
   </footer>
 
   <script src="js/main.js"></script>
+  <script>
+    // ─── Theme toggle ─────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      leleTheme.applySavedTheme();
+      document.getElementById('themeToggleContainer').appendChild(leleTheme.createToggle());
+    });
+
+    // ─── Particles ────────────────────────────────────
+    tsParticles.load("particles-canvas", {
+      fpsLimit: 60,
+      particles: {
+        number: { value: 60, density: { enable: true } },
+        color: { value: ["#a855f7", "#d946ef", "#22d3ee"] },
+        shape: { type: "circle" },
+        opacity: { value: 0.4, random: true },
+        size: { value: { min: 1, max: 3 }, random: true },
+        links: {
+          enable: true,
+          distance: 150,
+          color: "#a855f7",
+          opacity: 0.15,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 1.5,
+          direction: "none",
+          random: true,
+          straight: false,
+          outModes: "bounce"
+        }
+      },
+      interactivity: {
+        events: {
+          onHover: { enable: true, mode: "grab" },
+          onClick: { enable: true, mode: "push" }
+        },
+        modes: {
+          grab: { distance: 140, links: { opacity: 0.3 } },
+          push: { quantity: 3 }
+        }
+      },
+      background: { color: "transparent" },
+      detectRetina: true
+    });
+  </script>
 </body>
 </html>

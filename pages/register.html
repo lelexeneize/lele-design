@@ -8,22 +8,24 @@
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="../js/theme.js"></script>
 </head>
-<body class="bg-[#0a0a0f] text-white font-['Inter'] min-h-screen flex items-center justify-center">
-
+<body class="font-['Inter'] min-h-screen flex items-center justify-center">
   <div class="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-transparent to-violet-900/20"></div>
 
   <div class="relative z-10 w-full max-w-md mx-6">
-    <a href="../index.html" class="inline-block text-2xl font-black tracking-tight mb-10">
-      <span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span>
-      <span class="text-white/70 font-light">Design</span>
-    </a>
+    <div class="flex items-center justify-between mb-8">
+      <a href="../index.html" class="text-2xl font-black tracking-tight">
+        <span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span>
+        <span class="opacity-70 font-light">Design</span>
+      </a>
+      <div id="themeToggleContainer"></div>
+    </div>
 
-    <div class="p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+    <div class="p-8 rounded-2xl glass">
       <h1 class="text-2xl font-bold mb-2">Crear cuenta</h1>
       <p class="text-white/40 text-sm mb-8">Únete y empieza a crear</p>
 
-      <!-- Google Sign-Up -->
       <div id="g_id_onload"
            data-client_id="835547393237-c0n1nfmf8e15gjugisqcgba3bqcq4gi6.apps.googleusercontent.com"
            data-login_uri=""
@@ -43,38 +45,32 @@
       </div>
 
       <div class="relative mb-6">
-        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/[0.06]"></div></div>
-        <div class="relative flex justify-center"><span class="px-4 bg-[#0a0a0f] text-xs text-white/30">o con email</span></div>
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t" style="border-color: var(--border-color);"></div></div>
+        <div class="relative flex justify-center"><span class="px-4 text-xs text-white/30" style="background: var(--bg-primary);">o con email</span></div>
       </div>
 
       <form class="space-y-5" onsubmit="return false;">
-        <div>
-          <label class="text-sm font-medium text-white/60 block mb-2">Nombre completo</label>
-          <input type="text" placeholder="Tu nombre" class="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.08] transition-all text-sm">
-        </div>
-        <div>
-          <label class="text-sm font-medium text-white/60 block mb-2">Correo electrónico</label>
-          <input type="email" placeholder="tu@correo.com" class="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.08] transition-all text-sm">
-        </div>
-        <div>
-          <label class="text-sm font-medium text-white/60 block mb-2">Contraseña</label>
-          <input type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.08] transition-all text-sm">
-        </div>
-        <div>
-          <label class="text-sm font-medium text-white/60 block mb-2">Confirmar contraseña</label>
-          <input type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.08] transition-all text-sm">
-        </div>
-        <button type="submit" class="w-full py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25">
-          Crear cuenta
-        </button>
+        <div><label class="text-sm font-medium text-white/60 block mb-2">Nombre completo</label>
+          <input type="text" placeholder="Tu nombre" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all"></div>
+        <div><label class="text-sm font-medium text-white/60 block mb-2">Correo electrónico</label>
+          <input type="email" placeholder="tu@correo.com" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all"></div>
+        <div><label class="text-sm font-medium text-white/60 block mb-2">Contraseña</label>
+          <input type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all"></div>
+        <div><label class="text-sm font-medium text-white/60 block mb-2">Confirmar contraseña</label>
+          <input type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all"></div>
+        <button type="submit" class="w-full py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25">Crear cuenta</button>
       </form>
-
-      <p class="text-center text-sm text-white/40 mt-6">
-        ¿Ya tienes cuenta? <a href="login.html" class="text-violet-400 hover:text-violet-300 transition font-medium">Inicia sesión</a>
-      </p>
+      <p class="text-center text-sm text-white/40 mt-6">¿Ya tienes cuenta? <a href="login.html" class="text-violet-400 hover:text-violet-300 transition font-medium">Inicia sesión</a></p>
     </div>
   </div>
 
   <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      leleTheme.applySavedTheme();
+      const tc = document.getElementById('themeToggleContainer');
+      if (tc && !tc.querySelector('.theme-toggle')) tc.appendChild(leleTheme.createToggle());
+    });
+  </script>
 </body>
 </html>
