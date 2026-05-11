@@ -1,0 +1,44 @@
+// ─── Supabase Configuration ──────────────────────────────
+// 1. Create a free project at https://supabase.com
+// 2. Go to Project Settings → API
+// 3. Copy your Project URL and anon/public key below
+// 4. Run sql/schema.sql in the Supabase SQL Editor
+// ─────────────────────────────────────────────────────────
+
+const SUPABASE_CONFIG = {
+  url: '',
+  anonKey: ''
+};
+
+// ─── Supabase client singleton ───────────────────────────
+let _supabaseClient = null;
+
+function getSupabaseClient() {
+  if (_supabaseClient) return _supabaseClient;
+  if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
+    console.warn('⚠️ Supabase not configured. Using localStorage fallback.');
+    return null;
+  }
+  if (typeof supabase === 'undefined') {
+    console.warn('⚠️ Supabase JS SDK not loaded. Using localStorage fallback.');
+    return null;
+  }
+  _supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+  return _supabaseClient;
+}
+
+// ─── Check if Supabase is available ──────────────────────
+function isSupabaseReady() {
+  const sb = getSupabaseClient();
+  return sb !== null;
+}
+
+// ─── Load Supabase SDK if not present ────────────────────
+(function ensureSupabaseSDK() {
+  if (typeof supabase !== 'undefined') return;
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+  script.onload = () => console.log('✅ Supabase SDK loaded');
+  script.onerror = () => console.warn('⚠️ Failed to load Supabase SDK');
+  document.head.appendChild(script);
+})();

@@ -123,6 +123,8 @@
     </div>
   </div>
 
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/supabase-db.js"></script>
   <script src="../js/auth.js"></script>
   <script>
     // ─── Sidebar mobile ─────────────────────────────────
@@ -146,8 +148,8 @@
     });
 
     // ─── Gestión de trabajos ────────────────────────────
-    function renderWorks() {
-      const works = JSON.parse(localStorage.getItem('lele_works') || '[]');
+    async function renderWorks() {
+      const works = await dbGetWorks();
       const list = document.getElementById('worksList');
       if (works.length === 0) {
         list.innerHTML = '<div class="text-center text-white/30 py-10">No hay trabajos todavía</div>';
@@ -162,27 +164,25 @@
               <span class="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400">${w.category}</span>
             </div>
           </div>
-          <button onclick="deleteWork(${i})" class="text-xs text-white/30 hover:text-red-400 transition">Eliminar</button>
+          <button onclick="deleteWork('${w.id || i}')" class="text-xs text-white/30 hover:text-red-400 transition">Eliminar</button>
         </div>
       `).join('');
     }
 
-    function deleteWork(index) {
+    async function deleteWork(id) {
       if (!confirm('Eliminar este trabajo?')) return;
-      const works = JSON.parse(localStorage.getItem('lele_works') || '[]');
-      works.splice(index, 1);
-      localStorage.setItem('lele_works', JSON.stringify(works));
+      await dbDeleteWork(id);
       renderWorks();
     }
 
-    document.getElementById('clearAllWorks')?.addEventListener('click', () => {
+    document.getElementById('clearAllWorks')?.addEventListener('click', async () => {
       if (!confirm('Eliminar todos los trabajos?')) return;
-      localStorage.setItem('lele_works', '[]');
+      await dbDeleteAllWorks();
       renderWorks();
     });
 
     // ─── Upload ─────────────────────────────────────────
-    document.getElementById('workForm')?.addEventListener('submit', (e) => {
+    document.getElementById('workForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const title = document.getElementById('workTitle').value.trim();
       const description = document.getElementById('workDesc').value.trim();
@@ -193,10 +193,8 @@
 
       if (!title) { status.textContent = 'Falta el título'; return; }
 
-      const processImage = (imageData) => {
-        const works = JSON.parse(localStorage.getItem('lele_works') || '[]');
-        works.unshift({ title, description, category, image: imageData, createdAt: Date.now() });
-        localStorage.setItem('lele_works', JSON.stringify(works));
+      const processImage = async (imageData) => {
+        await dbAddWork({ title, description, category, image: imageData });
         document.getElementById('workTitle').value = '';
         document.getElementById('workDesc').value = '';
         fileInput.value = '';
@@ -210,7 +208,6 @@
         reader.onload = (e) => processImage(e.target.result);
         reader.readAsDataURL(fileInput.files[0]);
       } else {
-        // Gradiente basado en el color seleccionado
         const gradient = `linear-gradient(135deg, ${color}, ${color}88, #0a0a0f)`;
         processImage(gradient);
       }

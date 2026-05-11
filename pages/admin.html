@@ -86,40 +86,39 @@
     </div>
   </div>
 
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/supabase-db.js"></script>
   <script src="../js/auth.js"></script>
   <script>
-    function renderUsers(filter = '') {
-      let users = JSON.parse(localStorage.getItem('lele_users') || '[]');
+    async function renderUsers(filter = '') {
+      let users = await dbGetUsers();
       const currentUser = JSON.parse(localStorage.getItem('lele_user'));
       if (currentUser && !users.some(u => u.email === currentUser.email)) {
         users.push({ ...currentUser, registeredAt: Date.now() });
-        localStorage.setItem('lele_users', JSON.stringify(users));
       }
       const tbody = document.getElementById('usersTableBody');
       document.getElementById('totalUsers').textContent = users.length;
       document.getElementById('googleUsers').textContent = users.filter(u => u.isGoogle).length;
       document.getElementById('emailUsers').textContent = users.filter(u => !u.isGoogle).length;
       const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-      document.getElementById('newUsers').textContent = users.filter(u => u.registeredAt > weekAgo).length;
+      document.getElementById('newUsers').textContent = users.filter(u => (u.registeredAt || u.created_at ? new Date(u.created_at || u.registeredAt).getTime() : 0) > weekAgo).length;
 
       const filtered = filter ? users.filter(u => u.name?.toLowerCase().includes(filter.toLowerCase()) || u.email?.toLowerCase().includes(filter.toLowerCase())) : users;
       if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-white/30">${users.length === 0 ? 'Aún no hay usuarios registrados' : 'Sin resultados'}</td></tr>`;
         return;
       }
-      tbody.innerHTML = filtered.map((u, i) => `<tr class="border-b" style="border-color: var(--border-color);"><td class="p-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-xs font-bold shrink-0" ${u.picture ? `style="background-image:url('${u.picture}');background-size:cover"` : ''}>${u.picture ? '' : (u.name?.charAt(0)||'?').toUpperCase()}</div><span class="font-medium">${u.name||'Sin nombre'}</span></div></td><td class="p-4 text-white/60">${u.email||'—'}</td><td class="p-4 text-white/40 text-xs">${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-medium ${u.isGoogle ? 'bg-blue-500/10 text-blue-400' : 'bg-violet-500/10 text-violet-400'}">${u.isGoogle ? 'Google' : 'Email'}</span></td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400">Gratis</span></td><td class="p-4 text-right"><button onclick="removeUser(${i})" class="text-xs text-white/30 hover:text-red-400 transition">Eliminar</button></td></tr>`).join('');
+      tbody.innerHTML = filtered.map((u, i) => `<tr class="border-b" style="border-color: var(--border-color);"><td class="p-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-xs font-bold shrink-0" ${u.picture ? `style="background-image:url('${u.picture}');background-size:cover"` : ''}>${u.picture ? '' : (u.name?.charAt(0)||'?').toUpperCase()}</div><span class="font-medium">${u.name||'Sin nombre'}</span></div></td><td class="p-4 text-white/60">${u.email||'—'}</td><td class="p-4 text-white/40 text-xs">${(u.registeredAt || u.created_at) ? new Date(u.created_at || u.registeredAt).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-medium ${u.isGoogle ? 'bg-blue-500/10 text-blue-400' : 'bg-violet-500/10 text-violet-400'}">${u.isGoogle ? 'Google' : u.role === 'admin' ? 'Admin' : 'Email'}</span></td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400">${u.plan || 'Gratis'}</span></td><td class="p-4 text-right"><button onclick="removeUser('${u.id || u.email}')" class="text-xs text-white/30 hover:text-red-400 transition">Eliminar</button></td></tr>`).join('');
     }
-    function removeUser(index) {
+    async function removeUser(id) {
       if (!confirm('¿Eliminar este usuario?')) return;
-      const users = JSON.parse(localStorage.getItem('lele_users') || '[]');
-      users.splice(index, 1);
-      localStorage.setItem('lele_users', JSON.stringify(users));
+      await dbRemoveUser(id);
       renderUsers(document.getElementById('searchInput').value);
     }
     document.getElementById('searchInput').addEventListener('input', (e) => renderUsers(e.target.value));
-    document.getElementById('exportBtn').addEventListener('click', () => {
-      const users = JSON.parse(localStorage.getItem('lele_users') || '[]');
-      const csv = 'Nombre,Email,Registro,Método,Plan\n' + users.map(u => `"${u.name||''}","${u.email||''}","${new Date(u.registeredAt).toLocaleString()}","${u.isGoogle?'Google':'Email'}","Gratis"`).join('\n');
+    document.getElementById('exportBtn').addEventListener('click', async () => {
+      const users = await dbGetUsers();
+      const csv = 'Nombre,Email,Registro,Método,Plan\n' + users.map(u => `"${u.name||''}","${u.email||''}","${new Date(u.created_at || u.registeredAt).toLocaleString()}","${u.isGoogle?'Google':'Email'}","${u.plan || 'Gratis'}"`).join('\n');
       const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'}); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `usuarios_lele_${new Date().toISOString().slice(0,10)}.csv`; link.click();
     });
 

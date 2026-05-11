@@ -57,12 +57,15 @@
     <div id="lightboxInfo" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white text-sm bg-black/50 px-6 py-3 rounded-full backdrop-blur-md"></div>
   </div>
 
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/supabase-db.js"></script>
   <script src="../js/main.js"></script>
   <script>
-    // ─── Cargar trabajos desde localStorage ─────────────
-    function loadGallery(filter = 'all') {
+    // ─── Cargar trabajos desde Supabase / localStorage ──
+    async function loadGallery(filter = 'all') {
       const grid = document.getElementById('galleryGrid');
-      const works = JSON.parse(localStorage.getItem('lele_works') || '[]');
+      const works = await dbGetWorks();
+      _currentWorks = works;
 
       if (works.length === 0) {
         grid.innerHTML = `<div class="col-span-full text-center text-white/30 py-20">
@@ -98,16 +101,16 @@
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightboxImg');
     const lightboxInfo = document.getElementById('lightboxInfo');
+    let _currentWorks = [];
 
     function openLightbox(index, filter) {
-      const works = JSON.parse(localStorage.getItem('lele_works') || '[]');
-      const filtered = filter === 'all' ? works : works.filter(w => w.category === filter);
+      const filtered = filter === 'all' ? _currentWorks : _currentWorks.filter(w => w.category === filter);
       const work = filtered[index];
       if (!work) return;
       lightboxImg.style.background = work.image;
       lightboxImg.style.backgroundSize = 'cover';
       lightboxImg.style.backgroundPosition = 'center';
-      lightboxImg.src = ''; // es gradiente, no src real
+      lightboxImg.src = '';
       lightboxInfo.textContent = `${work.title} — ${work.category}`;
       lightbox.classList.remove('opacity-0', 'pointer-events-none');
     }
