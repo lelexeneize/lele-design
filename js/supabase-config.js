@@ -6,8 +6,8 @@
 // ─────────────────────────────────────────────────────────
 
 const SUPABASE_CONFIG = {
-  url: '',
-  anonKey: ''
+  url: 'https://qovtekqxruusqhscacqn.supabase.co',
+  anonKey: 'sb_publishable_iZ9oKQoxTU0ui2kAUhCcLg_CrXpI1S2'
 };
 
 // ─── Supabase client singleton ───────────────────────────
