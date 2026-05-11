@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="../js/theme.js"></script>
-  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="font-['Inter']">
 
@@ -22,121 +22,108 @@
     </div>
   </nav>
 
-  <main class="pt-24 pb-20 px-6 max-w-3xl mx-auto">
+  <main class="pt-24 pb-20 px-6 max-w-2xl mx-auto">
     <div class="text-center mb-12">
       <h1 class="text-4xl md:text-5xl font-black mb-4 text-white">Completá tu compra</h1>
       <p class="text-white/40" id="planDisplay">Seleccioná un plan para continuar</p>
     </div>
 
-    <!-- Plan selector compacto -->
-    <div class="flex flex-wrap justify-center gap-3 mb-10">
-      <button onclick="selectPlan('essential', 45000)" class="plan-btn px-6 py-3 rounded-full glass-hover text-sm text-white/60 hover:text-white transition-all border border-white/[0.06]">Essential — $45.000 ARS</button>
-      <button onclick="selectPlan('pro', 65000)" class="plan-btn px-6 py-3 rounded-full bg-violet-600/20 border-violet-500/50 text-white font-medium text-sm transition-all">Pro — $65.000 ARS</button>
-      <button onclick="selectPlan('elite', 85000)" class="plan-btn px-6 py-3 rounded-full glass-hover text-sm text-white/60 hover:text-white transition-all border border-white/[0.06]">Elite — $85.000 ARS</button>
+    <div id="planSelector" class="space-y-3 mb-10">
+      <button onclick="selectPlan('essential')" class="plan-btn w-full text-left p-5 rounded-2xl border border-white/[0.06] glass-hover transition-all">
+        <div class="flex justify-between items-center">
+          <div>
+            <span class="text-white font-bold">Essential</span>
+            <p class="text-white/40 text-sm">12 optimizaciones esenciales</p>
+          </div>
+          <div class="text-right">
+            <p class="text-white font-bold">$45 USD</p>
+            <p class="text-white/30 text-xs">ARS $45.000</p>
+          </div>
+        </div>
+      </button>
+      <button onclick="selectPlan('pro')" class="plan-btn w-full text-left p-5 rounded-2xl border-violet-500/30 bg-violet-600/10 border transition-all">
+        <div class="flex justify-between items-center">
+          <div>
+            <span class="text-white font-bold">Pro</span>
+            <p class="text-white/40 text-sm">Todo Essential + optimización avanzada</p>
+          </div>
+          <div class="text-right">
+            <p class="text-white font-bold">$65 USD</p>
+            <p class="text-white/30 text-xs">ARS $65.000</p>
+          </div>
+        </div>
+      </button>
+      <button onclick="selectPlan('elite')" class="plan-btn w-full text-left p-5 rounded-2xl border border-white/[0.06] glass-hover transition-all">
+        <div class="flex justify-between items-center">
+          <div>
+            <span class="text-white font-bold">Elite</span>
+            <p class="text-white/40 text-sm">Todo Pro + optimización kernel y soporte 30d</p>
+          </div>
+          <div class="text-right">
+            <p class="text-white font-bold">$85 USD</p>
+            <p class="text-white/30 text-xs">ARS $85.000</p>
+          </div>
+        </div>
+      </button>
     </div>
 
-    <!-- Datos del comprador -->
-    <div class="p-8 rounded-2xl glass mb-8">
-      <h3 class="text-lg font-bold mb-6 text-white">Tus datos</h3>
-      <div class="space-y-4">
-        <div>
-          <label class="text-sm font-medium opacity-60 block mb-1.5">Nombre completo</label>
-          <input id="buyerName" type="text" placeholder="Tu nombre" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all">
+    <div id="paymentOptions" class="hidden space-y-4">
+      <div class="p-6 rounded-2xl glass text-center">
+        <h3 class="text-lg font-bold text-white mb-1" id="summaryPlan">Seleccioná un plan</h3>
+        <p class="text-white/40 text-sm mb-6" id="summaryPrice">—</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a id="mpButton" href="#" target="_blank" class="flex-1 px-6 py-4 rounded-full bg-[#00BFFF] hover:bg-[#009ACD] text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#00BFFF]/25">
+            <i class="fab fa-mercadopago text-lg"></i> Pagar con Mercado Pago
+          </a>
+          <a id="ppButton" href="#" target="_blank" class="flex-1 px-6 py-4 rounded-full bg-[#0070BA] hover:bg-[#005DA6] text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#0070BA]/25">
+            <i class="fab fa-paypal text-lg"></i> Pagar con PayPal
+          </a>
         </div>
-        <div>
-          <label class="text-sm font-medium opacity-60 block mb-1.5">Email</label>
-          <input id="buyerEmail" type="email" placeholder="tu@email.com" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all">
-        </div>
+        <p class="text-white/20 text-xs mt-4"><i class="fas fa-lock mr-1"></i> Pago 100% seguro</p>
       </div>
     </div>
-
-    <!-- Resumen -->
-    <div class="p-8 rounded-2xl glass mb-8">
-      <div class="flex justify-between items-center">
-        <div>
-          <h3 class="text-lg font-bold text-white" id="summaryPlan">Seleccioná un plan</h3>
-          <p class="text-sm text-white/40" id="summaryPrice">—</p>
-        </div>
-        <button id="payButton" onclick="startPayment()" class="px-8 py-4 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold transition-all shadow-lg shadow-violet-600/25 text-base disabled:opacity-40 disabled:cursor-not-allowed" disabled>
-          Ir a pagar
-        </button>
-      </div>
-    </div>
-
-    <!-- MercadoPago brick -->
-    <div id="wallet_container" class="hidden"></div>
 
     <div class="text-center text-white/20 text-xs mt-8">
-      <i class="fas fa-lock mr-1"></i> Pago 100% seguro vía Mercado Pago
+      ¿Consultas? Escribinos a <a href="mailto:hola@leledesign.com" class="text-violet-400 hover:text-violet-300">hola@leledesign.com</a>
     </div>
   </main>
 
   <script>
-    let selectedPlan = null;
-    let selectedPrice = 0;
+    const PLANS = {
+      essential: { name: 'Essential', priceUSD: 45, priceARS: 45000, mp: 'https://mpago.la/16LPzvD', pp: 'https://paypal.me/leleballan/45' },
+      pro:       { name: 'Pro',       priceUSD: 65, priceARS: 65000, mp: 'https://mpago.la/2cQ6RDK', pp: 'https://paypal.me/leleballan/65' },
+      elite:     { name: 'Elite',     priceUSD: 85, priceARS: 85000, mp: 'https://mpago.la/1WfM3hA', pp: 'https://paypal.me/leleballan/85' }
+    };
 
-    // Read plan from URL
+    let selectedPlan = null;
+
     const urlParams = new URLSearchParams(window.location.search);
     const urlPlan = urlParams.get('plan');
-    if (urlPlan) {
-      const prices = { essential: 45000, pro: 65000, elite: 85000 };
-      if (prices[urlPlan]) {
-        setTimeout(() => selectPlan(urlPlan, prices[urlPlan]), 100);
-      }
+    if (urlPlan && PLANS[urlPlan]) {
+      setTimeout(() => selectPlan(urlPlan), 100);
     }
 
-    function selectPlan(plan, price) {
+    function selectPlan(plan) {
       selectedPlan = plan;
-      selectedPrice = price;
-      document.querySelectorAll('.plan-btn').forEach(b => {
-        b.classList.remove('bg-violet-600/20', 'border-violet-500/50', 'text-white');
-        b.classList.add('text-white/60');
-      });
-      event.target.classList.add('bg-violet-600/20', 'border-violet-500/50', 'text-white');
-      event.target.classList.remove('text-white/60');
+      const p = PLANS[plan];
 
-      const names = { essential: 'Essential', pro: 'Pro', elite: 'Elite' };
-      document.getElementById('summaryPlan').textContent = `Sabina Optimizer — ${names[plan]}`;
-      document.getElementById('summaryPrice').textContent = `ARS $${price.toLocaleString()}`;
-      document.getElementById('planDisplay').textContent = `Plan seleccionado: ${names[plan]}`;
-      document.getElementById('payButton').disabled = false;
-    }
-
-    async function startPayment() {
-      const name = document.getElementById('buyerName').value.trim();
-      const email = document.getElementById('buyerEmail').value.trim();
-
-      if (!name || !email) {
-        alert('Completá nombre y email');
-        return;
-      }
-
-      const btn = document.getElementById('payButton');
-      btn.textContent = '⏳ Procesando...';
-      btn.disabled = true;
-
-      try {
-        const resp = await fetch('/api/create-preference.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ plan: selectedPlan, name, email })
-        });
-
-        const data = await resp.json();
-
-        if (data.init_point) {
-          // Redirect to Mercado Pago
-          window.location.href = data.init_point;
+      document.querySelectorAll('.plan-btn').forEach((b, i) => {
+        const keys = Object.keys(PLANS);
+        if (keys[i] === plan) {
+          b.classList.add('border-violet-500/30', 'bg-violet-600/10');
+          b.classList.remove('border-white/[0.06]');
         } else {
-          alert('Error al crear el pago: ' + (data.error || 'desconocido'));
-          btn.textContent = 'Ir a pagar';
-          btn.disabled = false;
+          b.classList.remove('border-violet-500/30', 'bg-violet-600/10');
+          b.classList.add('border-white/[0.06]');
         }
-      } catch (err) {
-        alert('Error de conexión. ¿El backend está configurado?');
-        btn.textContent = 'Ir a pagar';
-        btn.disabled = false;
-      }
+      });
+
+      document.getElementById('summaryPlan').textContent = `Sabina Optimizer — ${p.name}`;
+      document.getElementById('summaryPrice').textContent = `$${p.priceUSD} USD · ARS $${p.priceARS.toLocaleString()}`;
+      document.getElementById('mpButton').href = p.mp;
+      document.getElementById('ppButton').href = p.pp;
+      document.getElementById('planDisplay').textContent = `Plan seleccionado: ${p.name}`;
+      document.getElementById('paymentOptions').classList.remove('hidden');
     }
   </script>
 </body>
