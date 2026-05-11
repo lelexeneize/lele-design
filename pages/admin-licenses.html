@@ -76,37 +76,51 @@
   <script src="../js/supabase-db.js"></script>
   <script src="../js/auth.js"></script>
   <script>
+    function generateLicenseKey(plan) {
+      const prefix = plan.substring(0, 2).toUpperCase();
+      const segments = [];
+      const chars = '0123456789ABCDEF';
+      for (let i = 0; i < 4; i++) {
+        let seg = '';
+        for (let j = 0; j < 6; j++) seg += chars[Math.floor(Math.random() * 16)];
+        segments.push(seg);
+      }
+      return `${prefix}-${segments.join('-')}`;
+    }
+
     async function generateKeys() {
       const plan = document.getElementById('keyPlan').value;
       const count = parseInt(document.getElementById('keyCount').value) || 1;
       const status = document.getElementById('genStatus');
+      const sb = getSupabaseClient();
+
+      if (!sb) {
+        status.textContent = '❌ Supabase no configurado';
+        return;
+      }
 
       status.textContent = 'Generando...';
+      const keys = [];
 
-      try {
-        const resp = await fetch('/api/create-license.js', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer admin-key-aqui' // TODO: reemplazar con key real
-          },
-          body: JSON.stringify({ plan, count })
+      for (let i = 0; i < count; i++) {
+        const key = generateLicenseKey(plan);
+        const { error } = await sb.from('license_keys').insert({
+          key: key,
+          plan: plan,
+          status: 'active'
         });
+        if (!error) keys.push(key);
+      }
 
-        const data = await resp.json();
-
-        if (data.keys) {
-          const output = document.getElementById('keysOutput');
-          const textarea = document.getElementById('keysText');
-          output.classList.remove('hidden');
-          textarea.value = data.keys.join('\n');
-          status.textContent = `✅ ${data.keys.length} key(s) generadas`;
-          loadStats();
-        } else {
-          status.textContent = '❌ ' + (data.error || 'Error');
-        }
-      } catch (err) {
-        status.textContent = '❌ Error de conexión';
+      if (keys.length > 0) {
+        const output = document.getElementById('keysOutput');
+        const textarea = document.getElementById('keysText');
+        output.classList.remove('hidden');
+        textarea.value = keys.join('\n');
+        status.textContent = `✅ ${keys.length} key(s) generadas`;
+        loadStats();
+      } else {
+        status.textContent = '❌ Error generando keys. ¿Tenés permisos de admin?';
       }
     }
 

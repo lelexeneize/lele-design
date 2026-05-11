@@ -75,6 +75,16 @@
     let selectedPlan = null;
     let selectedPrice = 0;
 
+    // Read plan from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlPlan = urlParams.get('plan');
+    if (urlPlan) {
+      const prices = { essential: 45000, pro: 65000, elite: 85000 };
+      if (prices[urlPlan]) {
+        setTimeout(() => selectPlan(urlPlan, prices[urlPlan]), 100);
+      }
+    }
+
     function selectPlan(plan, price) {
       selectedPlan = plan;
       selectedPrice = price;
