@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sabina Optimizer — Lele Design</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="../js/theme.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="font-['Inter']">
+
+  <!-- NAVBAR -->
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style="background: rgba(10,10,15,0.7);">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="../index.html" class="text-2xl font-black tracking-tight">
+        <span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span>
+        <span class="text-white/70 font-light">Design</span>
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-white/60">
+        <a href="../index.html#servicios" class="hover:text-white transition">Servicios</a>
+        <a href="../index.html#trabajos" class="hover:text-white transition">Trabajos</a>
+        <a href="trabajos.html" class="hover:text-white transition">Galería</a>
+        <a href="optimizer.html" class="text-white transition">Optimizer</a>
+        <a href="../index.html#contacto" class="hover:text-white transition">Contacto</a>
+      </div>
+      <div class="flex items-center gap-3">
+        <div id="themeToggleContainer"></div>
+        <a href="login.html" class="text-sm text-white/70 hover:text-white transition">Ingresar</a>
+        <a href="register.html" class="text-sm px-4 py-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold transition-all shadow-lg shadow-violet-600/25">
+          Registrarse
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+    <div class="absolute inset-0 bg-gradient-to-br from-violet-900/20 via-transparent to-cyan-900/20"></div>
+    <div class="absolute inset-0">
+      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-[120px] animate-pulse"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600/15 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s"></div>
+    </div>
+    <div class="relative z-10 text-center max-w-4xl mx-auto px-6">
+      <div class="text-6xl mb-6">⚡</div>
+      <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-white/60 mb-6">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        Optimización Windows profesional
+      </span>
+      <h1 class="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6">
+        <span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">Sabina</span>
+        <span class="text-white">Optimizer</span>
+      </h1>
+      <p class="text-lg md:text-xl text-white/40 max-w-2xl mx-auto mb-10 leading-relaxed">
+        Máximo rendimiento para tu PC. Nuestra app optimiza Windows, reduce latencia, 
+        limpia el sistema y ajusta cada capa para gaming y productividad.
+      </p>
+    </div>
+  </section>
+
+  <!-- PLANES -->
+  <section class="py-24 relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <span class="text-xs uppercase tracking-[0.2em] text-violet-400 font-semibold">Planes</span>
+        <h2 class="text-4xl md:text-5xl font-black mt-4 text-white">Elegí tu plan</h2>
+        <p class="text-white/40 mt-4 max-w-xl mx-auto">Optimización progresiva según tus necesidades</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+
+        <!-- Essential -->
+        <div class="p-8 rounded-2xl glass glass-hover transition-all flex flex-col">
+          <div class="mb-6">
+            <div class="text-3xl mb-3">🚀</div>
+            <h3 class="text-xl font-bold text-white">Essential</h3>
+            <p class="text-white/40 text-sm mt-1">Para un boost de respuesta inmediato</p>
+          </div>
+          <div class="mb-6">
+            <p class="text-4xl font-black text-white">$45</p>
+            <p class="text-white/30 text-sm">ARS $45.000</p>
+          </div>
+          <ul class="space-y-3 mb-8 text-sm flex-1">
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Optimización Windows</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Optimización de Red & DNS</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Configuración en Juego</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Optimización Input</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> App descargable + auto-ejecutable</li>
+          </ul>
+          <a href="#" class="block text-center py-3 rounded-full border border-white/10 hover:border-white/20 text-sm font-medium transition-all text-white/60 hover:text-white">
+            Comprar ahora
+          </a>
+        </div>
+
+        <!-- PRO -->
+        <div class="p-8 rounded-2xl bg-gradient-to-b from-violet-600/10 to-fuchsia-600/10 border border-violet-500/30 relative flex flex-col">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-xs font-semibold text-white">Más vendido</div>
+          <div class="mb-6">
+            <div class="text-3xl mb-3">🔥</div>
+            <h3 class="text-xl font-bold text-white">Pro</h3>
+            <p class="text-white/40 text-sm mt-1">Para jugadores competitivos</p>
+          </div>
+          <div class="mb-6">
+            <p class="text-4xl font-black text-white">$65</p>
+            <p class="text-white/30 text-sm">ARS $65.000</p>
+          </div>
+          <ul class="space-y-3 mb-8 text-sm flex-1">
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Todo Essential</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> BIOS & Configuraciones Ocultas</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Overclock CPU/GPU</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Limpieza de Drivers & Bloatware</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> GPU Shader Cache & Driver Tweak</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Optimización Monitor & Refresh Rate</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Mouse Polling & Raw Input</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Conexión remota + instalación</li>
+          </ul>
+          <a href="#" class="block text-center py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25">
+            Comprar ahora
+          </a>
+        </div>
+
+        <!-- Elite -->
+        <div class="p-8 rounded-2xl glass glass-hover transition-all flex flex-col">
+          <div class="mb-6">
+            <div class="text-3xl mb-3">💎</div>
+            <h3 class="text-xl font-bold text-white">Elite</h3>
+            <p class="text-white/40 text-sm mt-1">El techo absoluto del rendimiento</p>
+          </div>
+          <div class="mb-6">
+            <p class="text-4xl font-black text-white">$85</p>
+            <p class="text-white/30 text-sm">ARS $85.000</p>
+          </div>
+          <ul class="space-y-3 mb-8 text-sm flex-1">
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Todo Pro</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Optimización a nivel Kernel</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> DPC Latency & IRQ Fix</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> RAM Timings (primarios/secundarios/terciarios)</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Undervolting CPU/GPU</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Reporte de Benchmarks Antes/Después</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Punto de Restauración + Garantía</li>
+            <li class="flex items-start gap-3 text-white/60"><i class="fas fa-check text-emerald-400 mt-0.5"></i> Conexión remota + instalación + soporte 30 días</li>
+          </ul>
+          <a href="#" class="block text-center py-3 rounded-full border border-white/10 hover:border-white/20 text-sm font-medium transition-all text-white/60 hover:text-white">
+            Comprar ahora
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARATIVA -->
+  <section class="py-24 bg-white/[0.02] relative">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-black mt-4 text-white">Comparativa completa</h2>
+        <p class="text-white/40 mt-4 max-w-xl mx-auto">Todo lo que incluye cada plan al detalle</p>
+      </div>
+      <div class="overflow-x-auto rounded-2xl border border-white/[0.06]">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-white/[0.06] text-white/40 text-xs uppercase tracking-wider">
+              <th class="text-left p-5 font-medium">Característica</th>
+              <th class="text-center p-5 font-medium">Essential</th>
+              <th class="text-center p-5 font-medium text-violet-400">Pro</th>
+              <th class="text-center p-5 font-medium">Elite</th>
+            </tr>
+          </thead>
+          <tbody class="text-white/60">
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Optimización Windows</td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Optimización de Red & DNS</td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Configuración en Juego</td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Optimización Input</td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">App descargable auto-ejecutable</td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">BIOS & Configuraciones Ocultas</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Overclock CPU/GPU</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Limpieza Drivers & Bloatware</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">GPU Shader Cache & Driver Tweak</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Monitor & Refresh Rate</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Mouse Polling & Raw Input</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Conexión remota + instalación</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Optimización nivel Kernel</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">DPC Latency & IRQ Fix</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">RAM Timings avanzados</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Undervolting CPU/GPU</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Benchmarks Antes/Después</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr class="border-b border-white/[0.04]"><td class="p-4">Punto Restauración + Garantía</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+            <tr><td class="p-4">Soporte Post-Sesión 30 días</td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center text-white/20"><i class="fas fa-times"></i></td><td class="text-center"><i class="fas fa-check text-emerald-400"></i></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="py-24">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-black mt-4 text-white">Cómo funciona</h2>
+        <p class="text-white/40 mt-4 max-w-xl mx-auto">En 3 simples pasos</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="text-center">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-2xl font-black text-white mb-4">1</div>
+          <h3 class="text-lg font-bold text-white mb-2">Elegí tu plan</h3>
+          <p class="text-white/40 text-sm">Seleccioná Essential, Pro o Elite según lo que necesites optimizar.</p>
+        </div>
+        <div class="text-center">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center text-2xl font-black text-white mb-4">2</div>
+          <h3 class="text-lg font-bold text-white mb-2">Descargá la app</h3>
+          <p class="text-white/40 text-sm">Recibí el link de descarga de Sabina Optimizer según tu plan.</p>
+        </div>
+        <div class="text-center">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center text-2xl font-black text-white mb-4">3</div>
+          <h3 class="text-lg font-bold text-white mb-2">Ejecutá y optimizá</h3>
+          <p class="text-white/40 text-sm">Corré la app como administrador y deja que haga su magia. En minutos notás la diferencia.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-24 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-violet-600/10 via-fuchsia-600/10 to-cyan-600/10"></div>
+    <div class="relative z-10 max-w-3xl mx-auto text-center px-6">
+      <h2 class="text-4xl md:text-5xl font-black mb-6 text-white">¿Listo para llevar tu PC al máximo?</h2>
+      <p class="text-white/40 text-lg mb-10">Elegí tu plan y empezá a optimizar hoy.</p>
+      <a href="#" class="inline-block px-10 py-4 rounded-full bg-white text-[#0a0a0f] font-bold hover:bg-white/90 transition-all text-base">
+        Ver planes
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-white/[0.06] py-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid md:grid-cols-4 gap-10 mb-12">
+        <div class="md:col-span-2">
+          <a href="../index.html" class="text-2xl font-black tracking-tight">
+            <span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span>
+            <span class="text-white/70 font-light">Design</span>
+          </a>
+          <p class="text-white/40 text-sm mt-4 max-w-sm leading-relaxed">
+            Transformamos ideas en experiencias visuales impactantes. Optimizamos tu PC para máxima performance.
+          </p>
+        </div>
+        <div>
+          <h4 class="text-sm font-semibold mb-4 text-white">Servicios</h4>
+          <ul class="space-y-2 text-sm text-white/40">
+            <li><a href="../index.html" class="hover:text-white transition">Diseño</a></li>
+            <li><a href="optimizer.html" class="hover:text-white transition">Optimizer</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-sm font-semibold mb-4 text-white">Contacto</h4>
+          <ul class="space-y-2 text-sm text-white/40">
+            <li>hola@leledesign.com</li>
+            <li>@leledesign</li>
+            <li>Buenos Aires, AR</li>
+          </ul>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-white/[0.06] text-center text-sm text-white/30">
+        © 2026 Lele Design. Todos los derechos reservados.
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      leleTheme.applySavedTheme();
+      const tc = document.getElementById('themeToggleContainer');
+      if (tc && !tc.querySelector('.theme-toggle')) tc.appendChild(leleTheme.createToggle());
+    });
+  </script>
+</body>
+</html>
