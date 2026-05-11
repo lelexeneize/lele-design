@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comprar — Sabina Optimizer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="../js/theme.js"></script>
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+</head>
+<body class="font-['Inter']">
+
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style="background: rgba(10,10,15,0.7);">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="../index.html" class="text-2xl font-black tracking-tight">
+        <span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span>
+        <span class="text-white/70 font-light">Design</span>
+      </a>
+      <a href="optimizer.html" class="text-sm text-white/60 hover:text-white transition">← Volver</a>
+    </div>
+  </nav>
+
+  <main class="pt-24 pb-20 px-6 max-w-3xl mx-auto">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-black mb-4 text-white">Completá tu compra</h1>
+      <p class="text-white/40" id="planDisplay">Seleccioná un plan para continuar</p>
+    </div>
+
+    <!-- Plan selector compacto -->
+    <div class="flex flex-wrap justify-center gap-3 mb-10">
+      <button onclick="selectPlan('essential', 45000)" class="plan-btn px-6 py-3 rounded-full glass-hover text-sm text-white/60 hover:text-white transition-all border border-white/[0.06]">Essential — $45.000 ARS</button>
+      <button onclick="selectPlan('pro', 65000)" class="plan-btn px-6 py-3 rounded-full bg-violet-600/20 border-violet-500/50 text-white font-medium text-sm transition-all">Pro — $65.000 ARS</button>
+      <button onclick="selectPlan('elite', 85000)" class="plan-btn px-6 py-3 rounded-full glass-hover text-sm text-white/60 hover:text-white transition-all border border-white/[0.06]">Elite — $85.000 ARS</button>
+    </div>
+
+    <!-- Datos del comprador -->
+    <div class="p-8 rounded-2xl glass mb-8">
+      <h3 class="text-lg font-bold mb-6 text-white">Tus datos</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm font-medium opacity-60 block mb-1.5">Nombre completo</label>
+          <input id="buyerName" type="text" placeholder="Tu nombre" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all">
+        </div>
+        <div>
+          <label class="text-sm font-medium opacity-60 block mb-1.5">Email</label>
+          <input id="buyerEmail" type="email" placeholder="tu@email.com" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all">
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="p-8 rounded-2xl glass mb-8">
+      <div class="flex justify-between items-center">
+        <div>
+          <h3 class="text-lg font-bold text-white" id="summaryPlan">Seleccioná un plan</h3>
+          <p class="text-sm text-white/40" id="summaryPrice">—</p>
+        </div>
+        <button id="payButton" onclick="startPayment()" class="px-8 py-4 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold transition-all shadow-lg shadow-violet-600/25 text-base disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+          Ir a pagar
+        </button>
+      </div>
+    </div>
+
+    <!-- MercadoPago brick -->
+    <div id="wallet_container" class="hidden"></div>
+
+    <div class="text-center text-white/20 text-xs mt-8">
+      <i class="fas fa-lock mr-1"></i> Pago 100% seguro vía Mercado Pago
+    </div>
+  </main>
+
+  <script>
+    let selectedPlan = null;
+    let selectedPrice = 0;
+
+    function selectPlan(plan, price) {
+      selectedPlan = plan;
+      selectedPrice = price;
+      document.querySelectorAll('.plan-btn').forEach(b => {
+        b.classList.remove('bg-violet-600/20', 'border-violet-500/50', 'text-white');
+        b.classList.add('text-white/60');
+      });
+      event.target.classList.add('bg-violet-600/20', 'border-violet-500/50', 'text-white');
+      event.target.classList.remove('text-white/60');
+
+      const names = { essential: 'Essential', pro: 'Pro', elite: 'Elite' };
+      document.getElementById('summaryPlan').textContent = `Sabina Optimizer — ${names[plan]}`;
+      document.getElementById('summaryPrice').textContent = `ARS $${price.toLocaleString()}`;
+      document.getElementById('planDisplay').textContent = `Plan seleccionado: ${names[plan]}`;
+      document.getElementById('payButton').disabled = false;
+    }
+
+    async function startPayment() {
+      const name = document.getElementById('buyerName').value.trim();
+      const email = document.getElementById('buyerEmail').value.trim();
+
+      if (!name || !email) {
+        alert('Completá nombre y email');
+        return;
+      }
+
+      const btn = document.getElementById('payButton');
+      btn.textContent = '⏳ Procesando...';
+      btn.disabled = true;
+
+      try {
+        const resp = await fetch('/api/create-preference.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan: selectedPlan, name, email })
+        });
+
+        const data = await resp.json();
+
+        if (data.init_point) {
+          // Redirect to Mercado Pago
+          window.location.href = data.init_point;
+        } else {
+          alert('Error al crear el pago: ' + (data.error || 'desconocido'));
+          btn.textContent = 'Ir a pagar';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        alert('Error de conexión. ¿El backend está configurado?');
+        btn.textContent = 'Ir a pagar';
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
