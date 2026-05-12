@@ -1,7 +1,7 @@
 ╔══════════════════════════════════════════════════════════════╗
 ║  Sabina Optimizer v1.0                                   ║
 ║  Windows Performance Optimization Tool                    ║
-║  By Lele Design - https://leledesign.vercel.app           ║
+║  By Lele Design - https://leleoficial.vercel.app           ║
 ╚══════════════════════════════════════════════════════════════╝
 
 CÓMO USAR:
@@ -29,6 +29,6 @@ PLANES:
   Pro        - Conexión remota + instalación (USD 65 / ARS 65.000)
   Elite      - Soporte 30 días + garantía (USD 85 / ARS 85.000)
 
-Comprar: https://leledesign.vercel.app/pages/optimizer.html
+Comprar: https://leleoficial.vercel.app/pages/optimizer.html
 
 SOPORTE: hola@leledesign.com
