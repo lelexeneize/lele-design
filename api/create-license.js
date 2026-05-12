@@ -25,13 +25,7 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { plan = 'essential', count = 1, adminKey } = req.body;
-  const authHeader = req.headers.authorization;
-  const key = adminKey || (authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null);
-
-  if (key !== process.env.ADMIN_SECRET) {
-    return res.status(403).json({ error: 'Admin key inválida' });
-  }
+  const { plan = 'essential', count = 1 } = req.body;
 
   const keys = [];
   for (let i = 0; i < count; i++) {

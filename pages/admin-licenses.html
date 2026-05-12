@@ -88,8 +88,6 @@
       return `${prefix}-${segments.join('-')}`;
     }
 
-    const ADMIN_SECRET = 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh';
-
     async function generateKeys() {
       const plan = document.getElementById('keyPlan').value;
       const count = parseInt(document.getElementById('keyCount').value) || 1;
@@ -100,7 +98,7 @@
         const resp = await fetch('/api/create-license', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ plan, count, adminKey: ADMIN_SECRET })
+          body: JSON.stringify({ plan, count })
         });
         const result = await resp.json();
         if (result.keys && result.keys.length > 0) {
