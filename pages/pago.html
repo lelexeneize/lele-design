@@ -219,11 +219,12 @@
       const btn = document.getElementById('mpButton');
       btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Creando preferencia...';
       btn.style.pointerEvents = 'none';
+      const currentEmail = document.getElementById('buyerEmail')?.value || '';
       try {
         const res = await fetch('/api/create-preference', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ plan })
+          body: JSON.stringify({ plan, email: currentEmail })
         });
         const data = await res.json();
         if (data.init_point) {

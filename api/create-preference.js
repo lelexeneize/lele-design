@@ -54,7 +54,11 @@ module.exports = async (req, res) => {
           pending: 'https://leleoficial.vercel.app/pages/pago.html'
         },
         auto_return: 'approved',
-        notification_url: 'https://leleoficial.vercel.app/api/webhook.js'
+        notification_url: 'https://leleoficial.vercel.app/api/webhook.js',
+        metadata: {
+          plan: plan,
+          email: email || 'comprador@email.com'
+        }
       })
     });
 
