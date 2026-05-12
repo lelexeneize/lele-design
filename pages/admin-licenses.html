@@ -90,14 +90,7 @@
 
     const ADMIN_SECRET = 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh';
 
-    async function generateKeysViaAPI(plan, count) {
-      const resp = await fetch('/api/create-license', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ADMIN_SECRET },
-        body: JSON.stringify({ plan, count })
-      });
-      return await resp.json();
-    }
+    const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvdnRla3F4cnV1c3Foc2NhY3FuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODU0MDI4MSwiZXhwIjoyMDk0MTE2MjgxfQ.qi10zx-39NLHeBqaf3NLEtqqPEEhBCtCvrmrGF8pdiU';
 
     async function generateKeys() {
       const plan = document.getElementById('keyPlan').value;
@@ -105,17 +98,29 @@
       const status = document.getElementById('genStatus');
       status.textContent = 'Generando...';
 
-      const result = await generateKeysViaAPI(plan, count);
-
-      if (result.keys && result.keys.length > 0) {
-        const output = document.getElementById('keysOutput');
-        const textarea = document.getElementById('keysText');
-        output.classList.remove('hidden');
-        textarea.value = result.keys.join('\n');
-        status.textContent = `✅ ${result.keys.length} key(s) generadas`;
-        loadStats();
-      } else {
-        status.textContent = '❌ ' + (result.error || 'Error generando keys');
+      try {
+        const sbAdmin = supabase.createClient(
+          'https://qovtekqxruusqhscacqn.supabase.co',
+          SERVICE_KEY
+        );
+        const keys = [];
+        for (let i = 0; i < count; i++) {
+          const key = generateLicenseKey(plan);
+          const { error } = await sbAdmin.from('license_keys').insert({
+            key: key, plan: plan, status: 'active'
+          });
+          if (!error) keys.push(key);
+        }
+        if (keys.length > 0) {
+          document.getElementById('keysOutput').classList.remove('hidden');
+          document.getElementById('keysText').value = keys.join('\n');
+          status.textContent = `✅ ${keys.length} key(s) generadas`;
+          loadStats();
+        } else {
+          status.textContent = '❌ Error al insertar en Supabase';
+        }
+      } catch (e) {
+        status.textContent = '❌ ' + e.message;
       }
     }
 
