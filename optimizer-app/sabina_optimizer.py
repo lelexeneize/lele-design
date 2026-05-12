@@ -168,37 +168,28 @@ def save_license(key):
 # ── Restore Point ───────────────────────────────────────────────────
 def create_restore_point():
     desc = f"SabinaOptimizer_{datetime.datetime.now():%Y%m%d_%H%M%S}"
-    # Intentar metodo directo primero (mas compatible)
-    ps_direct = f"Checkpoint-Computer -Description '{desc}' -RestorePointType MODIFY_SETTINGS -EA SilentlyContinue"
-    try:
-        r = subprocess.run(["powershell", "-NoProfile", "-Command", ps_direct],
-                           capture_output=True, text=True, timeout=60)
-        if r.returncode == 0:
-            return (True, f"Punto de restauracion '{desc}' creado correctamente")
-    except subprocess.TimeoutExpired:
-        return (False, "Timeout al crear punto de restauracion")
-    except:
-        pass
-    # Fallback: intentar con WMI
-    ps_wmi = (
-        "$sr = Get-CimInstance -ClassName SystemRestore -Filter \"Drive='C'\" -ErrorAction SilentlyContinue; "
-        f"Checkpoint-Computer -Description '{desc}' -RestorePointType MODIFY_SETTINGS -ErrorAction SilentlyContinue"
-    )
-    try:
-        r = subprocess.run(["powershell", "-NoProfile", "-Command", ps_wmi],
-                           capture_output=True, text=True, timeout=60)
-        if r.returncode == 0:
-            return (True, f"Punto de restauracion '{desc}' creado correctamente")
-        err = r.stderr.strip()
-        if "0x80041010" in err:
-            return (False, "Restaurar sistema no esta disponible. Activalo desde 'Crear punto de restauracion' en Windows.")
-        if "admin" in err.lower() or "privilege" in err.lower() or "access denied" in err.lower():
-            return (False, "Ejecuta SabinaOptimizer como ADMINISTRADOR (clic derecho > Ejecutar como administrador)")
-        return (False, err or "Restaurar sistema no habilitado. Activalo en 'Crear punto de restauracion' de Windows.")
-    except subprocess.TimeoutExpired:
-        return (False, "Timeout al crear punto de restauracion")
-    except Exception as e:
-        return (False, f"No se pudo crear: {e}")
+    err = ""
+    # Intentar Checkpoint-Computer directo (sin -EA para ver el error real)
+    for attempt, cmd in [
+        ("Directo", f"Checkpoint-Computer -Description '{desc}' -RestorePointType MODIFY_SETTINGS"),
+        ("Fallback", f"Checkpoint-Computer -Description '{desc}' -RestorePointType MODIFY_SETTINGS 2>&1"),
+    ]:
+        try:
+            r = subprocess.run(["powershell", "-NoProfile", "-Command", cmd],
+                               capture_output=True, text=True, timeout=60)
+            if r.returncode == 0:
+                return (True, f"Punto de restauracion '{desc}' creado correctamente")
+            err = (r.stderr.strip() or r.stdout.strip() or err)
+        except subprocess.TimeoutExpired:
+            err = "Timeout al crear punto de restauracion"
+        except Exception as e:
+            err = f"{err} | {e}" if err else str(e)
+    # Interpretar el error real
+    if "0x80041010" in err:
+        return (False, "Restaurar sistema no esta disponible. Activalo desde 'Crear punto de restauracion' de Windows.")
+    if any(kw in err.lower() for kw in ("admin", "privilege", "access denied", "permission", "denegado", "elevado")):
+        return (False, "Ejecuta SabinaOptimizer como ADMINISTRADOR (clic derecho > Ejecutar como administrador)")
+    return (False, err or "No se pudo crear el punto de restauracion.")
 
 # ── Log ─────────────────────────────────────────────────────────────
 def write_log(msg):
