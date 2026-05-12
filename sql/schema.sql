@@ -92,7 +92,7 @@ CREATE POLICY "Admin can manage all works"
   );
 
 -- ─── License keys ──────────────────────────────────────────
-CREATE TABLE license_keys (
+CREATE TABLE IF NOT EXISTS license_keys (
   key TEXT PRIMARY KEY,
   plan TEXT NOT NULL DEFAULT 'essential',
   status TEXT NOT NULL DEFAULT 'active',
