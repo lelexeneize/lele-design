@@ -11,7 +11,9 @@ Add-Type -AssemblyName System.Drawing
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
 $script:APP_VERSION = "4.0"
-$script:APP_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
+$script:ScriptPath = if ($MyInvocation.MyCommand.Path) { $MyInvocation.MyCommand.Path } else { $PSCommandPath }
+if (-not $script:ScriptPath) { $script:ScriptPath = (Get-Location).Path + "\SabinaOptimizer.ps1" }
+$script:APP_DIR = Split-Path -Parent $script:ScriptPath
 $script:DEV_FILE = Join-Path $script:APP_DIR "DEV_MODE"
 $script:LogPath = "$env:USERPROFILE\Desktop\SabinaOptimizer_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
 $script:UserPlan = "none"
@@ -127,7 +129,7 @@ function Show-MainWindow {
 
     $form = New-Object System.Windows.Forms.Form
     $form.Text = "Sabina Optimizer v$script:APP_VERSION"
-    $form.Size = New-Object Drawing.Size(1100, 780)
+    $form.Size = [Drawing.Size]::new(1100, 780)
     $form.StartPosition = "CenterScreen"
     $form.BackColor = [Drawing.Color]::FromArgb(10,10,15)
     $form.FormBorderStyle = "FixedSingle"
@@ -135,7 +137,7 @@ function Show-MainWindow {
 
     # ── Title bar ──
     $titleBar = New-Object System.Windows.Forms.Panel
-    $titleBar.Size = New-Object Drawing.Size(1100, 44)
+    $titleBar.Size = [Drawing.Size]::new(1100, 44)
     $titleBar.BackColor = [Drawing.Color]::FromArgb(15,15,26)
     $titleBar.Dock = "Top"
     $form.Controls.Add($titleBar)
@@ -144,14 +146,14 @@ function Show-MainWindow {
     $titleLabel.Text = "  Sabina Optimizer v$script:APP_VERSION"
     $titleLabel.Font = $FONT_TITLE
     $titleLabel.ForeColor = [Drawing.Color]::FromArgb(168,85,247)
-    $titleLabel.Size = New-Object Drawing.Size(400, 44)
-    $titleLabel.Location = New-Object Drawing.Point(10,0)
+    $titleLabel.Size = [Drawing.Size]::new(400, 44)
+    $titleLabel.Location = [Drawing.Point]::new(10,0)
     $titleBar.Controls.Add($titleLabel)
 
     # ── License bar ──
     $licenseBar = New-Object System.Windows.Forms.Panel
-    $licenseBar.Size = New-Object Drawing.Size(1100, 44)
-    $licenseBar.Location = New-Object Drawing.Point(0,44)
+    $licenseBar.Size = [Drawing.Size]::new(1100, 44)
+    $licenseBar.Location = [Drawing.Point]::new(0,44)
     $licenseBar.BackColor = [Drawing.Color]::FromArgb(20,20,32)
     $licenseBar.BorderStyle = "FixedSingle"
     $form.Controls.Add($licenseBar)
@@ -160,13 +162,13 @@ function Show-MainWindow {
     $lockIcon.Text = "KEY:"
     $lockIcon.Font = $FONT_BTN
     $lockIcon.ForeColor = [Drawing.Color]::FromArgb(136,136,136)
-    $lockIcon.Size = New-Object Drawing.Size(50, 30)
-    $lockIcon.Location = New-Object Drawing.Point(12, 7)
+    $lockIcon.Size = [Drawing.Size]::new(50, 30)
+    $lockIcon.Location = [Drawing.Point]::new(12, 7)
     $licenseBar.Controls.Add($lockIcon)
 
     $licenseInput = New-Object System.Windows.Forms.TextBox
-    $licenseInput.Size = New-Object Drawing.Size(220, 28)
-    $licenseInput.Location = New-Object Drawing.Point(60, 7)
+    $licenseInput.Size = [Drawing.Size]::new(220, 28)
+    $licenseInput.Location = [Drawing.Point]::new(60, 7)
     $licenseInput.BackColor = [Drawing.Color]::FromArgb(10,10,15)
     $licenseInput.ForeColor = [Drawing.Color]::White
     $licenseInput.BorderStyle = "FixedSingle"
@@ -175,8 +177,8 @@ function Show-MainWindow {
 
     $validateBtn = New-Object System.Windows.Forms.Button
     $validateBtn.Text = "Validar"
-    $validateBtn.Size = New-Object Drawing.Size(80, 28)
-    $validateBtn.Location = New-Object Drawing.Point(286, 7)
+    $validateBtn.Size = [Drawing.Size]::new(80, 28)
+    $validateBtn.Location = [Drawing.Point]::new(286, 7)
     $validateBtn.BackColor = [Drawing.Color]::FromArgb(168,85,247)
     $validateBtn.ForeColor = [Drawing.Color]::White
     $validateBtn.FlatStyle = "Flat"
@@ -188,8 +190,8 @@ function Show-MainWindow {
     $licenseStatus.Text = ""
     $licenseStatus.Font = $FONT_SMALL
     $licenseStatus.ForeColor = [Drawing.Color]::FromArgb(136,136,136)
-    $licenseStatus.Size = New-Object Drawing.Size(200, 28)
-    $licenseStatus.Location = New-Object Drawing.Point(375, 8)
+    $licenseStatus.Size = [Drawing.Size]::new(200, 28)
+    $licenseStatus.Location = [Drawing.Point]::new(375, 8)
     $licenseBar.Controls.Add($licenseStatus)
 
     $planBadge = New-Object System.Windows.Forms.Label
@@ -198,8 +200,8 @@ function Show-MainWindow {
     $planBadge.ForeColor = [Drawing.Color]::White
     $planBadge.BackColor = [Drawing.Color]::FromArgb(239,68,68)
     $planBadge.TextAlign = "MiddleCenter"
-    $planBadge.Size = New-Object Drawing.Size(140, 28)
-    $planBadge.Location = New-Object Drawing.Point(920, 7)
+    $planBadge.Size = [Drawing.Size]::new(140, 28)
+    $planBadge.Location = [Drawing.Point]::new(920, 7)
     $licenseBar.Controls.Add($planBadge)
 
     function Update-PlanBadge {
@@ -227,8 +229,8 @@ function Show-MainWindow {
 
     # ── Category tabs ──
     $catBar = New-Object System.Windows.Forms.Panel
-    $catBar.Size = New-Object Drawing.Size(1100, 36)
-    $catBar.Location = New-Object Drawing.Point(0,88)
+    $catBar.Size = [Drawing.Size]::new(1100, 36)
+    $catBar.Location = [Drawing.Point]::new(0,88)
     $catBar.BackColor = [Drawing.Color]::FromArgb(10,10,15)
     $form.Controls.Add($catBar)
 
@@ -238,8 +240,8 @@ function Show-MainWindow {
     function MakeCatBtn($text, $x, $cat) {
         $btn = New-Object System.Windows.Forms.Button
         $btn.Text = $text
-        $btn.Size = New-Object Drawing.Size(140, 30)
-        $btn.Location = New-Object Drawing.Point($x, 3)
+        $btn.Size = [Drawing.Size]::new(140, 30)
+        $btn.Location = [Drawing.Point]::new($x, 3)
         $btn.FlatStyle = "Flat"
         $btn.Font = $FONT_BTN
         $btn.Cursor = "Hand"
@@ -261,22 +263,22 @@ function Show-MainWindow {
 
     # ── Scrollable optimization panel ──
     $optScroll = New-Object System.Windows.Forms.Panel
-    $optScroll.Size = New-Object Drawing.Size(1080, 400)
-    $optScroll.Location = New-Object Drawing.Point(10, 128)
+    $optScroll.Size = [Drawing.Size]::new(1080, 400)
+    $optScroll.Location = [Drawing.Point]::new(10, 128)
     $optScroll.AutoScroll = $true
     $form.Controls.Add($optScroll)
 
     # ── Console output ──
     $consolePanel = New-Object System.Windows.Forms.Panel
-    $consolePanel.Size = New-Object Drawing.Size(1080, 150)
-    $consolePanel.Location = New-Object Drawing.Point(10, 532)
+    $consolePanel.Size = [Drawing.Size]::new(1080, 150)
+    $consolePanel.Location = [Drawing.Point]::new(10, 532)
     $consolePanel.BackColor = [Drawing.Color]::FromArgb(10,10,15)
     $consolePanel.BorderStyle = "FixedSingle"
     $form.Controls.Add($consolePanel)
 
     $consoleHeader = New-Object System.Windows.Forms.Label
     $consoleHeader.Text = "  Consola"
-    $consoleHeader.Size = New-Object Drawing.Size(1080, 24)
+    $consoleHeader.Size = [Drawing.Size]::new(1080, 24)
     $consoleHeader.BackColor = [Drawing.Color]::FromArgb(20,20,32)
     $consoleHeader.ForeColor = [Drawing.Color]::FromArgb(136,136,136)
     $consoleHeader.Font = $FONT_SMALL
@@ -284,8 +286,8 @@ function Show-MainWindow {
 
     $outputBox = New-Object System.Windows.Forms.TextBox
     $outputBox.Multiline = $true
-    $outputBox.Size = New-Object Drawing.Size(1076, 122)
-    $outputBox.Location = New-Object Drawing.Point(2, 26)
+    $outputBox.Size = [Drawing.Size]::new(1076, 122)
+    $outputBox.Location = [Drawing.Point]::new(2, 26)
     $outputBox.Font = $FONT_MONO
     $outputBox.BackColor = [Drawing.Color]::FromArgb(10,10,15)
     $outputBox.ForeColor = [Drawing.Color]::FromArgb(0,255,136)
@@ -297,15 +299,15 @@ function Show-MainWindow {
 
     # ── Bottom bar ──
     $bottomBar = New-Object System.Windows.Forms.Panel
-    $bottomBar.Size = New-Object Drawing.Size(1100, 50)
-    $bottomBar.Location = New-Object Drawing.Point(0, 690)
+    $bottomBar.Size = [Drawing.Size]::new(1100, 50)
+    $bottomBar.Location = [Drawing.Point]::new(0, 690)
     $bottomBar.BackColor = [Drawing.Color]::FromArgb(20,20,32)
     $form.Controls.Add($bottomBar)
 
     $selAllBtn = New-Object System.Windows.Forms.Button
     $selAllBtn.Text = "Seleccionar todo"
-    $selAllBtn.Size = New-Object Drawing.Size(140, 34)
-    $selAllBtn.Location = New-Object Drawing.Point(20, 8)
+    $selAllBtn.Size = [Drawing.Size]::new(140, 34)
+    $selAllBtn.Location = [Drawing.Point]::new(20, 8)
     $selAllBtn.FlatStyle = "Flat"
     $selAllBtn.BackColor = [Drawing.Color]::FromArgb(26,26,46)
     $selAllBtn.ForeColor = [Drawing.Color]::White
@@ -315,8 +317,8 @@ function Show-MainWindow {
 
     $desAllBtn = New-Object System.Windows.Forms.Button
     $desAllBtn.Text = "Deseleccionar todo"
-    $desAllBtn.Size = New-Object Drawing.Size(140, 34)
-    $desAllBtn.Location = New-Object Drawing.Point(170, 8)
+    $desAllBtn.Size = [Drawing.Size]::new(140, 34)
+    $desAllBtn.Location = [Drawing.Point]::new(170, 8)
     $desAllBtn.FlatStyle = "Flat"
     $desAllBtn.BackColor = [Drawing.Color]::FromArgb(26,26,46)
     $desAllBtn.ForeColor = [Drawing.Color]::White
@@ -326,8 +328,8 @@ function Show-MainWindow {
 
     $runBtn = New-Object System.Windows.Forms.Button
     $runBtn.Text = "Ejecutar seleccionadas"
-    $runBtn.Size = New-Object Drawing.Size(180, 38)
-    $runBtn.Location = New-Object Drawing.Point(690, 6)
+    $runBtn.Size = [Drawing.Size]::new(180, 38)
+    $runBtn.Location = [Drawing.Point]::new(690, 6)
     $runBtn.FlatStyle = "Flat"
     $runBtn.BackColor = [Drawing.Color]::FromArgb(168,85,247)
     $runBtn.ForeColor = [Drawing.Color]::White
@@ -337,8 +339,8 @@ function Show-MainWindow {
 
     $runAllBtn = New-Object System.Windows.Forms.Button
     $runAllBtn.Text = "EJECUTAR TODO"
-    $runAllBtn.Size = New-Object Drawing.Size(160, 38)
-    $runAllBtn.Location = New-Object Drawing.Point(880, 6)
+    $runAllBtn.Size = [Drawing.Size]::new(160, 38)
+    $runAllBtn.Location = [Drawing.Point]::new(880, 6)
     $runAllBtn.FlatStyle = "Flat"
     $runAllBtn.BackColor = [Drawing.Color]::FromArgb(34,211,238)
     $runAllBtn.ForeColor = [Drawing.Color]::Black
@@ -371,8 +373,8 @@ function Show-MainWindow {
             $lockMsg.Text = "  Ingresa tu license key para desbloquear las optimizaciones"
             $lockMsg.Font = New-Object Drawing.Font("Segoe UI", 14)
             $lockMsg.ForeColor = [Drawing.Color]::FromArgb(136,136,136)
-            $lockMsg.Size = New-Object Drawing.Size(600, 40)
-            $lockMsg.Location = New-Object Drawing.Point(20, 30)
+            $lockMsg.Size = [Drawing.Size]::new(600, 40)
+            $lockMsg.Location = [Drawing.Point]::new(20, 30)
             $optScroll.Controls.Add($lockMsg)
             return
         }
@@ -384,16 +386,16 @@ function Show-MainWindow {
 
             # Card panel
             $card = New-Object System.Windows.Forms.Panel
-            $card.Size = New-Object Drawing.Size(1050, 70)
-            $card.Location = New-Object Drawing.Point(5, $y)
+            $card.Size = [Drawing.Size]::new(1050, 70)
+            $card.Location = [Drawing.Point]::new(5, $y)
             $card.BackColor = [Drawing.Color]::FromArgb(20,20,32)
             $card.BorderStyle = "FixedSingle"
             if ($isLocked) { $card.BackColor = [Drawing.Color]::FromArgb(15,15,26) }
 
             # Checkbox
             $cb = New-Object System.Windows.Forms.CheckBox
-            $cb.Size = New-Object Drawing.Size(20, 60)
-            $cb.Location = New-Object Drawing.Point(8, 5)
+            $cb.Size = [Drawing.Size]::new(20, 60)
+            $cb.Location = [Drawing.Point]::new(8, 5)
             $cb.Checked = (-not $isLocked)
             $cb.Enabled = (-not $isLocked)
             $cb.Tag = $opt.id
@@ -412,8 +414,8 @@ function Show-MainWindow {
                 [Convert]::ToInt32($catColors[$opt.category].Substring(5,2),16)
             )
             $catBadge.TextAlign = "MiddleCenter"
-            $catBadge.Size = New-Object Drawing.Size(65, 16)
-            $catBadge.Location = New-Object Drawing.Point(700, 10)
+            $catBadge.Size = [Drawing.Size]::new(65, 16)
+            $catBadge.Location = [Drawing.Point]::new(700, 10)
             $card.Controls.Add($catBadge)
 
             # Risk badge
@@ -428,8 +430,8 @@ function Show-MainWindow {
                 [Convert]::ToInt32($riskColors[$opt.risk].Substring(5,2),16)
             )
             $riskBadge.TextAlign = "MiddleCenter"
-            $riskBadge.Size = New-Object Drawing.Size(42, 16)
-            $riskBadge.Location = New-Object Drawing.Point(770, 10)
+            $riskBadge.Size = [Drawing.Size]::new(42, 16)
+            $riskBadge.Location = [Drawing.Point]::new(770, 10)
             $card.Controls.Add($riskBadge)
 
             # Name
@@ -437,8 +439,8 @@ function Show-MainWindow {
             $nameLabel.Text = $opt.name
             $nameLabel.Font = New-Object Drawing.Font("Segoe UI", 10, [Drawing.FontStyle]::Bold)
             $nameLabel.ForeColor = [Drawing.Color]::White
-            $nameLabel.Size = New-Object Drawing.Size(500, 20)
-            $nameLabel.Location = New-Object Drawing.Point(32, 8)
+            $nameLabel.Size = [Drawing.Size]::new(500, 20)
+            $nameLabel.Location = [Drawing.Point]::new(32, 8)
             $card.Controls.Add($nameLabel)
 
             # Description
@@ -446,8 +448,8 @@ function Show-MainWindow {
             $descLabel.Text = $opt.desc
             $descLabel.Font = New-Object Drawing.Font("Segoe UI", 8)
             $descLabel.ForeColor = [Drawing.Color]::FromArgb(136,136,136)
-            $descLabel.Size = New-Object Drawing.Size(660, 18)
-            $descLabel.Location = New-Object Drawing.Point(32, 30)
+            $descLabel.Size = [Drawing.Size]::new(660, 18)
+            $descLabel.Location = [Drawing.Point]::new(32, 30)
             $card.Controls.Add($descLabel)
 
             # Script preview toggle
@@ -457,16 +459,16 @@ function Show-MainWindow {
             $scriptToggle.FlatStyle = "Flat"
             $scriptToggle.BackColor = [Drawing.Color]::FromArgb(26,26,46)
             $scriptToggle.ForeColor = [Drawing.Color]::FromArgb(136,136,136)
-            $scriptToggle.Size = New-Object Drawing.Size(55, 18)
-            $scriptToggle.Location = New-Object Drawing.Point(820, 9)
+            $scriptToggle.Size = [Drawing.Size]::new(55, 18)
+            $scriptToggle.Location = [Drawing.Point]::new(820, 9)
             $scriptToggle.Cursor = "Hand"
             $scriptToggle.Tag = $null  # will store the script panel
             $card.Controls.Add($scriptToggle)
 
             # Script detail panel (hidden by default)
             $scriptDetail = New-Object System.Windows.Forms.Panel
-            $scriptDetail.Size = New-Object Drawing.Size(420, 16 + ($opt.commands.Count * 18))
-            $scriptDetail.Location = New-Object Drawing.Point(610, 32)
+            $scriptDetail.Size = [Drawing.Size]::new(420, 16 + ($opt.commands.Count * 18))
+            $scriptDetail.Location = [Drawing.Point]::new(610, 32)
             $scriptDetail.BackColor = [Drawing.Color]::FromArgb(10,10,15)
             $scriptDetail.Visible = $false
 
@@ -476,8 +478,8 @@ function Show-MainWindow {
                 $cmdLabel.Text = "> $cmd"
                 $cmdLabel.Font = New-Object Drawing.Font("Consolas", 8)
                 $cmdLabel.ForeColor = [Drawing.Color]::FromArgb(34,211,238)
-                $cmdLabel.Size = New-Object Drawing.Size(410, 16)
-                $cmdLabel.Location = New-Object Drawing.Point(6, $sy)
+                $cmdLabel.Size = [Drawing.Size]::new(410, 16)
+                $cmdLabel.Location = [Drawing.Point]::new(6, $sy)
                 $scriptDetail.Controls.Add($cmdLabel)
                 $sy += 18
             }
@@ -491,7 +493,7 @@ function Show-MainWindow {
             $y += 76
         }
 
-        $optScroll.AutoScrollMargin = New-Object Drawing.Size(0, 10)
+        $optScroll.AutoScrollMargin = [Drawing.Size]::new(0, 10)
     }
 
     # ── Wire events ──
