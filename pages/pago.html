@@ -31,42 +31,89 @@
     </div>
 
     <div id="planSelector" class="space-y-3 mb-10">
-      <button onclick="selectPlan('essential')" class="plan-btn w-full text-left p-5 rounded-2xl border border-white/[0.06] glass-hover transition-all">
-        <div class="flex justify-between items-center">
-          <div>
-            <span class="text-white font-bold">Essential</span>
-            <p class="text-white/40 text-sm">12 optimizaciones esenciales</p>
-          </div>
-          <div class="text-right">
-            <p class="text-white font-bold">u$s45</p>
-            <p class="text-white/30 text-xs">$45.000 ARS</p>
-          </div>
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-white mb-3">Sabina Optimizer</h2>
+        <div class="space-y-3">
+          <button onclick="selectPlan('essential')" class="plan-btn w-full text-left p-5 rounded-2xl border border-white/[0.06] glass-hover transition-all">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-white font-bold">Essential</span>
+                <p class="text-white/40 text-sm">12 optimizaciones esenciales</p>
+              </div>
+              <div class="text-right">
+                <p class="text-white font-bold">u$s45</p>
+                <p class="text-white/30 text-xs">$45.000 ARS</p>
+              </div>
+            </div>
+          </button>
+          <button onclick="selectPlan('pro')" class="plan-btn w-full text-left p-5 rounded-2xl border-violet-500/30 bg-violet-600/10 border transition-all">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-white font-bold">Pro</span>
+                <p class="text-white/40 text-sm">Todo Essential + optimización avanzada</p>
+              </div>
+              <div class="text-right">
+                <p class="text-white font-bold">u$s65</p>
+                <p class="text-white/30 text-xs">$65.000 ARS</p>
+              </div>
+            </div>
+          </button>
+          <button onclick="selectPlan('elite')" class="plan-btn w-full text-left p-5 rounded-2xl border border-white/[0.06] glass-hover transition-all">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-white font-bold">Elite</span>
+                <p class="text-white/40 text-sm">Todo Pro + optimización kernel y soporte 30d</p>
+              </div>
+              <div class="text-right">
+                <p class="text-white font-bold">u$s85</p>
+                <p class="text-white/30 text-xs">$85.000 ARS</p>
+              </div>
+            </div>
+          </button>
         </div>
-      </button>
-      <button onclick="selectPlan('pro')" class="plan-btn w-full text-left p-5 rounded-2xl border-violet-500/30 bg-violet-600/10 border transition-all">
-        <div class="flex justify-between items-center">
-          <div>
-            <span class="text-white font-bold">Pro</span>
-            <p class="text-white/40 text-sm">Todo Essential + optimización avanzada</p>
-          </div>
-          <div class="text-right">
-            <p class="text-white font-bold">u$s65</p>
-            <p class="text-white/30 text-xs">$65.000 ARS</p>
-          </div>
+      </div>
+
+      <div>
+        <h2 class="text-lg font-bold text-white mb-3">Diseño</h2>
+        <div class="space-y-3">
+          <button onclick="selectPlan('starter')" class="plan-btn w-full text-left p-5 rounded-2xl border border-white/[0.06] glass-hover transition-all">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-white font-bold">Starter</span>
+                <p class="text-white/40 text-sm">Diseños IA + logo + flyers</p>
+              </div>
+              <div class="text-right">
+                <p class="text-white font-bold">u$s29</p>
+                <p class="text-white/30 text-xs">$35.000 ARS</p>
+              </div>
+            </div>
+          </button>
+          <button onclick="selectPlan('designpro')" class="plan-btn w-full text-left p-5 rounded-2xl border-violet-500/30 bg-violet-600/10 border transition-all">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-white font-bold">Pro</span>
+                <p class="text-white/40 text-sm">Diseños IA + web + TikTok ilimitado</p>
+              </div>
+              <div class="text-right">
+                <p class="text-white font-bold">u$s79</p>
+                <p class="text-white/30 text-xs">$95.000 ARS</p>
+              </div>
+            </div>
+          </button>
+          <button onclick="selectPlan('starter-enterprise')" class="plan-btn w-full text-left p-5 rounded-2xl border border-white/[0.06] glass-hover transition-all">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-white font-bold">Enterprise</span>
+                <p class="text-white/40 text-sm">Diseños IA + web ilimitadas + gerente dedicado</p>
+              </div>
+              <div class="text-right">
+                <p class="text-white font-bold">u$s199</p>
+                <p class="text-white/30 text-xs">$239.000 ARS</p>
+              </div>
+            </div>
+          </button>
         </div>
-      </button>
-      <button onclick="selectPlan('elite')" class="plan-btn w-full text-left p-5 rounded-2xl border border-white/[0.06] glass-hover transition-all">
-        <div class="flex justify-between items-center">
-          <div>
-            <span class="text-white font-bold">Elite</span>
-            <p class="text-white/40 text-sm">Todo Pro + optimización kernel y soporte 30d</p>
-          </div>
-          <div class="text-right">
-            <p class="text-white font-bold">u$s85</p>
-            <p class="text-white/30 text-xs">$85.000 ARS</p>
-          </div>
-        </div>
-      </button>
+      </div>
     </div>
 
     <div id="paymentOptions" class="hidden space-y-4">
@@ -92,9 +139,12 @@
 
   <script>
     const PLANS = {
-      essential: { name: 'Essential', priceUSD: 45, priceARS: 45000, mp: 'https://mpago.la/16LPzvD', pp: 'https://paypal.me/leleballan/45' },
-      pro:       { name: 'Pro',       priceUSD: 65, priceARS: 65000, mp: 'https://mpago.la/2cQ6RDK', pp: 'https://paypal.me/leleballan/65' },
-      elite:     { name: 'Elite',     priceUSD: 85, priceARS: 85000, mp: 'https://mpago.la/1WfM3hA', pp: 'https://paypal.me/leleballan/85' }
+      essential: { name: 'Sabina Optimizer — Essential', priceUSD: 45, priceARS: 45000, mp: 'https://mpago.la/16LPzvD', pp: 'https://paypal.me/leleballan/45' },
+      pro:       { name: 'Sabina Optimizer — Pro',       priceUSD: 65, priceARS: 65000, mp: 'https://mpago.la/2cQ6RDK', pp: 'https://paypal.me/leleballan/65' },
+      elite:     { name: 'Sabina Optimizer — Elite',     priceUSD: 85, priceARS: 85000, mp: 'https://mpago.la/1WfM3hA', pp: 'https://paypal.me/leleballan/85' },
+      starter:   { name: 'Diseño — Starter',             priceUSD: 29, priceARS: 35000, mp: '', pp: 'https://paypal.me/leleballan/29' },
+      designpro: { name: 'Diseño — Pro',                 priceUSD: 79, priceARS: 95000, mp: '', pp: 'https://paypal.me/leleballan/79' },
+      enterprise:{ name: 'Diseño — Enterprise',          priceUSD: 199, priceARS: 239000, mp: '', pp: 'https://paypal.me/leleballan/199' }
     };
 
     let selectedPlan = null;
