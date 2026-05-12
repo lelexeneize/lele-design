@@ -5,9 +5,13 @@
 
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
+const supabaseAnon = createClient(
   process.env.SUPABASE_URL || 'https://qovtekqxruusqhscacqn.supabase.co',
-  process.env.SUPABASE_ANON_KEY || 'sb_publishable_iZ9oKQoxTU0ui2kAUhCcLg_CrXpI1S2'
+  process.env.SUPABASE_ANON_KEY
+);
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL || 'https://qovtekqxruusqhscacqn.supabase.co',
+  process.env.SUPABASE_SERVICE_KEY
 );
 
 module.exports = async (req, res) => {
@@ -18,7 +22,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAnon
       .from('license_keys')
       .select('*')
       .eq('key', key)
@@ -32,11 +36,13 @@ module.exports = async (req, res) => {
       return res.status(403).json({ valid: false, error: 'Licencia ' + data.status });
     }
 
-    // Marcar como usada
-    await supabase
-      .from('license_keys')
-      .update({ status: 'used', used_at: new Date().toISOString() })
-      .eq('key', data.key);
+    // Marcar como usada (usando service key para bypass RLS)
+    if (process.env.SUPABASE_SERVICE_KEY) {
+      await supabaseAdmin
+        .from('license_keys')
+        .update({ status: 'used', used_at: new Date().toISOString() })
+        .eq('key', data.key);
+    }
 
     return res.json({
       valid: true,

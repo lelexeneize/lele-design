@@ -11,7 +11,7 @@ LICENSE_FILE = os.path.join(APP_DIR, "license.key")
 LOG_PATH = os.path.join(os.environ["USERPROFILE"], "Desktop",
     f"SabinaOptimizer_{datetime.datetime.now():%Y%m%d_%H%M%S}.log")
 MASTER_KEY = "SABINA-DEV-2026-MASTER"
-LICENSE_URL = "https://leledesign.vercel.app/api/validate-license.js?key="
+LICENSE_URL = "https://leleoficial.vercel.app/api/validate-license.js?key="
 
 IS_DEV_MODE = os.path.exists(DEV_FILE)
 user_plan = "none"
