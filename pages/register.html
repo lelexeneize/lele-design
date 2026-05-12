@@ -46,13 +46,6 @@
       </div>
 
       <div class="flex flex-col gap-3 mb-6">
-        <button onclick="socialRegister('facebook')" class="w-full py-3 rounded-full bg-[#1877F2] hover:bg-[#166fe5] text-white font-semibold text-sm transition-all flex items-center justify-center gap-3 shadow-lg shadow-[#1877F2]/25">
-          <i class="fab fa-facebook-f text-lg"></i> Registrarse con Facebook
-        </button>
-        <button onclick="socialRegister('apple')" class="w-full py-3 rounded-full bg-white hover:bg-gray-100 text-black font-semibold text-sm transition-all flex items-center justify-center gap-3 shadow-lg">
-          <i class="fab fa-apple text-lg"></i> Registrarse con Apple
-        </button>
-        <p class="text-[10px] text-white/20 text-center">Facebook/Apple requieren habilitarlos en Supabase Dashboard > Authentication > Providers</p>
       </div>
 
       <div class="relative mb-6">
@@ -83,20 +76,6 @@
   <script src="../js/supabase-db.js"></script>
   <script src="../js/auth.js"></script>
   <script>
-    async function socialRegister(provider) {
-      try {
-        const sb = getSupabaseClient();
-        if (sb) {
-          const { error } = await sb.auth.signInWithOAuth({ provider });
-          if (error) alert('Error al conectar con ' + provider + ': ' + error.message);
-        } else {
-          alert('Supabase no está configurado');
-        }
-      } catch (e) {
-        alert('El registro con ' + provider + ' no está disponible.\n\nHabilitarlo en: Supabase Dashboard > Authentication > Providers');
-      }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
       leleTheme.applySavedTheme();
       const tc = document.getElementById('themeToggleContainer');
