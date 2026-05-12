@@ -8,39 +8,58 @@
 
 ## Admin
 - Admin login: /pages/admin-login.html (solo usuarios con role=admin)
-- Admin dashboard: /pages/admin-dashboard.html
+- Admin dashboard: /pages/admin.html
+- Admin works: /pages/admin-works.html
+- Admin licenses: /pages/admin-licenses.html
 - Admin user: leandroballan@gmail.com (role: admin, plan: free, credits: 10)
+- Login 2FA ya solucionado
 
 ## Auth
 - Google OAuth configurado en Supabase
 - Callback URLs: https://leleoficial.vercel.app/pages/login.html
 - JS origins: https://leleoficial.vercel.app
 
-## Licencias
+## Licencias (sistema funcionando)
+- Ya todo implementado: create-license, validate-license, pago-exitoso genera key, descargar.html valida
 - Planes: Starter / Pro / Enterprise
-- Mercado Pago links:
+- Mercado Pago links directos:
   - Starter: https://mpago.la/32yd9dp
   - Pro: https://mpago.la/1eRVkzL
   - Enterprise: https://mpago.la/1WxgLEq
 - Licencias se validan contra: /api/validate-license.js
-- Admin puede generar/revocar licencias desde admin-licenses.html
+- Admin puede generar/revocar desde admin-licenses.html
+- Envio de email post-compra vía Resend (NO configurado - dominio público de Vercel no permite)
 
 ## Optimizer App (.exe)
 - Ruta: /optimizer-app/SabinaOptimizer.exe
 - Descarga: https://github.com/lelexeneize/lele-design/raw/main/optimizer-app/SabinaOptimizer.exe
 - Código fuente: /optimizer-app/sabina_optimizer.py
 - Master key: SABINA-DEV-2026-MASTER
-- DEV_MODE: crear archivo vacío DEV_MODE junto al .exe para saltar validación
+- DEV_MODE: archivo vacío junto al .exe saltea validación
 - Validación offline via MASTER_KEY, online via /api/validate-license.js
-- Nota: chimney=disabled está deprecado en netsh, se quitó del código
+- chimney=disabled quitado del código (deprecado)
 - Recompilar con: pyinstaller SabinaOptimizer.spec
+
+## Mercado Pago (pendiente)
+- MP_ACCESS_TOKEN no configurado en Vercel (no hace falta, los links directos andan)
+- create-preference.js y webhook.js existen pero no se usan porque no hay token
+- Flujo actual: usuario paga via link directo → vuelve a pago-exitoso → se genera license key manualmente
+
+## Páginas
+- index.html, login, register, dashboard, admin, admin-login, admin-licenses, admin-works
+- optimizer, pago, pago-exitoso, descargar
+- trabajos (galería), privacidad, terminos, eliminacion-datos
+- generator.html -> SOLO dice "Próximamente", placeholder
+
+## Pending
+- Resend: no funciona porque Vercel dominio público (necesita dominio custom)
+- generator.html: placeholder sin backend de IA
+- Faltan enlaces a políticas legales en el footer del index
+- admin-login invisible para usuarios normales
 
 ## Testing
 - Probar .exe en Windows Sandbox (Windows Pro)
-- Sandbox no tiene BCD (HPET falla), ni servicio Restore Point, ni GPU real
+- Sandbox no tiene BCD, Restore Point ni GPU real
 
 ## Local
 - Carpeta local: C:\Users\Usuario\Desktop\Lele Design
-
-## Pending / Known Issues
-- Algunos comandos del .exe muestran advertencias de deprecación (ej: chimney)
