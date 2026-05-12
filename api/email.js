@@ -1,9 +1,15 @@
-const { createClient } = require('@supabase/supabase-js');
+let supabase;
 
-const supabase = createClient(
-  process.env.SUPABASE_URL || 'https://qovtekqxruusqhscacqn.supabase.co',
-  process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY
-);
+function getSupabase() {
+  if (!supabase) {
+    const { createClient } = require('@supabase/supabase-js');
+    supabase = createClient(
+      process.env.SUPABASE_URL || 'https://qovtekqxruusqhscacqn.supabase.co',
+      process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || 'public'
+    );
+  }
+  return supabase;
+}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
@@ -58,11 +64,11 @@ module.exports = async (req, res) => {
     const result = await response.json();
     if (!response.ok) throw new Error(result?.errors?.[0]?.message || 'Error al enviar');
 
-    await supabase.from('license_keys').update({ emailed_at: new Date().toISOString() }).eq('key', key);
+    try { await getSupabase().from('license_keys').update({ emailed_at: new Date().toISOString() }).eq('key', key); } catch (_) {}
 
     return res.json({ sent: true, id: result?.id });
   } catch (err) {
-    console.error('Email error:', err);
+    console.error('Email error:', err.message);
     return res.status(200).json({ sent: false, error: err.message });
   }
 };
