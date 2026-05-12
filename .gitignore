@@ -8,3 +8,4 @@ optimizer-app/build/
 *.spec
 
 .vercel
+.env*.local
