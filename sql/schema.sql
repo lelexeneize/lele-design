@@ -90,3 +90,32 @@ CREATE POLICY "Admin can manage all works"
       AND profiles.role = 'admin'
     )
   );
+
+-- ─── License keys ──────────────────────────────────────────
+CREATE TABLE license_keys (
+  key TEXT PRIMARY KEY,
+  plan TEXT NOT NULL DEFAULT 'essential',
+  status TEXT NOT NULL DEFAULT 'active',
+  used_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE license_keys ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read license_keys"
+  ON license_keys FOR SELECT
+  USING (true);
+
+CREATE POLICY "Allow anon inserts"
+  ON license_keys FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "Admins can update license_keys"
+  ON license_keys FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE profiles.id = auth.uid()
+      AND profiles.role = 'admin'
+    )
+  );

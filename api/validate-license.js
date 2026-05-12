@@ -35,8 +35,8 @@ module.exports = async (req, res) => {
     // Marcar como usada
     await supabase
       .from('license_keys')
-      .update({ status: 'used', activated_at: new Date().toISOString() })
-      .eq('id', data.id);
+      .update({ status: 'used', used_at: new Date().toISOString() })
+      .eq('key', data.key);
 
     return res.json({
       valid: true,

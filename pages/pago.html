@@ -170,9 +170,10 @@
         }
       });
 
-      document.getElementById('summaryPlan').textContent = `Sabina Optimizer — ${p.name}`;
+      document.getElementById('summaryPlan').textContent = p.name;
       document.getElementById('summaryPrice').textContent = `u$${p.priceUSD} · $${p.priceARS.toLocaleString()} ARS`;
       document.getElementById('mpButton').href = p.mp;
+      document.getElementById('mpButton').style.display = p.mp ? 'flex' : 'none';
       document.getElementById('ppButton').href = p.pp;
       document.getElementById('planDisplay').textContent = `Plan seleccionado: ${p.name}`;
       document.getElementById('paymentOptions').classList.remove('hidden');

@@ -7,9 +7,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="../js/theme.js"></script>
 </head>
-<body class="bg-[#0a0a0f] text-white font-['Inter'] min-h-screen flex items-center justify-center">
-
+<body class="font-['Inter'] min-h-screen flex items-center justify-center">
   <div class="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-transparent to-orange-900/20"></div>
 
   <div class="relative z-10 w-full max-w-sm mx-6">
@@ -19,38 +20,82 @@
       <span class="block text-[10px] uppercase tracking-[0.2em] text-amber-400 font-semibold mt-1">Admin Panel</span>
     </a>
 
-    <div class="p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+    <div class="p-8 rounded-2xl glass">
       <h1 class="text-2xl font-bold mb-2">Acceso admin</h1>
-      <p class="text-white/40 text-sm mb-8">Solo personal autorizado</p>
+      <p class="text-white/40 text-sm mb-8">Iniciá sesión con tu cuenta de administrador</p>
+
+      <div id="g_id_onload"
+           data-client_id="835547393237-c0n1nfmf8e15gjugisqcgba3bqcq4gi6.apps.googleusercontent.com"
+           data-auto_prompt="false"
+           data-callback="handleGoogleLogin">
+      </div>
+      <div class="flex justify-center mb-6">
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="pill"
+             data-theme="outline"
+             data-text="signin_with"
+             data-size="large"
+             data-locale="es"
+             data-width="280">
+        </div>
+      </div>
+
+      <div class="relative mb-6">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t" style="border-color: var(--border-color);"></div></div>
+        <div class="relative flex justify-center"><span class="px-4 text-xs text-white/30" style="background: var(--bg-primary);">o con email</span></div>
+      </div>
 
       <form id="adminLoginForm" class="space-y-5">
         <div>
           <label class="text-sm font-medium text-white/60 block mb-2">Email</label>
-          <input id="adminEmail" type="email" value="admin@leledesign.com" class="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:bg-white/[0.08] transition-all text-sm">
+          <input id="adminEmail" type="email" placeholder="admin@ejemplo.com" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-amber-500/50 transition-all">
         </div>
         <div>
           <label class="text-sm font-medium text-white/60 block mb-2">Contraseña</label>
-          <input id="adminPass" type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:bg-white/[0.08] transition-all text-sm">
+          <input id="adminPass" type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-amber-500/50 transition-all">
         </div>
         <button type="submit" class="w-full py-3 rounded-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-semibold text-sm transition-all shadow-lg shadow-amber-600/25">
           Ingresar
         </button>
       </form>
+      <p class="text-center text-sm text-white/40 mt-6"><a href="login.html" class="text-amber-400 hover:text-amber-300 transition">← Usar login normal</a></p>
     </div>
   </div>
 
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/supabase-db.js"></script>
+  <script src="../js/auth.js"></script>
   <script>
-    document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('adminEmail').value.trim();
       const pass = document.getElementById('adminPass').value.trim();
+      const btn = e.target.querySelector('button[type="submit"]');
+      const orig = btn.textContent;
+      btn.textContent = 'Ingresando...';
+      btn.disabled = true;
 
-      // Credenciales hardcodeadas para demo
-      if (email === 'admin@leledesign.com' && pass === 'admin123') {
-        localStorage.setItem('lele_admin', 'true');
-        window.location.href = 'admin.html';
-      } else {
-        alert('Credenciales incorrectas. Probá:\nEmail: admin@leledesign.com\nPass: admin123');
+      try {
+        const sb = getSupabaseClient();
+        if (sb) {
+          const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+          if (!error && data.user) {
+            const { data: profile } = await sb.from('profiles').select('role').eq('id', data.user.id).single();
+            if (profile?.role === 'admin') {
+              localStorage.setItem('lele_user', JSON.stringify({ name: email, email, picture: '', isAdmin: true }));
+              window.location.href = 'admin.html';
+              return;
+            } else {
+              alert('Esta cuenta no tiene permisos de administrador.');
+            }
+          }
+        }
+        btn.textContent = 'Credenciales incorrectas';
+        setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2000);
+      } catch (_) {
+        btn.textContent = 'Error';
+        setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2000);
       }
     });
   </script>

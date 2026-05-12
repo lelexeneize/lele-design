@@ -87,14 +87,6 @@
         btn.textContent = 'Ingresando...';
         btn.disabled = true;
 
-        // Admin
-        if (email === 'admin@leledesign.com' && password === 'admin123') {
-          const user = { name: 'Admin', email: 'admin@leledesign.com', picture: '', isAdmin: true };
-          localStorage.setItem('lele_user', JSON.stringify(user));
-          window.location.href = 'admin-licenses.html';
-          return;
-        }
-
         try {
           const sb = getSupabaseClient();
           if (sb) {

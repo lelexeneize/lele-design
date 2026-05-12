@@ -110,7 +110,7 @@
       lightboxImg.style.background = work.image;
       lightboxImg.style.backgroundSize = 'cover';
       lightboxImg.style.backgroundPosition = 'center';
-      lightboxImg.src = '';
+      lightboxImg.removeAttribute('src');
       lightboxInfo.textContent = `${work.title} — ${work.category}`;
       lightbox.classList.remove('opacity-0', 'pointer-events-none');
     }

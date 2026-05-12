@@ -20,7 +20,7 @@
     <nav class="flex-1 space-y-1">
       <a href="admin.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm transition-all"><span>👥</span> Usuarios</a>
       <a href="admin-works.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm transition-all"><span>🖼️</span> Galería</a>
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-600/20 text-amber-300 text-sm font-medium"><span>🔑</span> Licencias</a>
+      <a href="admin-licenses.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-600/20 text-amber-300 text-sm font-medium"><span>🔑</span> Licencias</a>
     </nav>
     <div class="pt-6 border-t border-white/[0.06]">
       <a href="#" onclick="logout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-red-400 text-sm transition-all"><span>🚪</span> Cerrar sesión</a>
@@ -133,7 +133,26 @@
       document.getElementById('countElite').textContent = data.filter(k => k.plan === 'elite').length;
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    async function checkAdminAccess() {
+      const user = JSON.parse(localStorage.getItem('lele_user'));
+      if (!user) { window.location.href = 'admin-login.html'; return false; }
+      const sb = getSupabaseClient();
+      if (sb) {
+        const { data: { user: authUser } } = await sb.auth.getUser();
+        if (authUser) {
+          const { data: profile } = await sb.from('profiles').select('role').eq('id', authUser.id).single();
+          if (profile?.role !== 'admin') {
+            alert('No tenés permisos de administrador.');
+            window.location.href = '../index.html';
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!(await checkAdminAccess())) return;
       leleTheme.applySavedTheme();
       document.getElementById('themeToggleContainer')?.appendChild(leleTheme.createToggle());
       loadStats();

@@ -16,19 +16,27 @@ async function dbGetUsers() {
   return JSON.parse(localStorage.getItem('lele_users') || '[]');
 }
 
+function uuidFallback() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
 async function dbSaveUser(user) {
   const sb = getSupabaseClient();
   if (sb) {
     try {
       // Upsert: insert if not exists, update if exists (matched by email)
       const { error } = await sb.from('profiles').upsert({
-        id: user.id || crypto.randomUUID(),
+        id: user.id || uuidFallback(),
         name: user.name || '',
         email: user.email || '',
         picture: user.picture || '',
         plan: 'free',
         credits: 10,
-        role: user.email === 'admin@leledesign.com' ? 'admin' : 'user'
+        role: 'user'
       }, { onConflict: 'email', ignoreDuplicates: false });
       if (error) console.warn('Supabase upsert error:', error.message);
     } catch (e) {
@@ -101,24 +109,14 @@ async function dbDeleteWork(workId) {
 async function dbDeleteAllWorks() {
   const sb = getSupabaseClient();
   if (sb) {
-    await sb.from('works').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    const { data: all } = await sb.from('works').select('id');
+    if (all) for (const w of all) await sb.from('works').delete().eq('id', w.id);
     return;
   }
   localStorage.setItem('lele_works', '[]');
 }
 
 // ─── AUTH ────────────────────────────────────────────────────────
-
-async function dbSignInWithGoogle() {
-  const sb = getSupabaseClient();
-  if (sb) {
-    const { error } = await sb.auth.signInWithOAuth({ provider: 'google' });
-    if (error) console.error('Supabase Google sign-in error:', error.message);
-    return;
-  }
-  // If no Supabase, Google OAuth works as before via Google Identity Services
-  console.warn('Supabase not configured — using legacy Google Sign-In');
-}
 
 async function dbSignOut() {
   const sb = getSupabaseClient();

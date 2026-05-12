@@ -35,9 +35,9 @@ module.exports = async (req, res) => {
     const paymentId = data?.id;
     if (!paymentId) return res.status(200).send('OK');
 
-    // Obtener datos del pago (necesitarías el SDK)
-    // Por ahora, creamos un placeholder
-    const plan = 'essential'; // Esto vendría del payment metadata
+    // Obtener plan del metadata del pago (requiere SDK de Mercado Pago + MP_ACCESS_TOKEN)
+    // Mientras MP_ACCESS_TOKEN no esté configurado, intentamos leer del body
+    const plan = data?.metadata?.plan || data?.additional_info?.items?.[0]?.id || 'essential';
     const key = generateLicenseKey(plan);
 
     const { error } = await supabase.from('license_keys').insert({
