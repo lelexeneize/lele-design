@@ -90,49 +90,27 @@
 
     const ADMIN_SECRET = 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh';
 
-    const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvdnRla3F4cnV1c3Foc2NhY3FuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODU0MDI4MSwiZXhwIjoyMDk0MTE2MjgxfQ.qi10zx-39NLHeBqaf3NLEtqqPEEhBCtCvrmrGF8pdiU';
-
-    async function waitForSupabaseSDK() {
-      for (let i = 0; i < 50; i++) {
-        if (typeof supabase !== 'undefined') return true;
-        await new Promise(r => setTimeout(r, 100));
-      }
-      return false;
-    }
-
     async function generateKeys() {
       const plan = document.getElementById('keyPlan').value;
       const count = parseInt(document.getElementById('keyCount').value) || 1;
       const status = document.getElementById('genStatus');
       status.textContent = 'Generando...';
 
-      const loaded = await waitForSupabaseSDK();
-      if (!loaded) {
-        status.textContent = '❌ SDK de Supabase no cargado. Recargá la página.';
-        return;
-      }
-
       try {
-        const sbAdmin = supabase.createClient(
-          'https://qovtekqxruusqhscacqn.supabase.co',
-          SERVICE_KEY
-        );
-        const keys = [];
-        for (let i = 0; i < count; i++) {
-          const key = generateLicenseKey(plan);
-          const { data, error } = await sbAdmin.from('license_keys').insert({
-            key: key, plan: plan, status: 'active'
-          }).select();
-          if (error) {
-            status.textContent = '❌ ' + error.message + ' (code: ' + error.code + ')';
-            return;
-          }
-          keys.push(key);
+        const resp = await fetch('/api/create-license', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan, count, adminKey: ADMIN_SECRET })
+        });
+        const result = await resp.json();
+        if (result.keys && result.keys.length > 0) {
+          document.getElementById('keysOutput').classList.remove('hidden');
+          document.getElementById('keysText').value = result.keys.join('\n');
+          status.textContent = `✅ ${result.keys.length} key(s) generadas`;
+          loadStats();
+        } else {
+          status.textContent = '❌ ' + (result.error || 'Error desconocido');
         }
-        document.getElementById('keysOutput').classList.remove('hidden');
-        document.getElementById('keysText').value = keys.join('\n');
-        status.textContent = `✅ ${keys.length} key(s) generadas`;
-        loadStats();
       } catch (e) {
         status.textContent = '❌ ' + e.message;
       }

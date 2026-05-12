@@ -25,15 +25,11 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { plan = 'essential', count = 1 } = req.body;
+  const { plan = 'essential', count = 1, adminKey } = req.body;
   const authHeader = req.headers.authorization;
+  const key = adminKey || (authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null);
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'No autorizado' });
-  }
-
-  const adminKey = authHeader.split(' ')[1];
-  if (adminKey !== process.env.ADMIN_SECRET) {
+  if (key !== process.env.ADMIN_SECRET) {
     return res.status(403).json({ error: 'Admin key inválida' });
   }
 
