@@ -4,7 +4,7 @@ function saveUserToRegistry(user) {
   dbSaveUser(user);
 }
 
-function handleGoogleLogin(response) {
+async function handleGoogleLogin(response) {
   const payload = decodeJwtResponse(response.credential);
   const user = {
     name: payload.name,
@@ -14,6 +14,23 @@ function handleGoogleLogin(response) {
   };
   localStorage.setItem('lele_user', JSON.stringify(user));
   saveUserToRegistry(user);
+
+  const isAdminPage = window.location.pathname.includes('admin-login.html');
+  if (isAdminPage) {
+    try {
+      const sb = getSupabaseClient();
+      if (sb) {
+        const { data: profile } = await sb.from('profiles').select('role').eq('email', payload.email).single();
+        if (profile?.role === 'admin') {
+          localStorage.setItem('lele_user', JSON.stringify({ ...user, isAdmin: true }));
+          window.location.href = 'admin.html';
+          return;
+        }
+      }
+    } catch (_) {}
+    alert('Esta cuenta no tiene permisos de administrador.');
+    return;
+  }
   window.location.href = 'dashboard.html';
 }
 
@@ -50,6 +67,20 @@ function logout() {
   });
 }
 
+async function checkAdminAndRedirect() {
+  const user = JSON.parse(localStorage.getItem('lele_user'));
+  if (!user?.email) return;
+  try {
+    const sb = getSupabaseClient();
+    if (sb) {
+      const { data: profile } = await sb.from('profiles').select('role').eq('email', user.email).single();
+      if (profile?.role === 'admin') {
+        window.location.href = 'admin.html';
+      }
+    }
+  } catch (_) {}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const user = JSON.parse(localStorage.getItem('lele_user'));
 
@@ -61,6 +92,11 @@ document.addEventListener('DOMContentLoaded', () => {
                      window.location.pathname.includes('register.html');
   if (user && isAuthPage) {
     window.location.href = 'dashboard.html';
+  }
+
+  const isAdminLoginPage = window.location.pathname.includes('admin-login.html');
+  if (user && isAdminLoginPage) {
+    checkAdminAndRedirect();
   }
 
   const isProtected = window.location.pathname.includes('dashboard.html') ||
