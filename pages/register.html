@@ -44,6 +44,15 @@
         </div>
       </div>
 
+      <div class="flex flex-col gap-3 mb-6">
+        <button onclick="socialRegister('facebook')" class="w-full py-3 rounded-full bg-[#1877F2] hover:bg-[#166fe5] text-white font-semibold text-sm transition-all flex items-center justify-center gap-3 shadow-lg shadow-[#1877F2]/25">
+          <i class="fab fa-facebook-f text-lg"></i> Registrarse con Facebook
+        </button>
+        <button onclick="socialRegister('apple')" class="w-full py-3 rounded-full bg-white hover:bg-gray-100 text-black font-semibold text-sm transition-all flex items-center justify-center gap-3 shadow-lg">
+          <i class="fab fa-apple text-lg"></i> Registrarse con Apple
+        </button>
+      </div>
+
       <div class="relative mb-6">
         <div class="absolute inset-0 flex items-center"><div class="w-full border-t" style="border-color: var(--border-color);"></div></div>
         <div class="relative flex justify-center"><span class="px-4 text-xs text-white/30" style="background: var(--bg-primary);">o con email</span></div>
@@ -51,14 +60,14 @@
 
       <form class="space-y-5" onsubmit="return false;">
         <div><label class="text-sm font-medium text-white/60 block mb-2">Nombre completo</label>
-          <input type="text" placeholder="Tu nombre" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all"></div>
+          <input id="regName" type="text" placeholder="Tu nombre" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all"></div>
         <div><label class="text-sm font-medium text-white/60 block mb-2">Correo electrónico</label>
-          <input type="email" placeholder="tu@correo.com" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all"></div>
+          <input id="regEmail" type="email" placeholder="tu@correo.com" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all"></div>
         <div><label class="text-sm font-medium text-white/60 block mb-2">Contraseña</label>
-          <input type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all"></div>
+          <input id="regPassword" type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all"></div>
         <div><label class="text-sm font-medium text-white/60 block mb-2">Confirmar contraseña</label>
-          <input type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all"></div>
-        <button type="submit" class="w-full py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25">Crear cuenta</button>
+          <input id="regConfirm" type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 transition-all"></div>
+        <button type="submit" id="regBtn" class="w-full py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25">Crear cuenta</button>
       </form>
       <p class="text-center text-sm text-white/40 mt-6">¿Ya tienes cuenta? <a href="login.html" class="text-violet-400 hover:text-violet-300 transition font-medium">Inicia sesión</a></p>
     </div>
@@ -68,10 +77,61 @@
   <script src="../js/supabase-db.js"></script>
   <script src="../js/auth.js"></script>
   <script>
+    async function socialRegister(provider) {
+      try {
+        const sb = getSupabaseClient();
+        if (sb) {
+          const { error } = await sb.auth.signInWithOAuth({ provider });
+          if (error) alert('Error al conectar con ' + provider + ': ' + error.message);
+        } else {
+          alert('Supabase no está configurado');
+        }
+      } catch (e) {
+        alert('El registro con ' + provider + ' no está disponible.\n\nHabilitarlo en: Supabase Dashboard > Authentication > Providers');
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       leleTheme.applySavedTheme();
       const tc = document.getElementById('themeToggleContainer');
       if (tc && !tc.querySelector('.theme-toggle')) tc.appendChild(leleTheme.createToggle());
+
+      document.querySelector('form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const pass = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('regConfirm').value;
+        const btn = document.getElementById('regBtn');
+        const orig = btn.textContent;
+
+        if (!name || !email || !pass) { btn.textContent = 'Completa todos los campos'; setTimeout(() => { btn.textContent = orig; }, 2000); return; }
+        if (pass.length < 6) { btn.textContent = 'Mínimo 6 caracteres'; setTimeout(() => { btn.textContent = orig; }, 2000); return; }
+        if (pass !== confirm) { btn.textContent = 'Las contraseñas no coinciden'; setTimeout(() => { btn.textContent = orig; }, 2000); return; }
+
+        btn.textContent = 'Creando cuenta...';
+        btn.disabled = true;
+
+        try {
+          const sb = getSupabaseClient();
+          if (sb) {
+            const { data, error } = await sb.auth.signUp({
+              email, password: pass,
+              options: { data: { full_name: name } }
+            });
+            if (error) {
+              btn.textContent = error.message;
+              setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
+              return;
+            }
+          }
+          localStorage.setItem('lele_user', JSON.stringify({ name, email, picture: '' }));
+          window.location.href = 'dashboard.html';
+        } catch (_) {
+          btn.textContent = 'Error de conexión';
+          setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2000);
+        }
+      });
     });
   </script>
 </body>

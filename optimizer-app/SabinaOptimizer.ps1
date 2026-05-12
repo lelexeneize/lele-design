@@ -25,6 +25,24 @@ function Write-Log($msg) {
     "[$t] $msg" | Out-File -LiteralPath $script:LogPath -Append -Encoding utf8
 }
 
+function New-RestorePoint {
+    $desc = "SabinaOptimizer_$(Get-Date -Format 'yyyyMMdd_HHmmss')"
+    try {
+        $os = Get-CimInstance Win32_OperatingSystem
+        $systemDrive = $os.SystemDrive
+        $sr = Get-CimInstance -ClassName SystemRestore -Filter "Drive='$($systemDrive -replace ':','')'" -ErrorAction Stop
+        if (-not $sr -or -not $sr.Enable) {
+            return @{ success=$false; msg="Restaurar sistema NO esta habilitado en $systemDrive.`nActivalo en: Panel de control > Sistema > Proteccion del sistema`nO ejecuta: Enable-ComputerRestore -Drive `"$systemDrive`" (Admin)" }
+        }
+        Checkpoint-Computer -Description $desc -RestorePointType MODIFY_SETTINGS -ErrorAction Stop
+        return @{ success=$true; msg="Punto de restauracion '$desc' creado correctamente" }
+    } catch [System.Management.Automation.MethodInvocationException] {
+        return @{ success=$false; msg="Restaurar sistema no esta habilitado en $systemDrive.`nActivalo en: Panel de control > Sistema > Proteccion del sistema" }
+    } catch {
+        return @{ success=$false; msg="No se pudo crear punto de restauracion: $_" }
+    }
+}
+
 # ═══════════════════════════════════════════════════════════════
 #  OPTIMIZACIONES
 # ═══════════════════════════════════════════════════════════════
@@ -38,8 +56,8 @@ function Add-Opt($id, $name, $desc, $cat, $risk, $commands, $scriptBlock) {
 # Essential
 Add-Opt "powerplan" "Power Plan: Alto Rendimiento" "Activa el plan de energia de alto rendimiento." "Essential" "Bajo" @("powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c") { powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c 2>$null; "Power Plan: High Performance activado" }
 Add-Opt "hpet" "Desactivar HPET" "Reduce latencia y mejora FPS. Requiere reinicio." "Essential" "Medio" @("bcdedit /deletevalue useplatformclock") { bcdedit /deletevalue useplatformclock 2>$null; "HPET desactivado (requiere reinicio)" }
-Add-Opt "gamemode" "Game Mode" "Prioriza recursos para juegos." "Essential" "Bajo" @('Set-ItemProperty "HKCU:\Software\Microsoft\GameBar" AutoGameModeEnabled 1 -Type DWord -Force') { Set-ItemProperty "HKCU:\Software\Microsoft\GameBar" AutoGameModeEnabled 1 -Type DWord -Force -EA 0; "Game Mode activado" }
-Add-Opt "xbox" "Deshabilitar Xbox Game Bar" "Elimina superposicion de Xbox." "Essential" "Bajo" @('Set-ItemProperty "HKCU:\Software\Microsoft\GameBar" ShowStartupPanel 0 -Type DWord -Force') { Set-ItemProperty "HKCU:\Software\Microsoft\GameBar" ShowStartupPanel 0 -Type DWord -Force -EA 0; "Xbox Game Bar deshabilitado" }
+Add-Opt "gamemode" "Game Mode" "Prioriza recursos para juegos." "Essential" "Bajo" @('Set-ItemProperty "HKCU:\Software\Microsoft\GameBar" AutoGameModeEnabled 1 -Type DWord -Force') { $path = "HKCU:\Software\Microsoft\GameBar"; if (-not (Test-Path $path)) { New-Item -Path $path -Force -EA 0 | Out-Null }; Set-ItemProperty $path AutoGameModeEnabled 1 -Type DWord -Force -EA 0; "Game Mode activado" }
+Add-Opt "xbox" "Deshabilitar Xbox Game Bar" "Elimina superposicion de Xbox." "Essential" "Bajo" @('Set-ItemProperty "HKCU:\Software\Microsoft\GameBar" ShowStartupPanel 0 -Type DWord -Force') { $path = "HKCU:\Software\Microsoft\GameBar"; if (-not (Test-Path $path)) { New-Item -Path $path -Force -EA 0 | Out-Null }; Set-ItemProperty $path ShowStartupPanel 0 -Type DWord -Force -EA 0; "Xbox Game Bar deshabilitado" }
 Add-Opt "gpusched" "GPU Hardware Scheduling" "Reduce latencia de GPU. Requiere reinicio." "Essential" "Medio" @('Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" HwSchMode 2 -Type DWord -Force') { Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" HwSchMode 2 -Type DWord -Force -EA 0; "GPU Scheduling: Hardware accelerated (requiere reinicio)" }
 Add-Opt "timer" "Timer Resolution" "Ajusta temporizador del sistema para menor latencia." "Essential" "Bajo" @('Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" TimerResolution 10000 -Type DWord -Force') { Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" TimerResolution 10000 -Type DWord -Force -EA 0; "Timer Resolution optimizado" }
 Add-Opt "nagle" "Deshabilitar Nagle" "Reduce ping en juegos online." "Essential" "Bajo" @('Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" TcpAckFrequency 1 -Type DWord -Force','Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" TCPNoDelay 1 -Type DWord -Force') { Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" TcpAckFrequency 1 -Type DWord -Force -EA 0; Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" TCPNoDelay 1 -Type DWord -Force -EA 0; "Nagle Algorithm deshabilitado" }
@@ -47,14 +65,17 @@ Add-Opt "dns" "DNS Cloudflare" "Cambia DNS a 1.1.1.1 (mas rapido y seguro)." "Es
 Add-Opt "tcptune" "Optimizar TCP/IP" "Ajusta TCP para menor latencia de red." "Essential" "Bajo" @("netsh int tcp set global autotuninglevel=normal","netsh int tcp set global rss=enabled","netsh int tcp set global chimney=disabled") { netsh int tcp set global autotuninglevel=normal 2>$null; netsh int tcp set global rss=enabled 2>$null; netsh int tcp set global chimney=disabled 2>$null; "TCP/IP optimizado" }
 Add-Opt "cleanup" "Limpieza del sistema" "Limpia TEMP, Prefetch, Papelera, Update cache, DNS." "Essential" "Bajo" @("Remove-Item `"`$env:TEMP`*`" -Recurse -Force","Remove-Item `"`$env:WINDIR\Temp\`*`" -Recurse -Force","Clear-RecycleBin -Force","ipconfig /flushdns") { Remove-Item "$env:TEMP\*" -Recurse -Force -EA 0; Remove-Item "$env:WINDIR\Temp\*" -Recurse -Force -EA 0; Remove-Item "$env:WINDIR\Prefetch\*" -Recurse -Force -EA 0; Clear-RecycleBin -Force -EA 0; Stop-Service wuauserv -Force -EA 0; Remove-Item "$env:WINDIR\SoftwareDistribution\Download\*" -Recurse -Force -EA 0; Start-Service wuauserv -EA 0; ipconfig /flushdns | Out-Null; "Limpieza completada" }
 Add-Opt "input" "Optimizar Input" "Raw Buffer, mouse acceleration OFF, prioridad foreground." "Essential" "Bajo" @('Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Keyboard" KeyboardDataQueueSize 100 -Type DWord -Force','Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Mouse" MouseDataQueueSize 100 -Type DWord -Force','Set-ItemProperty "HKCU:\Control Panel\Mouse" MouseSpeed 0 -Force') { Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Keyboard" KeyboardDataQueueSize 100 -Type DWord -Force -EA 0; Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Mouse" MouseDataQueueSize 100 -Type DWord -Force -EA 0; Set-ItemProperty "HKCU:\Control Panel\Mouse" MouseSpeed 0 -Force -EA 0; Set-ItemProperty "HKCU:\Control Panel\Mouse" MouseThreshold1 0 -Force -EA 0; Set-ItemProperty "HKCU:\Control Panel\Mouse" MouseThreshold2 0 -Force -EA 0; Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl" Win32PrioritySeparation 38 -Type DWord -Force -EA 0; "Input optimizado" }
+Add-Opt "telemetry" "Deshabilitar Telemetria" "Apaga el rastreo de datos de Windows (DiagTrack)." "Essential" "Bajo" @("Stop-Service DiagTrack -Force","Set-Service DiagTrack -StartupType Disabled") { Stop-Service DiagTrack -Force -EA 0; Set-Service DiagTrack -StartupType Disabled -EA 0; $p = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection"; if (-not (Test-Path $p)) { New-Item -Path $p -Force -EA 0 | Out-Null }; Set-ItemProperty $p AllowTelemetry 0 -Type DWord -Force -EA 0; "Telemetria deshabilitada" }
+Add-Opt "visualfx" "Efectos Visuales Ultrarrapidos" "Desactiva animaciones lentas de ventanas." "Essential" "Bajo" @('Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" VisualFXSetting 2 -Type DWord -Force') { Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" VisualFXSetting 2 -Type DWord -Force -EA 0; "Efectos visuales optimizados" }
 
 # Pro
-Add-Opt "bloatware" "Remover Bloatware" "Desinstala apps preinstaladas (Xbox, Cortana, Skype, Copilot...)." "Pro" "Medio" @("Remove-AppxPackage bloatware apps") { $apps = "Microsoft.BingWeather","Microsoft.GetHelp","Microsoft.Microsoft3DViewer","Microsoft.MicrosoftOfficeHub","Microsoft.MicrosoftSolitaireCollection","Microsoft.Office.OneNote","Microsoft.People","Microsoft.Print3D","Microsoft.SkypeApp","Microsoft.Wallet","Microsoft.WindowsAlarms","Microsoft.WindowsCamera","Microsoft.WindowsFeedbackHub","Microsoft.WindowsMaps","Microsoft.WindowsSoundRecorder","Microsoft.YourPhone","Microsoft.ZuneMusic","Microsoft.ZuneVideo","Microsoft.Copilot","Clipchamp.Clipchamp"; foreach ($app in $apps) { Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage -AllUsers -EA 0; Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like "$app*" | Remove-AppxProvisionedPackage -Online -EA 0 }; "Bloatware removido: $($apps.Count) apps" }
+Add-Opt "bloatware" "Remover Bloatware" "Desinstala apps preinstaladas (Xbox, Cortana, Skype, Copilot...)." "Pro" "Medio" @("Remove-AppxPackage bloatware apps") { $apps = @("Microsoft.BingWeather","Microsoft.GetHelp","Microsoft.Microsoft3DViewer","Microsoft.MicrosoftOfficeHub","Microsoft.MicrosoftSolitaireCollection","Microsoft.Office.OneNote","Microsoft.People","Microsoft.Print3D","Microsoft.SkypeApp","Microsoft.Wallet","Microsoft.WindowsAlarms","Microsoft.WindowsCamera","Microsoft.WindowsFeedbackHub","Microsoft.WindowsMaps","Microsoft.WindowsSoundRecorder","Microsoft.YourPhone","Microsoft.ZuneMusic","Microsoft.ZuneVideo","Microsoft.Copilot","Clipchamp.Clipchamp"); $prov = Get-AppxProvisionedPackage -Online -EA 0; foreach ($app in $apps) { Get-AppxPackage -Name "*$app*" -AllUsers -EA 0 | Remove-AppxPackage -AllUsers -EA 0; if ($prov) { $prov | Where-Object DisplayName -like "*$app*" | Remove-AppxProvisionedPackage -Online -EA 0 } }; "Bloatware removido: $($apps.Count) apps" }
 Add-Opt "onedrive" "Desinstalar OneDrive" "Elimina OneDrive completamente del sistema." "Pro" "Medio" @("Stop-Process -Name OneDrive -Force",'Start-Process "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe" -ArgumentList "/uninstall" -Wait') { Stop-Process -Name OneDrive -Force -EA 0; $od = "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe"; if (Test-Path $od) { Start-Process $od -ArgumentList "/uninstall" -NoNewWindow -Wait }; "OneDrive desinstalado" }
 Add-Opt "ssd" "Optimizar SSD/NVMe" "Hibernacion OFF, SuperFetch OFF, TRIM." "Pro" "Bajo" @("powercfg -h off","Stop-Service SysMain -Force","Optimize-Volume -DriveLetter C -ReTrim") { powercfg -h off 2>$null; Stop-Service SysMain -Force -EA 0; Set-Service SysMain -StartupType Disabled -EA 0; Optimize-Volume -DriveLetter C -ReTrim -EA 0; "SSD optimizado: Hibernate OFF, SuperFetch OFF, TRIM ejecutado" }
-Add-Opt "gpucache" "Shader Cache GPU" "Maximiza cache de shaders NVIDIA." "Pro" "Bajo" @('Set-ItemProperty "HKLM:\SOFTWARE\NVIDIA Corporation\Global" ShaderCacheSize 4294967295 -Type DWord -Force') { Set-ItemProperty "HKLM:\SOFTWARE\NVIDIA Corporation\Global" ShaderCacheSize 4294967295 -Type DWord -Force -EA 0; powercfg -setdcvalueindex SCHEME_CURRENT SUB_GRAPHICS GPUPREFERENCE 1 2>$null; powercfg -setacvalueindex SCHEME_CURRENT SUB_GRAPHICS GPUPREFERENCE 1 2>$null; "Shader Cache maximizado + GPU Performance Mode" }
-Add-Opt "driverclean" "Limpiar Drivers Fantasma" "Escanea y detecta drivers huerfanos." "Pro" "Bajo" @('Get-PnpDevice | Where-Object { $_.Problem -eq 22 -and $_.Class -ne "SoftwareDevice" }') { $orphaned = Get-PnpDevice | Where-Object { $_.Problem -eq 22 -and $_.Class -ne "SoftwareDevice" }; if ($orphaned) { foreach ($d in $orphaned) { "Driver huerfano: $($d.FriendlyName)" } } else { "No se detectaron drivers fantasma" } }
+Add-Opt "gpucache" "Shader Cache GPU" "Maximiza cache de shaders NVIDIA." "Pro" "Bajo" @('Set-ItemProperty "HKLM:\SOFTWARE\NVIDIA Corporation\Global" ShaderCacheSize 4294967295 -Type DWord -Force') { $path = "HKLM:\SOFTWARE\NVIDIA Corporation\Global"; if (-not (Test-Path $path)) { New-Item -Path $path -Force -EA 0 | Out-Null }; Set-ItemProperty $path ShaderCacheSize 4294967295 -Type DWord -Force -EA 0; powercfg -setdcvalueindex SCHEME_CURRENT SUB_GRAPHICS GPUPREFERENCE 1 2>$null; powercfg -setacvalueindex SCHEME_CURRENT SUB_GRAPHICS GPUPREFERENCE 1 2>$null; "Shader Cache maximizado + GPU Performance Mode" }
+Add-Opt "driverclean" "Limpiar Drivers Fantasma" "Escanea y detecta drivers desconectados (fantasmas)." "Pro" "Bajo" @('Get-PnpDevice | Where-Object { $_.Present -eq $false -and $_.Class -ne "SoftwareDevice" }') { $orphaned = Get-PnpDevice -EA 0 | Where-Object { $_.Present -eq $false -and $_.Class -ne "SoftwareDevice" }; if ($orphaned) { foreach ($d in $orphaned) { "Driver huerfano: $($d.FriendlyName)" } } else { "No se detectaron drivers fantasma" } }
 Add-Opt "monitor" "Guia Monitor" "Configurar Hz maximo y overdrive." "Pro" "Bajo" @("Guia: 1) Config. pantalla > Avanzado > Frecuencia maxima","2) NVIDIA Panel > Sin escalado","3) Menu OSD > Overdrive: Medio") { "Guia: 1) Config. pantalla > Avanzado > Frecuencia maxima"; "2) NVIDIA Panel > Sin escalado"; "3) Menu OSD > Overdrive: Medio" }
+Add-Opt "bgapps" "Bloquear Apps 2do Plano" "Impide que apps de Microsoft Store se ejecuten ocultas." "Pro" "Bajo" @('Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" GlobalUserDisabled 1 -Type DWord -Force') { $p = "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications"; if (-not (Test-Path $p)) { New-Item -Path $p -Force -EA 0 | Out-Null }; Set-ItemProperty $p GlobalUserDisabled 1 -Type DWord -Force -EA 0; "Apps en segundo plano bloqueadas" }
 
 # Elite
 Add-Opt "msimode" "MSI Mode (GPU+NVMe+USB)" "Activa MSI en dispositivos. Reduce latencia DPC." "Elite" "Medio" @('Set-ItemProperty -Path "HKLM:\...\MessageSignaledInterruptProperties" -Name MSISupported -Value 1') { $devices = Get-ChildItem "HKLM:\SYSTEM\CurrentControlSet\Enum\PCI" -Recurse -EA 0 | Where-Object { $_.GetValue("DeviceDesc") -match "NVIDIA|AMD|NVMe|Storage|USB|Network" }; $count = 0; foreach ($d in $devices) { $p = "$($d.PSPath)\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties"; if (Test-Path $p) { Set-ItemProperty -Path $p -Name MSISupported -Value 1 -Type DWord -Force -EA 0; $count++ } }; "MSI Mode activado en $count dispositivos" }
@@ -62,7 +83,7 @@ Add-Opt "dpclatency" "Guia DPC Latency" "Recomendaciones BIOS para minima latenc
 Add-Opt "ramtimings" "Guia RAM Timings" "Recomendaciones personalizadas para BIOS." "Elite" "Bajo" @("Consultar timings optimos con Get-CimInstance") { $mem = Get-CimInstance Win32_PhysicalMemory | Select-Object -First 1; "RAM: $([math]::Round($mem.Capacity/1GB,0)) GB @ $($mem.Speed) MHz"; "tCL: $(($mem.Speed/100 - 6) -as [int]) | tRCD: $(($mem.Speed/100 - 4) -as [int]) | tRP: $(($mem.Speed/100 - 4) -as [int]) | tRAS: 58-68"; "Usar MemTest86 despues de cambios" }
 Add-Opt "overclock" "Guia Overclock + Undervolt" "Guia personalizada CPU/GPU." "Elite" "Bajo" @("CPU Ratio: +1-2 | Voltage Offset: -0.05V","MSI Afterburner > Core +150 | Mem +750 | Power 110%") { $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1; "CPU: $($cpu.Name) | BIOS > CPU Ratio: +1-2 | Voltage Offset: -0.05V"; "GPU: MSI Afterburner > Core +150 | Mem +750 | Power 110%" }
 Add-Opt "benchmark" "Benchmark Rapido" "CPU, RAM, Disco y Ping." "Elite" "Bajo" @("Get-CimInstance Win32_Processor","Get-CimInstance Win32_OperatingSystem > FreePhysicalMemory","Test-Connection 1.1.1.1 -Count 3") { $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1; $os = Get-CimInstance Win32_OperatingSystem; $disk = Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" | Where-Object DeviceID -eq "C:"; $ping = Test-Connection "1.1.1.1" -Count 3 -EA 0; "CPU: $($cpu.Name) | RAM: $([math]::Round($os.FreePhysicalMemory/1MB,1)) GB libre | Disco: $([math]::Round($disk.FreeSpace/1GB,1)) GB libre | Ping: $(if($ping){[math]::Round(($ping|Measure-Object -Property ResponseTime -Average).Average,1)}else{'N/A'}) ms" }
-Add-Opt "restorepoint" "Crear Punto de Restauracion" "Deshace todos los cambios si algo falla." "Elite" "Bajo" @('Checkpoint-Computer -Description "SabinaOptimizer" -RestorePointType MODIFY_SETTINGS') { Checkpoint-Computer -Description "SabinaOptimizer_$(Get-Date -Format 'yyyyMMdd_HHmmss')" -RestorePointType MODIFY_SETTINGS -EA Stop; "Punto de restauracion creado" }
+Add-Opt "restorepoint" "Crear Punto de Restauracion" "Deshace todos los cambios si algo falla." "Elite" "Bajo" @("New-RestorePoint") { $r = New-RestorePoint; $r.msg }
 
 # ═══════════════════════════════════════════════════════════════
 #  LICENSE VALIDATION
@@ -252,10 +273,10 @@ function Show-MainWindow {
         return $btn
     }
 
-    $btnAll       = MakeCatBtn "Mostrar todas"       10, "All"
-    $btnEssential = MakeCatBtn "Essential (12)"      160, "Essential"
-    $btnPro       = MakeCatBtn "Pro (6)"             310, "Pro"
-    $btnElite     = MakeCatBtn "Elite (6)"           460, "Elite"
+    $btnAll       = MakeCatBtn "Mostrar todas"       10 "All"
+    $btnEssential = MakeCatBtn "Essential (13)"      160 "Essential"
+    $btnPro       = MakeCatBtn "Pro (7)"             310 "Pro"
+    $btnElite     = MakeCatBtn "Elite (6)"           460 "Elite"
     $catButtons["All"] = $btnAll
     $catButtons["Essential"] = $btnEssential
     $catButtons["Pro"] = $btnPro
@@ -325,6 +346,18 @@ function Show-MainWindow {
     $desAllBtn.Font = $FONT_NORMAL
     $desAllBtn.Cursor = "Hand"
     $bottomBar.Controls.Add($desAllBtn)
+
+    $restoreBtn = New-Object System.Windows.Forms.Button
+    $restoreBtn.Text = "Punto restauracion"
+    $restoreBtn.Size = New-Object System.Drawing.Size(150, 34)
+    $restoreBtn.Location = New-Object System.Drawing.Point(330, 8)
+    $restoreBtn.FlatStyle = "Flat"
+    $restoreBtn.BackColor = [System.Drawing.Color]::FromArgb(26,26,46)
+    $restoreBtn.ForeColor = [System.Drawing.Color]::White
+    $restoreBtn.Font = $FONT_NORMAL
+    $restoreBtn.Cursor = "Hand"
+    $bottomBar.Controls.Add($restoreBtn)
+    $restoreBtn.Add_Click({ New-RestorePointFromGUI })
 
     $runBtn = New-Object System.Windows.Forms.Button
     $runBtn.Text = "Ejecutar seleccionadas"
@@ -467,7 +500,8 @@ function Show-MainWindow {
 
             # Script detail panel (hidden by default)
             $scriptDetail = New-Object System.Windows.Forms.Panel
-            $scriptDetail.Size = New-Object System.Drawing.Size(420, 16 + ($opt.commands.Count * 18))
+            $h = 16 + ($opt.commands.Count * 18)
+            $scriptDetail.Size = New-Object System.Drawing.Size(420, $h)
             $scriptDetail.Location = New-Object System.Drawing.Point(610, 32)
             $scriptDetail.BackColor = [System.Drawing.Color]::FromArgb(10,10,15)
             $scriptDetail.Visible = $false
@@ -522,6 +556,15 @@ function Show-MainWindow {
         }
     })
 
+    function New-RestorePointFromGUI {
+        $r = New-RestorePoint
+        if ($r.success) {
+            [System.Windows.Forms.MessageBox]::Show($r.msg, "Restaurar Sistema", "OK", "Information")
+        } else {
+            [System.Windows.Forms.MessageBox]::Show($r.msg, "Restaurar Sistema", "OK", "Warning")
+        }
+    }
+
     function Run-Optimizations {
         $selected = @()
         foreach ($opt in $script:Optimizations) {
@@ -534,10 +577,29 @@ function Show-MainWindow {
             return
         }
 
-        $outputBox.Clear()
+        $ans = [System.Windows.Forms.MessageBox]::Show(
+            "RECOMENDADO: Crear un punto de restauracion antes de continuar?`n`nEsto permite deshacer todos los cambios si algo falla.",
+            "Restaurar Sistema",
+            "YesNoCancel",
+            "Question"
+        )
+        if ($ans -eq "Cancel") { return }
+        if ($ans -eq "Yes") {
+            $outputBox.Clear()
+            $outputBox.AppendText("Creando punto de restauracion...`r`n")
+            $outputBox.Refresh()
+            $r = New-RestorePoint
+            $outputBox.AppendText("$($r.msg)`r`n")
+            $outputBox.AppendText("----------------------------------------`r`n")
+            $outputBox.Refresh()
+            [System.Windows.Forms.Application]::DoEvents()
+            Start-Sleep -Milliseconds 300
+        }
+
         $outputBox.AppendText("Ejecutando $($selected.Count) optimizaciones...`r`n")
         $outputBox.AppendText("----------------------------------------`r`n")
         $outputBox.Refresh()
+        [System.Windows.Forms.Application]::DoEvents()
 
         $i = 0
         foreach ($opt in $selected) {
@@ -545,6 +607,7 @@ function Show-MainWindow {
             Write-Log "[$i/$($selected.Count)] $($opt.name)"
             $outputBox.AppendText("[$i/$($selected.Count)] > $($opt.name)...`r`n")
             $outputBox.Refresh()
+            [System.Windows.Forms.Application]::DoEvents()
             Start-Sleep -Milliseconds 100
 
             try {
@@ -556,12 +619,15 @@ function Show-MainWindow {
                 $outputBox.AppendText("  ERROR: $_`r`n")
             }
             $outputBox.Refresh()
+            [System.Windows.Forms.Application]::DoEvents()
             Start-Sleep -Milliseconds 50
         }
 
         $outputBox.AppendText("----------------------------------------`r`n")
         $outputBox.AppendText("$($selected.Count) optimizaciones aplicadas`r`n")
         $outputBox.AppendText("Log: $script:LogPath`r`n")
+        $outputBox.Refresh()
+        [System.Windows.Forms.Application]::DoEvents()
     }
 
     $runBtn.Add_Click({ Run-Optimizations })

@@ -1,5 +1,5 @@
 @echo off
-title Sabina Optimizer - Launcher
+title Sabina Optimizer v4.0 - Launcher
 cd /d "%~dp0"
 
 :: Auto-elevate to admin
@@ -10,14 +10,12 @@ if %errorLevel% neq 0 (
     exit /b
 )
 
-:: Set PowerShell execution policy and run
-echo ============================================
-echo   Sabina Optimizer v1.0
-echo   Iniciando...
-echo ============================================
-timeout /t 2 /nobreak >nul
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0SabinaOptimizer.ps1"
-
-echo.
-echo Presiona cualquier tecla para salir...
-pause >nul
+:: Run .exe (PyInstaller) or fallback to .ps1
+if exist "%~dp0SabinaOptimizer.exe" (
+    start "" "%~dp0SabinaOptimizer.exe"
+) else if exist "%~dp0SabinaOptimizer.ps1" (
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0SabinaOptimizer.ps1"
+) else (
+    echo ERROR: No se encuentra SabinaOptimizer.exe ni .ps1
+    pause
+)

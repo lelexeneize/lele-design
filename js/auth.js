@@ -66,7 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const isProtected = window.location.pathname.includes('dashboard.html') ||
                       window.location.pathname.includes('generator.html') ||
                       window.location.pathname.includes('admin.html') ||
-                      window.location.pathname.includes('admin-works.html');
+                      window.location.pathname.includes('admin-works.html') ||
+                      window.location.pathname.includes('admin-licenses.html');
   if (!user && isProtected) {
     window.location.href = 'login.html';
   }
