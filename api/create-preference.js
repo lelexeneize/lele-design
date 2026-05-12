@@ -49,12 +49,12 @@ module.exports = async (req, res) => {
         email: email || 'comprador@email.com'
       },
       back_urls: {
-        success: 'https://leledesign.vercel.app/pages/pago-exitoso.html',
-        failure: 'https://leledesign.vercel.app/pages/pago.html',
-        pending: 'https://leledesign.vercel.app/pages/pago.html'
+        success: 'https://leleoficial.com/pages/pago-exitoso.html',
+        failure: 'https://leleoficial.com/pages/pago.html',
+        pending: 'https://leleoficial.com/pages/pago.html'
       },
       auto_return: 'approved',
-      notification_url: 'https://leledesign.vercel.app/api/webhook.js'
+      notification_url: 'https://leleoficial.com/api/webhook.js'
     });
 
     return res.json({

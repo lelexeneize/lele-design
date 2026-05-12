@@ -26,14 +26,14 @@ module.exports = async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'Lele Design <onboarding@resend.dev>',
+        from: 'Lele Oficial <onboarding@resend.dev>',
         to: email,
         subject: `Tu license key para Sabina Optimizer ${planLabels[plan] || plan}`,
         html: `
           <div style="font-family: Inter, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #0a0a0f; border-radius: 16px; border: 1px solid #2a2a3a;">
             <div style="text-align: center; margin-bottom: 24px;">
               <span style="font-size: 28px; font-weight: 900; background: linear-gradient(135deg, #a855f7, #d946ef, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">LELE</span>
-              <span style="color: #888; font-weight: 300;">Design</span>
+              <span style="color: #888; font-weight: 300;">Oficial</span>
             </div>
             <h1 style="color: white; font-size: 20px; text-align: center; margin-bottom: 8px;">Gracias por tu compra</h1>
             <p style="color: #888; text-align: center; margin-bottom: 24px;">Tu license key para Sabina Optimizer ${planLabels[plan] || plan}</p>
@@ -41,7 +41,7 @@ module.exports = async (req, res) => {
               <p style="color: #888; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">License Key</p>
               <p style="color: #a855f7; font-size: 22px; font-weight: 700; font-family: monospace; letter-spacing: 2px; margin: 0;">${key}</p>
             </div>
-            <a href="https://leledesign.vercel.app/pages/descargar.html" style="display: block; text-align: center; padding: 14px; background: linear-gradient(135deg, #7c3aed, #d946ef); color: white; border-radius: 9999px; text-decoration: none; font-weight: 600; font-size: 14px; margin-bottom: 20px;">Descargar Sabina Optimizer</a>
+            <a href="https://leleoficial.com/pages/descargar.html" style="display: block; text-align: center; padding: 14px; background: linear-gradient(135deg, #7c3aed, #d946ef); color: white; border-radius: 9999px; text-decoration: none; font-weight: 600; font-size: 14px; margin-bottom: 20px;">Descargar Sabina Optimizer</a>
             <p style="color: #555; font-size: 12px; text-align: center;">Ejecutá el .exe como Administrador e ingresá tu license key para desbloquear todas las optimizaciones.</p>
           </div>
         `

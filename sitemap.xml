@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://leledesign.vercel.app/</loc><priority>1.0</priority></url>
-  <url><loc>https://leledesign.vercel.app/pages/optimizer.html</loc><priority>0.9</priority></url>
-  <url><loc>https://leledesign.vercel.app/pages/trabajos.html</loc><priority>0.8</priority></url>
-  <url><loc>https://leledesign.vercel.app/pages/login.html</loc><priority>0.6</priority></url>
-  <url><loc>https://leledesign.vercel.app/pages/register.html</loc><priority>0.6</priority></url>
-  <url><loc>https://leledesign.vercel.app/pages/pago.html</loc><priority>0.5</priority></url>
-  <url><loc>https://leledesign.vercel.app/pages/pago-exitoso.html</loc><priority>0.4</priority></url>
-  <url><loc>https://leledesign.vercel.app/pages/dashboard.html</loc><priority>0.3</priority></url>
-  <url><loc>https://leledesign.vercel.app/pages/generator.html</loc><priority>0.3</priority></url>
-  <url><loc>https://leledesign.vercel.app/pages/privacidad.html</loc><priority>0.5</priority></url>
-  <url><loc>https://leledesign.vercel.app/pages/terminos.html</loc><priority>0.5</priority></url>
-  <url><loc>https://leledesign.vercel.app/pages/eliminacion-datos.html</loc><priority>0.4</priority></url>
-  <url><loc>https://leledesign.vercel.app/pages/descargar.html</loc><priority>0.9</priority></url>
+  <url><loc>https://leleoficial.com/</loc><priority>1.0</priority></url>
+  <url><loc>https://leleoficial.com/pages/optimizer.html</loc><priority>0.9</priority></url>
+  <url><loc>https://leleoficial.com/pages/trabajos.html</loc><priority>0.8</priority></url>
+  <url><loc>https://leleoficial.com/pages/login.html</loc><priority>0.6</priority></url>
+  <url><loc>https://leleoficial.com/pages/register.html</loc><priority>0.6</priority></url>
+  <url><loc>https://leleoficial.com/pages/pago.html</loc><priority>0.5</priority></url>
+  <url><loc>https://leleoficial.com/pages/pago-exitoso.html</loc><priority>0.4</priority></url>
+  <url><loc>https://leleoficial.com/pages/dashboard.html</loc><priority>0.3</priority></url>
+  <url><loc>https://leleoficial.com/pages/generator.html</loc><priority>0.3</priority></url>
+  <url><loc>https://leleoficial.com/pages/privacidad.html</loc><priority>0.5</priority></url>
+  <url><loc>https://leleoficial.com/pages/terminos.html</loc><priority>0.5</priority></url>
+  <url><loc>https://leleoficial.com/pages/eliminacion-datos.html</loc><priority>0.4</priority></url>
+  <url><loc>https://leleoficial.com/pages/descargar.html</loc><priority>0.9</priority></url>
 </urlset>
