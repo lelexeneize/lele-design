@@ -63,6 +63,10 @@ CREATE POLICY "Users can update own profile"
   ON profiles FOR UPDATE
   USING (auth.uid() = id);
 
+CREATE POLICY "Allow anon insert profiles"
+  ON profiles FOR INSERT
+  WITH CHECK (true);
+
 -- Works: anyone can read, only authenticated can insert/update/delete
 CREATE POLICY "Anyone can read works"
   ON works FOR SELECT

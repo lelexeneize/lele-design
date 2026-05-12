@@ -4,7 +4,7 @@ function saveUserToRegistry(user) {
   dbSaveUser(user);
 }
 
-async function handleGoogleLogin(response) {
+function handleGoogleLogin(response) {
   const payload = decodeJwtResponse(response.credential);
   const user = {
     name: payload.name,
@@ -14,23 +14,6 @@ async function handleGoogleLogin(response) {
   };
   localStorage.setItem('lele_user', JSON.stringify(user));
   saveUserToRegistry(user);
-
-  const isAdminPage = window.location.pathname.includes('admin-login.html');
-  if (isAdminPage) {
-    try {
-      const sb = getSupabaseClient();
-      if (sb) {
-        const { data: profile } = await sb.from('profiles').select('role').eq('email', payload.email).single();
-        if (profile?.role === 'admin') {
-          localStorage.setItem('lele_user', JSON.stringify({ ...user, isAdmin: true }));
-          window.location.href = 'admin.html';
-          return;
-        }
-      }
-    } catch (_) {}
-    alert('Esta cuenta no tiene permisos de administrador.');
-    return;
-  }
   window.location.href = 'dashboard.html';
 }
 
