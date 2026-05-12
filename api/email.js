@@ -26,7 +26,7 @@ module.exports = async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'Lele Design <noreply@leledesign.com>',
+        from: 'Lele Design <onboarding@resend.dev>',
         to: email,
         subject: `Tu license key para Sabina Optimizer ${planLabels[plan] || plan}`,
         html: `
