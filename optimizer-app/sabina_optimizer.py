@@ -141,7 +141,7 @@ add_opt("restorepoint", "Crear Punto de Restauracion",
 
 # ── License ─────────────────────────────────────────────────────────
 def validate_license(key):
-    key = key.strip()
+    key = key.strip().upper()
     if key == MASTER_KEY:
         return "elite"
     try:
