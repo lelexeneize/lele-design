@@ -52,8 +52,17 @@ module.exports = async (req, res) => {
       return res.status(500).send('Error');
     }
 
-    // Enviar email con la key al comprador
-    // (integrar con Resend/SendGrid si se desea)
+    // Enviar email si tenemos el correo del comprador
+    const buyerEmail = data?.payer?.email || data?.metadata?.email;
+    if (buyerEmail) {
+      try {
+        await fetch(`${process.env.SUPABASE_URL ? 'https://leledesign.vercel.app' : 'http://localhost:3000'}/api/email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key, plan, email: buyerEmail })
+        });
+      } catch (_) {}
+    }
 
     console.log(`✅ License generated: ${key} (${plan})`);
     return res.status(200).send('OK');

@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS license_keys (
   plan TEXT NOT NULL DEFAULT 'essential',
   status TEXT NOT NULL DEFAULT 'active',
   used_at TIMESTAMPTZ,
+  emailed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
