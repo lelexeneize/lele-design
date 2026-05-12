@@ -3,3 +3,4 @@ supabase/.temp/
 supabase/.branches/
 node_modules/
 .env
+optimizer-app/DEV_MODE
