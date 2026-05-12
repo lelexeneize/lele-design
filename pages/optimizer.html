@@ -202,6 +202,528 @@
     </div>
   </section>
 
+  <!-- LAS 26 OPTIMIZACIONES -->
+  <section id="optimizaciones" class="py-24 relative">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <span class="text-xs uppercase tracking-[0.2em] text-violet-400 font-semibold">Catálogo completo</span>
+        <h2 class="text-4xl md:text-5xl font-black mt-4 text-white">Las 26 optimizaciones</h2>
+        <p class="text-white/40 mt-4 max-w-xl mx-auto">Cada plan desbloquea más poder. Todos los detalles con un clic.</p>
+      </div>
+
+      <!-- Filtros -->
+      <div class="flex justify-center gap-3 mb-12">
+        <button onclick="filterOpts('all')" class="filter-btn active px-6 py-2.5 rounded-full text-sm font-medium transition-all border" data-filter="all">Todas</button>
+        <button onclick="filterOpts('essential')" class="filter-btn px-6 py-2.5 rounded-full text-sm font-medium transition-all border" data-filter="essential">Essential <span class="text-emerald-400 font-bold">13</span></button>
+        <button onclick="filterOpts('pro')" class="filter-btn px-6 py-2.5 rounded-full text-sm font-medium transition-all border" data-filter="pro">Pro <span class="text-blue-400 font-bold">7</span></button>
+        <button onclick="filterOpts('elite')" class="filter-btn px-6 py-2.5 rounded-full text-sm font-medium transition-all border" data-filter="elite">Elite <span class="text-violet-400 font-bold">6</span></button>
+      </div>
+
+      <!-- Lista -->
+      <div class="space-y-3" id="optsList">
+        <!-- Essential -->
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fas fa-bolt"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Power Plan: Alto Rendimiento</h4>
+                <p class="text-white/40 text-xs">Activa el plan de energía de alto rendimiento</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Establece el plan de energía en "Alto rendimiento" para máxima potencia de CPU y GPU, eliminando limitaciones de ahorro de energía.</p>
+            <div class="mt-3 flex items-center gap-2 text-[10px] text-white/20 font-mono"><i class="fas fa-terminal"></i> powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c</div>
+          </div>
+        </div>
+
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fas fa-clock"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Desactivar HPET</h4>
+                <p class="text-white/40 text-xs">Reduce latencia y mejora FPS. Requiere reinicio.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-yellow-600/20 text-yellow-400 font-semibold">Medio</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Desactiva el HPET (High Precision Event Timer) del sistema para reducir la latencia de interrupciones y mejorar FPS en juegos.</p>
+            <div class="mt-3 flex items-center gap-2 text-[10px] text-white/20 font-mono"><i class="fas fa-terminal"></i> bcdedit /deletevalue useplatformclock</div>
+          </div>
+        </div>
+
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fas fa-gamepad"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Game Mode</h4>
+                <p class="text-white/40 text-xs">Prioriza recursos para juegos</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Activa el Game Mode de Windows para priorizar recursos del sistema hacia tus juegos, mejorando FPS y estabilidad.</p>
+            <div class="mt-3 flex items-center gap-2 text-[10px] text-white/20 font-mono"><i class="fas fa-terminal"></i> Set-ItemProperty ... AutoGameModeEnabled 1</div>
+          </div>
+        </div>
+
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fab fa-xbox"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Deshabilitar Xbox Game Bar</h4>
+                <p class="text-white/40 text-xs">Elimina superposición de Xbox</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Desactiva la Game Bar de Xbox para liberar recursos del sistema y evitar superposiciones que afectan el rendimiento en juegos.</p>
+          </div>
+        </div>
+
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fas fa-microchip"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">GPU Hardware Scheduling</h4>
+                <p class="text-white/40 text-xs">Reduce latencia de GPU. Requiere reinicio.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-yellow-600/20 text-yellow-400 font-semibold">Medio</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Activa la programación de GPU acelerada por hardware para reducir latencia y mejorar el rendimiento gráfico general.</p>
+          </div>
+        </div>
+
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fas fa-hourglass-half"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Timer Resolution</h4>
+                <p class="text-white/40 text-xs">Ajusta temporizador del sistema para menor latencia.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Ajusta la resolución del temporizador del sistema para reducir la latencia en juegos y aplicaciones en tiempo real.</p>
+          </div>
+        </div>
+
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fas fa-wifi"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Deshabilitar Nagle</h4>
+                <p class="text-white/40 text-xs">Reduce ping en juegos online</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Deshabilita el algoritmo de Nagle para reducir la latencia de red en juegos online y aplicaciones en tiempo real.</p>
+          </div>
+        </div>
+
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fas fa-globe"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">DNS Cloudflare</h4>
+                <p class="text-white/40 text-xs">Cambia DNS a 1.1.1.1 (más rápido y seguro)</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Configura los DNS de Cloudflare (1.1.1.1 y 1.0.0.1) para navegación más rápida, segura y privada.</p>
+          </div>
+        </div>
+
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fas fa-network-wired"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Optimizar TCP/IP</h4>
+                <p class="text-white/40 text-xs">Ajusta TCP para menor latencia de red</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Optimiza los parámetros TCP/IP del sistema para menor latencia de red y mejor rendimiento en conexiones online.</p>
+          </div>
+        </div>
+
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fas fa-broom"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Limpieza del sistema</h4>
+                <p class="text-white/40 text-xs">Limpia TEMP, Prefetch, Papelera, Update cache, DNS</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Limpia archivos temporales, Prefetch, Papelera de reciclaje, caché de actualizaciones y vacía DNS para liberar espacio y mejorar respuesta.</p>
+          </div>
+        </div>
+
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fas fa-eye-slash"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Telemetría y Rastreo</h4>
+                <p class="text-white/40 text-xs">Apaga servicios de diagnóstico de Windows</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Desactiva servicios de telemetría y rastreo de Windows que consumen CPU, RAM y envían datos a Microsoft. Libera recursos del sistema.</p>
+          </div>
+        </div>
+
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fas fa-paint-brush"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Efectos Visuales Ultrarrápidos</h4>
+                <p class="text-white/40 text-xs">Desactiva animaciones lentas del sistema</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-yellow-600/20 text-yellow-400 font-semibold">Medio</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Desactiva animaciones visuales lentas de Windows como minimizar/maximizar ventanas y animaciones de la taskbar. Mantiene fuentes suaves y aspecto visual.</p>
+          </div>
+        </div>
+
+        <div class="opt-item essential rounded-2xl glass border border-emerald-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-sm"><i class="fas fa-mouse"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Optimizar Input</h4>
+                <p class="text-white/40 text-xs">Raw Buffer, mouse acceleration OFF, prioridad foreground</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Optimiza la respuesta del mouse y teclado: aumenta buffers de datos, desactiva aceleración del mouse y prioriza ventanas en foreground para input más directo.</p>
+          </div>
+        </div>
+
+        <!-- Pro -->
+        <div class="opt-item pro rounded-2xl glass border border-blue-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center text-blue-400 text-sm"><i class="fas fa-box-open"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Remover Bloatware</h4>
+                <p class="text-white/40 text-xs">Desinstala apps preinstaladas (Xbox, Cortana, Skype, Copilot...)</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-yellow-600/20 text-yellow-400 font-semibold">Medio</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Elimina aplicaciones preinstaladas de Windows que consumen recursos innecesariamente, liberando espacio y mejorando el rendimiento general.</p>
+          </div>
+        </div>
+
+        <div class="opt-item pro rounded-2xl glass border border-blue-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center text-blue-400 text-sm"><i class="fab fa-microsoft"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Desinstalar OneDrive</h4>
+                <p class="text-white/40 text-xs">Elimina OneDrive completamente del sistema</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-yellow-600/20 text-yellow-400 font-semibold">Medio</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Elimina OneDrive y su integración con el explorador de archivos, liberando recursos del sistema que consume constantemente en segundo plano.</p>
+          </div>
+        </div>
+
+        <div class="opt-item pro rounded-2xl glass border border-blue-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center text-blue-400 text-sm"><i class="fas fa-database"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Optimizar SSD/NVMe</h4>
+                <p class="text-white/40 text-xs">Hibernación OFF, SuperFetch OFF, TRIM</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Optimiza unidades SSD/NVMe: desactiva hibernación para recuperar espacio, desactiva SuperFetch (innecesario en SSDs) y ejecuta TRIM para mantener el rendimiento.</p>
+          </div>
+        </div>
+
+        <div class="opt-item pro rounded-2xl glass border border-blue-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center text-blue-400 text-sm"><i class="fas fa-video"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Shader Cache GPU</h4>
+                <p class="text-white/40 text-xs">Maximiza caché de shaders NVIDIA</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Maximiza el tamaño del caché de shaders de NVIDIA y ajusta la preferencia de GPU para máximo rendimiento en juegos.</p>
+          </div>
+        </div>
+
+        <div class="opt-item pro rounded-2xl glass border border-blue-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center text-blue-400 text-sm"><i class="fas fa-eraser"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Limpiar Drivers Fantasma</h4>
+                <p class="text-white/40 text-xs">Escanea y detecta drivers huérfanos</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Detecta y lista drivers huérfanos o fantasmas en el sistema que pueden causar conflictos o consumir recursos innecesariamente.</p>
+          </div>
+        </div>
+
+        <div class="opt-item pro rounded-2xl glass border border-blue-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center text-blue-400 text-sm"><i class="fas fa-tv"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Guía Monitor</h4>
+                <p class="text-white/40 text-xs">Configurar Hz máximo y overdrive</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Guía para configurar la frecuencia máxima de tu monitor y activar overdrive desde el menú OSD para menor ghosting.</p>
+          </div>
+        </div>
+
+        <div class="opt-item pro rounded-2xl glass border border-blue-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center text-blue-400 text-sm"><i class="fas fa-ban"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Bloquear Apps en Segundo Plano</h4>
+                <p class="text-white/40 text-xs">Impide que apps innecesarias consuman recursos</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Bloquea la ejecución de aplicaciones en segundo plano que consumen CPU, RAM y datos innecesariamente, liberando recursos para tus juegos.</p>
+          </div>
+        </div>
+
+        <!-- Elite -->
+        <div class="opt-item elite rounded-2xl glass border border-violet-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-violet-600/20 flex items-center justify-center text-violet-400 text-sm"><i class="fas fa-server"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">MSI Mode (GPU+NVMe+USB)</h4>
+                <p class="text-white/40 text-xs">Activa MSI en dispositivos. Reduce latencia DPC.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-yellow-600/20 text-yellow-400 font-semibold">Medio</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Activa Message Signaled Interrupts (MSI) en GPU, NVMe y USB para reducir drásticamente la latencia DPC y mejorar el rendimiento en tiempo real.</p>
+          </div>
+        </div>
+
+        <div class="opt-item elite rounded-2xl glass border border-violet-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-violet-600/20 flex items-center justify-center text-violet-400 text-sm"><i class="fas fa-chart-line"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Guía DPC Latency</h4>
+                <p class="text-white/40 text-xs">Recomendaciones BIOS para mínima latencia</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Recomendaciones detalladas para configurar la BIOS: desactivar C-States, SpeedStep y Global C-States para reducir la latencia DPC al mínimo.</p>
+          </div>
+        </div>
+
+        <div class="opt-item elite rounded-2xl glass border border-violet-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-violet-600/20 flex items-center justify-center text-violet-400 text-sm"><i class="fas fa-memory"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Guía RAM Timings</h4>
+                <p class="text-white/40 text-xs">Recomendaciones personalizadas para BIOS</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Guía personalizada basada en tu hardware: calcula timings primarios (tCL, tRCD, tRP, tRAS) óptimos para tu RAM específica.</p>
+          </div>
+        </div>
+
+        <div class="opt-item elite rounded-2xl glass border border-violet-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-violet-600/20 flex items-center justify-center text-violet-400 text-sm"><i class="fas fa-tachometer-alt"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Guía Overclock + Undervolt</h4>
+                <p class="text-white/40 text-xs">Guía personalizada CPU/GPU</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Guía personalizada basada en tu CPU: recomendaciones de overclock (ratio +1-2) y undervolt (-0.05V) para CPU, y Afterburner para GPU (Core +150, Mem +750).</p>
+          </div>
+        </div>
+
+        <div class="opt-item elite rounded-2xl glass border border-violet-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-violet-600/20 flex items-center justify-center text-violet-400 text-sm"><i class="fas fa-chart-bar"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Benchmark Rápido</h4>
+                <p class="text-white/40 text-xs">CPU, RAM, Disco y Ping</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Ejecuta un benchmark rápido del sistema mostrando CPU, RAM disponible, espacio en disco y latencia de ping para medir el rendimiento antes y después.</p>
+          </div>
+        </div>
+
+        <div class="opt-item elite rounded-2xl glass border border-violet-600/10 overflow-hidden transition-all duration-300">
+          <div class="flex items-center justify-between p-5 cursor-pointer opt-header" onclick="toggleOpt(this)">
+            <div class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-lg bg-violet-600/20 flex items-center justify-center text-violet-400 text-sm"><i class="fas fa-shield-alt"></i></span>
+              <div>
+                <h4 class="text-white font-semibold text-sm">Crear Punto de Restauración</h4>
+                <p class="text-white/40 text-xs">Deshace todos los cambios si algo falla</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 font-semibold">Bajo</span>
+              <i class="fas fa-chevron-down text-white/30 transition-transform duration-300"></i>
+            </div>
+          </div>
+          <div class="opt-body hidden px-5 pb-5 border-t border-white/[0.04] pt-3">
+            <p class="text-white/40 text-xs leading-relaxed">Crea un punto de restauración del sistema antes de aplicar optimizaciones para poder deshacer todos los cambios en caso de cualquier inconveniente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- CÓMO FUNCIONA -->
   <section class="py-24">
     <div class="max-w-5xl mx-auto px-6">
@@ -308,6 +830,43 @@
       const tc = document.getElementById('themeToggleContainer');
       if (tc && !tc.querySelector('.theme-toggle')) tc.appendChild(leleTheme.createToggle());
     });
+
+    // ── Filtros ──────────────────────────────────────────
+    const FILTER_CLASSES = {
+      'all': 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white border-transparent',
+      'essential': 'bg-emerald-600/20 text-emerald-400 border-emerald-600/30',
+      'pro': 'bg-blue-600/20 text-blue-400 border-blue-600/30',
+      'elite': 'bg-violet-600/20 text-violet-400 border-violet-600/30'
+    };
+    let currentFilter = 'all';
+
+    function filterOpts(plan) {
+      currentFilter = plan;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        const f = btn.dataset.filter;
+        btn.className = 'filter-btn px-6 py-2.5 rounded-full text-sm font-medium transition-all border ' +
+          (f === plan ? FILTER_CLASSES[f] || FILTER_CLASSES['all'] : 'text-white/40 border-white/10 hover:text-white');
+      });
+      document.querySelectorAll('.opt-item').forEach(el => {
+        el.style.display = (plan === 'all' || el.classList.contains(plan)) ? '' : 'none';
+      });
+    }
+
+    // ── Accordion ────────────────────────────────────────
+    function toggleOpt(header) {
+      const body = header.parentElement.querySelector('.opt-body');
+      const icon = header.querySelector('.fa-chevron-down');
+      const isOpen = !body.classList.contains('hidden');
+      document.querySelectorAll('.opt-body').forEach(b => b.classList.add('hidden'));
+      document.querySelectorAll('.fa-chevron-down').forEach(i => i.style.transform = '');
+      if (!isOpen) {
+        body.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      }
+    }
+
+    // Iniciar con Essential visible
+    filterOpts('essential');
   </script>
 </body>
 </html>
