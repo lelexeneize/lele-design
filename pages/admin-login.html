@@ -55,6 +55,7 @@
   <script src="../js/auth.js"></script>
   <script>
     const REDIRECT_URL = window.location.origin + '/pages/admin-login.html';
+    let _handleOAuthDone = false;
 
     document.getElementById('googleLoginBtn').addEventListener('click', () => {
       const sb = getSupabaseClient();
@@ -68,29 +69,47 @@
       }
     });
 
-    async function handleOAuthRedirect() {
+    async function checkAdminByUserId(userId) {
       const sb = getSupabaseClient();
-      if (!sb) return;
-
-      const { data: { session } } = await sb.auth.getSession();
-      if (!session?.user) return;
-
-      const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-      if (profile?.role === 'admin') {
-        const user = {
-          name: session.user.user_metadata?.name || session.user.email,
-          email: session.user.email,
-          picture: session.user.user_metadata?.picture || '',
-          isAdmin: true
-        };
-        localStorage.setItem('lele_user', JSON.stringify(user));
-        window.location.href = 'admin.html';
-      } else {
-        alert('Esta cuenta no tiene permisos de administrador.');
-      }
+      if (!sb) return null;
+      const { data: profile } = await sb.from('profiles').select('role').eq('id', userId).single();
+      return profile?.role === 'admin';
     }
 
-    handleOAuthRedirect();
+    function handleAdminSession(session) {
+      if (_handleOAuthDone) return;
+      _handleOAuthDone = true;
+
+      checkAdminByUserId(session.user.id).then(isAdmin => {
+        if (isAdmin) {
+          const user = {
+            name: session.user.user_metadata?.name || session.user.email,
+            email: session.user.email,
+            picture: session.user.user_metadata?.picture || '',
+            isAdmin: true
+          };
+          localStorage.setItem('lele_user', JSON.stringify(user));
+          window.location.href = 'admin.html';
+        } else {
+          alert('Esta cuenta no tiene permisos de administrador.');
+        }
+      });
+    }
+
+    // Try onAuthStateChange first (catches OAuth redirect)
+    (function initOAuthHandler() {
+      const sb = getSupabaseClient();
+      if (!sb) { setTimeout(initOAuthHandler, 200); return; }
+      sb.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          handleAdminSession(session);
+        }
+      });
+      // Also try getSession immediately (in case session already exists)
+      sb.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) handleAdminSession(session);
+      });
+    })();
 
     document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -106,8 +125,8 @@
         if (sb) {
           const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
           if (!error && data.user) {
-            const { data: profile } = await sb.from('profiles').select('role').eq('id', data.user.id).single();
-            if (profile?.role === 'admin') {
+            const isAdmin = await checkAdminByUserId(data.user.id);
+            if (isAdmin) {
               localStorage.setItem('lele_user', JSON.stringify({ name: email, email, picture: '', isAdmin: true }));
               window.location.href = 'admin.html';
               return;
