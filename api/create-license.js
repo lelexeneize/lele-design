@@ -28,6 +28,7 @@ module.exports = async (req, res) => {
   const { plan = 'essential', count = 1 } = req.body;
 
   const keys = [];
+  const errors = [];
   for (let i = 0; i < count; i++) {
     const key = generateKey(plan);
     const { error } = await supabase.from('license_keys').insert({
@@ -35,8 +36,15 @@ module.exports = async (req, res) => {
       plan: plan,
       status: 'active'
     });
-    if (!error) keys.push(key);
+    if (error) {
+      errors.push(error.message);
+    } else {
+      keys.push(key);
+    }
   }
 
+  if (errors.length > 0) {
+    return res.json({ created: keys.length, keys, error: errors.join(' | ') });
+  }
   return res.json({ created: keys.length, keys });
 };
