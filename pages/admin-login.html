@@ -96,19 +96,23 @@
       });
     }
 
-    // Try onAuthStateChange first (catches OAuth redirect)
+    // Espera a que Supabase SDK esté listo y la sesión se recupere
     (function initOAuthHandler() {
       const sb = getSupabaseClient();
       if (!sb) { setTimeout(initOAuthHandler, 200); return; }
-      sb.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_IN' && session?.user) {
+
+      // Poll cada 300ms hasta 15 intentos buscando la sesión del OAuth redirect
+      let attempts = 0;
+      const poll = setInterval(async () => {
+        attempts++;
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.user) {
+          clearInterval(poll);
           handleAdminSession(session);
+        } else if (attempts >= 15) {
+          clearInterval(poll);
         }
-      });
-      // Also try getSession immediately (in case session already exists)
-      sb.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user) handleAdminSession(session);
-      });
+      }, 300);
     })();
 
     document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
