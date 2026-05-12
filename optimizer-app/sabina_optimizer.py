@@ -192,7 +192,9 @@ def create_restore_point():
         err = r.stderr.strip()
         if "0x80041010" in err:
             return (False, "Restaurar sistema no esta disponible. Activalo desde 'Crear punto de restauracion' en Windows.")
-        return (False, err or "Error desconocido")
+        if "admin" in err.lower() or "privilege" in err.lower() or "access denied" in err.lower():
+            return (False, "Ejecuta SabinaOptimizer como ADMINISTRADOR (clic derecho > Ejecutar como administrador)")
+        return (False, err or "Restaurar sistema no habilitado. Activalo en 'Crear punto de restauracion' de Windows.")
     except subprocess.TimeoutExpired:
         return (False, "Timeout al crear punto de restauracion")
     except Exception as e:
