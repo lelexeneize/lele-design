@@ -8,9 +8,12 @@
 const mercadopago = require('mercadopago');
 
 const PLANS = {
-  essential: { title: 'Sabina Optimizer - Essential', price: 45000, currency: 'ARS' },
-  pro:       { title: 'Sabina Optimizer - Pro',       price: 65000, currency: 'ARS' },
-  elite:     { title: 'Sabina Optimizer - Elite',     price: 85000, currency: 'ARS' }
+  essential:  { title: 'Sabina Optimizer - Essential', price: 45000,  currency: 'ARS' },
+  pro:        { title: 'Sabina Optimizer - Pro',       price: 65000,  currency: 'ARS' },
+  elite:      { title: 'Sabina Optimizer - Elite',     price: 85000,  currency: 'ARS' },
+  starter:    { title: 'Diseño - Starter',             price: 35000,  currency: 'ARS' },
+  designpro:  { title: 'Diseño - Pro',                 price: 95000,  currency: 'ARS' },
+  enterprise: { title: 'Diseño - Enterprise',          price: 239000, currency: 'ARS' }
 };
 
 module.exports = async (req, res) => {

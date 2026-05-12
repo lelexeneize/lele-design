@@ -54,9 +54,9 @@ module.exports = async (req, res) => {
 
     // Enviar email si tenemos el correo del comprador
     const buyerEmail = data?.payer?.email || data?.metadata?.email;
-    if (buyerEmail) {
+    if (buyerEmail && process.env.RESEND_API_KEY) {
       try {
-        await fetch(`${process.env.SUPABASE_URL ? 'https://leledesign.vercel.app' : 'http://localhost:3000'}/api/email`, {
+        await fetch(`https://leledesign.vercel.app/api/email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key, plan, email: buyerEmail })

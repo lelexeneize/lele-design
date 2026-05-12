@@ -56,8 +56,20 @@
 
   <script src="../js/supabase-config.js"></script>
   <script>
+    // Verificar que el pago fue iniciado desde la página de pago
+    const paymentData = JSON.parse(localStorage.getItem('payment_initiated'));
+    const oneHour = 60 * 60 * 1000;
+    if (!paymentData || (Date.now() - paymentData.time) > oneHour) {
+      document.getElementById('keyLoading').innerHTML = `
+        <p class="text-red-400 text-sm mb-3">No se detectó un pago reciente.</p>
+        <p class="text-white/30 text-xs mb-4">Para obtener tu license key, primero completá el pago.</p>
+        <a href="pago.html" class="inline-block px-6 py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-semibold">Ir a pagar</a>
+      `;
+      throw new Error('No payment detected');
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
-    const plan = urlParams.get('plan') || 'essential';
+    const plan = urlParams.get('plan') || paymentData.plan || 'essential';
 
     const planNames = {
       essential: { label: 'Essential', prefix: 'ES' },

@@ -103,7 +103,7 @@
               </div>
             </div>
           </button>
-          <button onclick="selectPlan('starter-enterprise')" class="plan-btn w-full text-left p-5 rounded-2xl border border-white/[0.06] glass-hover transition-all">
+          <button onclick="selectPlan('enterprise')" class="plan-btn w-full text-left p-5 rounded-2xl border border-white/[0.06] glass-hover transition-all">
             <div class="flex justify-between items-center">
               <div>
                 <span class="text-white font-bold">Enterprise</span>
@@ -180,6 +180,8 @@
       document.getElementById('ppButton').href = p.pp;
       document.getElementById('planDisplay').textContent = `Plan seleccionado: ${p.name}`;
       document.getElementById('paymentOptions').classList.remove('hidden');
+      // Marcar que el usuario inició un pago (previene acceso directo a pago-exitoso.html)
+      localStorage.setItem('payment_initiated', JSON.stringify({ plan, time: Date.now() }));
     }
   </script>
 </body>
