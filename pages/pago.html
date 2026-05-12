@@ -132,6 +132,13 @@
           </a>
         </div>
         <p class="text-white/20 text-xs mt-4"><i class="fas fa-lock mr-1"></i> Pago 100% seguro</p>
+        <div class="relative my-6">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t" style="border-color: var(--border-color);"></div></div>
+          <div class="relative flex justify-center"><span class="px-4 text-xs text-white/30" style="background: var(--bg-primary);">ya pagaste?</span></div>
+        </div>
+        <a id="alreadyPaidBtn" href="pago-exitoso.html" class="block w-full py-3 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm transition-all shadow-lg shadow-emerald-600/25">
+          <i class="fas fa-check-circle mr-2"></i> Ya pagué — Generar license key
+        </a>
       </div>
     </div>
 
@@ -180,6 +187,7 @@
       document.getElementById('ppButton').href = p.pp;
       document.getElementById('planDisplay').textContent = `Plan seleccionado: ${p.name}`;
       document.getElementById('paymentOptions').classList.remove('hidden');
+      document.getElementById('alreadyPaidBtn').href = 'pago-exitoso.html?plan=' + plan;
       // Marcar que el usuario inició un pago (previene acceso directo a pago-exitoso.html)
       localStorage.setItem('payment_initiated', JSON.stringify({ plan, time: Date.now() }));
     }
