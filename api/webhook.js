@@ -56,7 +56,7 @@ module.exports = async (req, res) => {
     const buyerEmail = data?.payer?.email || data?.metadata?.email;
     if (buyerEmail && process.env.RESEND_API_KEY) {
       try {
-        await fetch(`https://leleoficial.com/api/email`, {
+        await fetch(`https://leleoficial.vercel.app/api/email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key, plan, email: buyerEmail })

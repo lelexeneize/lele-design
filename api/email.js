@@ -41,7 +41,7 @@ module.exports = async (req, res) => {
               <p style="color: #888; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">License Key</p>
               <p style="color: #a855f7; font-size: 22px; font-weight: 700; font-family: monospace; letter-spacing: 2px; margin: 0;">${key}</p>
             </div>
-            <a href="https://leleoficial.com/pages/descargar.html" style="display: block; text-align: center; padding: 14px; background: linear-gradient(135deg, #7c3aed, #d946ef); color: white; border-radius: 9999px; text-decoration: none; font-weight: 600; font-size: 14px; margin-bottom: 20px;">Descargar Sabina Optimizer</a>
+            <a href="https://leleoficial.vercel.app/pages/descargar.html" style="display: block; text-align: center; padding: 14px; background: linear-gradient(135deg, #7c3aed, #d946ef); color: white; border-radius: 9999px; text-decoration: none; font-weight: 600; font-size: 14px; margin-bottom: 20px;">Descargar Sabina Optimizer</a>
             <p style="color: #555; font-size: 12px; text-align: center;">Ejecutá el .exe como Administrador e ingresá tu license key para desbloquear todas las optimizaciones.</p>
           </div>
         `
