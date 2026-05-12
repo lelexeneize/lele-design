@@ -32,14 +32,16 @@ function New-RestorePoint {
         $systemDrive = $os.SystemDrive
         $sr = Get-CimInstance -ClassName SystemRestore -Filter "Drive='$($systemDrive -replace ':','')'" -ErrorAction Stop
         if (-not $sr -or -not $sr.Enable) {
-            return @{ success=$false; msg="Restaurar sistema NO esta habilitado en $systemDrive.`nActivalo en: Panel de control > Sistema > Proteccion del sistema`nO ejecuta: Enable-ComputerRestore -Drive `"$systemDrive`" (Admin)" }
+            return @{ success = $false; msg = "Restaurar sistema NO esta habilitado en $systemDrive.`nActivalo en: Panel de control > Sistema > Proteccion del sistema`nO ejecuta: Enable-ComputerRestore -Drive `"$systemDrive`" (Admin)" }
         }
         Checkpoint-Computer -Description $desc -RestorePointType MODIFY_SETTINGS -ErrorAction Stop
-        return @{ success=$true; msg="Punto de restauracion '$desc' creado correctamente" }
-    } catch [System.Management.Automation.MethodInvocationException] {
-        return @{ success=$false; msg="Restaurar sistema no esta habilitado en $systemDrive.`nActivalo en: Panel de control > Sistema > Proteccion del sistema" }
-    } catch {
-        return @{ success=$false; msg="No se pudo crear punto de restauracion: $_" }
+        return @{ success = $true; msg = "Punto de restauracion '$desc' creado correctamente" }
+    }
+    catch [System.Management.Automation.MethodInvocationException] {
+        return @{ success = $false; msg = "Restaurar sistema no esta habilitado en $systemDrive.`nActivalo en: Panel de control > Sistema > Proteccion del sistema" }
+    }
+    catch {
+        return @{ success = $false; msg = "No se pudo crear punto de restauracion: $_" }
     }
 }
 
@@ -50,7 +52,7 @@ function New-RestorePoint {
 $script:Optimizations = @()
 
 function Add-Opt($id, $name, $desc, $cat, $risk, $commands, $scriptBlock) {
-    $script:Optimizations += @{ id=$id; name=$name; desc=$desc; category=$cat; risk=$risk; commands=$commands; action=$scriptBlock }
+    $script:Optimizations += @{ id = $id; name = $name; desc = $desc; category = $cat; risk = $risk; commands = $commands; action = $scriptBlock }
 }
 
 # Essential
@@ -60,29 +62,26 @@ Add-Opt "gamemode" "Game Mode" "Prioriza recursos para juegos." "Essential" "Baj
 Add-Opt "xbox" "Deshabilitar Xbox Game Bar" "Elimina superposicion de Xbox." "Essential" "Bajo" @('Set-ItemProperty "HKCU:\Software\Microsoft\GameBar" ShowStartupPanel 0 -Type DWord -Force') { $path = "HKCU:\Software\Microsoft\GameBar"; if (-not (Test-Path $path)) { New-Item -Path $path -Force -EA 0 | Out-Null }; Set-ItemProperty $path ShowStartupPanel 0 -Type DWord -Force -EA 0; "Xbox Game Bar deshabilitado" }
 Add-Opt "gpusched" "GPU Hardware Scheduling" "Reduce latencia de GPU. Requiere reinicio." "Essential" "Medio" @('Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" HwSchMode 2 -Type DWord -Force') { Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" HwSchMode 2 -Type DWord -Force -EA 0; "GPU Scheduling: Hardware accelerated (requiere reinicio)" }
 Add-Opt "timer" "Timer Resolution" "Ajusta temporizador del sistema para menor latencia." "Essential" "Bajo" @('Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" TimerResolution 10000 -Type DWord -Force') { Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" TimerResolution 10000 -Type DWord -Force -EA 0; "Timer Resolution optimizado" }
-Add-Opt "nagle" "Deshabilitar Nagle" "Reduce ping en juegos online." "Essential" "Bajo" @('Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" TcpAckFrequency 1 -Type DWord -Force','Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" TCPNoDelay 1 -Type DWord -Force') { Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" TcpAckFrequency 1 -Type DWord -Force -EA 0; Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" TCPNoDelay 1 -Type DWord -Force -EA 0; "Nagle Algorithm deshabilitado" }
-Add-Opt "dns" "DNS Cloudflare" "Cambia DNS a 1.1.1.1 (mas rapido y seguro)." "Essential" "Bajo" @("Set-DnsClientServerAddress -InterfaceIndex (Get-NetAdapter | ? Status -eq Up).ifIndex -ServerAddresses ('1.1.1.1','1.0.0.1')") { $a = Get-NetAdapter | Where-Object {$_.Status -eq "Up"}; foreach ($ad in $a) { Set-DnsClientServerAddress -InterfaceIndex $ad.ifIndex -ServerAddresses ("1.1.1.1","1.0.0.1") -EA 0 }; "DNS cambiado a Cloudflare" }
-Add-Opt "tcptune" "Optimizar TCP/IP" "Ajusta TCP para menor latencia de red." "Essential" "Bajo" @("netsh int tcp set global autotuninglevel=normal","netsh int tcp set global rss=enabled","netsh int tcp set global chimney=disabled") { netsh int tcp set global autotuninglevel=normal 2>$null; netsh int tcp set global rss=enabled 2>$null; netsh int tcp set global chimney=disabled 2>$null; "TCP/IP optimizado" }
-Add-Opt "cleanup" "Limpieza del sistema" "Limpia TEMP, Prefetch, Papelera, Update cache, DNS." "Essential" "Bajo" @("Remove-Item `"`$env:TEMP`*`" -Recurse -Force","Remove-Item `"`$env:WINDIR\Temp\`*`" -Recurse -Force","Clear-RecycleBin -Force","ipconfig /flushdns") { Remove-Item "$env:TEMP\*" -Recurse -Force -EA 0; Remove-Item "$env:WINDIR\Temp\*" -Recurse -Force -EA 0; Remove-Item "$env:WINDIR\Prefetch\*" -Recurse -Force -EA 0; Clear-RecycleBin -Force -EA 0; Stop-Service wuauserv -Force -EA 0; Remove-Item "$env:WINDIR\SoftwareDistribution\Download\*" -Recurse -Force -EA 0; Start-Service wuauserv -EA 0; ipconfig /flushdns | Out-Null; "Limpieza completada" }
-Add-Opt "input" "Optimizar Input" "Raw Buffer, mouse acceleration OFF, prioridad foreground." "Essential" "Bajo" @('Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Keyboard" KeyboardDataQueueSize 100 -Type DWord -Force','Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Mouse" MouseDataQueueSize 100 -Type DWord -Force','Set-ItemProperty "HKCU:\Control Panel\Mouse" MouseSpeed 0 -Force') { Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Keyboard" KeyboardDataQueueSize 100 -Type DWord -Force -EA 0; Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Mouse" MouseDataQueueSize 100 -Type DWord -Force -EA 0; Set-ItemProperty "HKCU:\Control Panel\Mouse" MouseSpeed 0 -Force -EA 0; Set-ItemProperty "HKCU:\Control Panel\Mouse" MouseThreshold1 0 -Force -EA 0; Set-ItemProperty "HKCU:\Control Panel\Mouse" MouseThreshold2 0 -Force -EA 0; Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl" Win32PrioritySeparation 38 -Type DWord -Force -EA 0; "Input optimizado" }
-Add-Opt "telemetry" "Deshabilitar Telemetria" "Apaga el rastreo de datos de Windows (DiagTrack)." "Essential" "Bajo" @("Stop-Service DiagTrack -Force","Set-Service DiagTrack -StartupType Disabled") { Stop-Service DiagTrack -Force -EA 0; Set-Service DiagTrack -StartupType Disabled -EA 0; $p = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection"; if (-not (Test-Path $p)) { New-Item -Path $p -Force -EA 0 | Out-Null }; Set-ItemProperty $p AllowTelemetry 0 -Type DWord -Force -EA 0; "Telemetria deshabilitada" }
-Add-Opt "visualfx" "Efectos Visuales Ultrarrapidos" "Desactiva animaciones lentas de ventanas." "Essential" "Bajo" @('Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" VisualFXSetting 2 -Type DWord -Force') { Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" VisualFXSetting 2 -Type DWord -Force -EA 0; "Efectos visuales optimizados" }
+Add-Opt "nagle" "Deshabilitar Nagle" "Reduce ping en juegos online." "Essential" "Bajo" @('Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" TcpAckFrequency 1 -Type DWord -Force', 'Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" TCPNoDelay 1 -Type DWord -Force') { Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" TcpAckFrequency 1 -Type DWord -Force -EA 0; Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\*" TCPNoDelay 1 -Type DWord -Force -EA 0; "Nagle Algorithm deshabilitado" }
+Add-Opt "dns" "DNS Cloudflare" "Cambia DNS a 1.1.1.1 (mas rapido y seguro)." "Essential" "Bajo" @("Set-DnsClientServerAddress -InterfaceIndex (Get-NetAdapter | ? Status -eq Up).ifIndex -ServerAddresses ('1.1.1.1','1.0.0.1')") { $a = Get-NetAdapter | Where-Object { $_.Status -eq "Up" }; foreach ($ad in $a) { Set-DnsClientServerAddress -InterfaceIndex $ad.ifIndex -ServerAddresses ("1.1.1.1", "1.0.0.1") -EA 0 }; "DNS cambiado a Cloudflare" }
+Add-Opt "tcptune" "Optimizar TCP/IP" "Ajusta TCP para menor latencia de red." "Essential" "Bajo" @("netsh int tcp set global autotuninglevel=normal", "netsh int tcp set global rss=enabled", "netsh int tcp set global chimney=disabled") { netsh int tcp set global autotuninglevel=normal 2>$null; netsh int tcp set global rss=enabled 2>$null; netsh int tcp set global chimney=disabled 2>$null; "TCP/IP optimizado" }
+Add-Opt "cleanup" "Limpieza del sistema" "Limpia TEMP, Prefetch, Papelera, Update cache, DNS." "Essential" "Bajo" @("Remove-Item `"`$env:TEMP`*`" -Recurse -Force", "Remove-Item `"`$env:WINDIR\Temp\`*`" -Recurse -Force", "Clear-RecycleBin -Force", "ipconfig /flushdns") { Remove-Item "$env:TEMP\*" -Recurse -Force -EA 0; Remove-Item "$env:WINDIR\Temp\*" -Recurse -Force -EA 0; Remove-Item "$env:WINDIR\Prefetch\*" -Recurse -Force -EA 0; Clear-RecycleBin -Force -EA 0; Stop-Service wuauserv -Force -EA 0; Remove-Item "$env:WINDIR\SoftwareDistribution\Download\*" -Recurse -Force -EA 0; Start-Service wuauserv -EA 0; ipconfig /flushdns | Out-Null; "Limpieza completada" }
+Add-Opt "input" "Optimizar Input" "Raw Buffer, mouse acceleration OFF, prioridad foreground." "Essential" "Bajo" @('Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Keyboard" KeyboardDataQueueSize 100 -Type DWord -Force', 'Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Mouse" MouseDataQueueSize 100 -Type DWord -Force', 'Set-ItemProperty "HKCU:\Control Panel\Mouse" MouseSpeed 0 -Force') { Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Keyboard" KeyboardDataQueueSize 100 -Type DWord -Force -EA 0; Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Mouse" MouseDataQueueSize 100 -Type DWord -Force -EA 0; Set-ItemProperty "HKCU:\Control Panel\Mouse" MouseSpeed 0 -Force -EA 0; Set-ItemProperty "HKCU:\Control Panel\Mouse" MouseThreshold1 0 -Force -EA 0; Set-ItemProperty "HKCU:\Control Panel\Mouse" MouseThreshold2 0 -Force -EA 0; Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl" Win32PrioritySeparation 38 -Type DWord -Force -EA 0; "Input optimizado" }
 
 # Pro
-Add-Opt "bloatware" "Remover Bloatware" "Desinstala apps preinstaladas (Xbox, Cortana, Skype, Copilot...)." "Pro" "Medio" @("Remove-AppxPackage bloatware apps") { $apps = @("Microsoft.BingWeather","Microsoft.GetHelp","Microsoft.Microsoft3DViewer","Microsoft.MicrosoftOfficeHub","Microsoft.MicrosoftSolitaireCollection","Microsoft.Office.OneNote","Microsoft.People","Microsoft.Print3D","Microsoft.SkypeApp","Microsoft.Wallet","Microsoft.WindowsAlarms","Microsoft.WindowsCamera","Microsoft.WindowsFeedbackHub","Microsoft.WindowsMaps","Microsoft.WindowsSoundRecorder","Microsoft.YourPhone","Microsoft.ZuneMusic","Microsoft.ZuneVideo","Microsoft.Copilot","Clipchamp.Clipchamp"); $prov = Get-AppxProvisionedPackage -Online -EA 0; foreach ($app in $apps) { Get-AppxPackage -Name "*$app*" -AllUsers -EA 0 | Remove-AppxPackage -AllUsers -EA 0; if ($prov) { $prov | Where-Object DisplayName -like "*$app*" | Remove-AppxProvisionedPackage -Online -EA 0 } }; "Bloatware removido: $($apps.Count) apps" }
-Add-Opt "onedrive" "Desinstalar OneDrive" "Elimina OneDrive completamente del sistema." "Pro" "Medio" @("Stop-Process -Name OneDrive -Force",'Start-Process "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe" -ArgumentList "/uninstall" -Wait') { Stop-Process -Name OneDrive -Force -EA 0; $od = "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe"; if (Test-Path $od) { Start-Process $od -ArgumentList "/uninstall" -NoNewWindow -Wait }; "OneDrive desinstalado" }
-Add-Opt "ssd" "Optimizar SSD/NVMe" "Hibernacion OFF, SuperFetch OFF, TRIM." "Pro" "Bajo" @("powercfg -h off","Stop-Service SysMain -Force","Optimize-Volume -DriveLetter C -ReTrim") { powercfg -h off 2>$null; Stop-Service SysMain -Force -EA 0; Set-Service SysMain -StartupType Disabled -EA 0; Optimize-Volume -DriveLetter C -ReTrim -EA 0; "SSD optimizado: Hibernate OFF, SuperFetch OFF, TRIM ejecutado" }
+Add-Opt "bloatware" "Remover Bloatware" "Desinstala apps preinstaladas (Xbox, Cortana, Skype, Copilot...)." "Pro" "Medio" @("Remove-AppxPackage bloatware apps") { $apps = @("Microsoft.BingWeather", "Microsoft.GetHelp", "Microsoft.Microsoft3DViewer", "Microsoft.MicrosoftOfficeHub", "Microsoft.MicrosoftSolitaireCollection", "Microsoft.Office.OneNote", "Microsoft.People", "Microsoft.Print3D", "Microsoft.SkypeApp", "Microsoft.Wallet", "Microsoft.WindowsAlarms", "Microsoft.WindowsCamera", "Microsoft.WindowsFeedbackHub", "Microsoft.WindowsMaps", "Microsoft.WindowsSoundRecorder", "Microsoft.YourPhone", "Microsoft.ZuneMusic", "Microsoft.ZuneVideo", "Microsoft.Copilot", "Clipchamp.Clipchamp"); $prov = Get-AppxProvisionedPackage -Online -EA 0; foreach ($app in $apps) { Get-AppxPackage -Name "*$app*" -AllUsers -EA 0 | Remove-AppxPackage -AllUsers -EA 0; if ($prov) { $prov | Where-Object DisplayName -like "*$app*" | Remove-AppxProvisionedPackage -Online -EA 0 } }; "Bloatware removido: $($apps.Count) apps" }
+Add-Opt "onedrive" "Desinstalar OneDrive" "Elimina OneDrive completamente del sistema." "Pro" "Medio" @("Stop-Process -Name OneDrive -Force", 'Start-Process "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe" -ArgumentList "/uninstall" -Wait') { Stop-Process -Name OneDrive -Force -EA 0; $od = "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe"; if (Test-Path $od) { Start-Process $od -ArgumentList "/uninstall" -NoNewWindow -Wait }; "OneDrive desinstalado" }
+Add-Opt "ssd" "Optimizar SSD/NVMe" "Hibernacion OFF, SuperFetch OFF, TRIM." "Pro" "Bajo" @("powercfg -h off", "Stop-Service SysMain -Force", "Optimize-Volume -DriveLetter C -ReTrim") { powercfg -h off 2>$null; Stop-Service SysMain -Force -EA 0; Set-Service SysMain -StartupType Disabled -EA 0; Optimize-Volume -DriveLetter C -ReTrim -EA 0; "SSD optimizado: Hibernate OFF, SuperFetch OFF, TRIM ejecutado" }
 Add-Opt "gpucache" "Shader Cache GPU" "Maximiza cache de shaders NVIDIA." "Pro" "Bajo" @('Set-ItemProperty "HKLM:\SOFTWARE\NVIDIA Corporation\Global" ShaderCacheSize 4294967295 -Type DWord -Force') { $path = "HKLM:\SOFTWARE\NVIDIA Corporation\Global"; if (-not (Test-Path $path)) { New-Item -Path $path -Force -EA 0 | Out-Null }; Set-ItemProperty $path ShaderCacheSize 4294967295 -Type DWord -Force -EA 0; powercfg -setdcvalueindex SCHEME_CURRENT SUB_GRAPHICS GPUPREFERENCE 1 2>$null; powercfg -setacvalueindex SCHEME_CURRENT SUB_GRAPHICS GPUPREFERENCE 1 2>$null; "Shader Cache maximizado + GPU Performance Mode" }
 Add-Opt "driverclean" "Limpiar Drivers Fantasma" "Escanea y detecta drivers desconectados (fantasmas)." "Pro" "Bajo" @('Get-PnpDevice | Where-Object { $_.Present -eq $false -and $_.Class -ne "SoftwareDevice" }') { $orphaned = Get-PnpDevice -EA 0 | Where-Object { $_.Present -eq $false -and $_.Class -ne "SoftwareDevice" }; if ($orphaned) { foreach ($d in $orphaned) { "Driver huerfano: $($d.FriendlyName)" } } else { "No se detectaron drivers fantasma" } }
-Add-Opt "monitor" "Guia Monitor" "Configurar Hz maximo y overdrive." "Pro" "Bajo" @("Guia: 1) Config. pantalla > Avanzado > Frecuencia maxima","2) NVIDIA Panel > Sin escalado","3) Menu OSD > Overdrive: Medio") { "Guia: 1) Config. pantalla > Avanzado > Frecuencia maxima"; "2) NVIDIA Panel > Sin escalado"; "3) Menu OSD > Overdrive: Medio" }
-Add-Opt "bgapps" "Bloquear Apps 2do Plano" "Impide que apps de Microsoft Store se ejecuten ocultas." "Pro" "Bajo" @('Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" GlobalUserDisabled 1 -Type DWord -Force') { $p = "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications"; if (-not (Test-Path $p)) { New-Item -Path $p -Force -EA 0 | Out-Null }; Set-ItemProperty $p GlobalUserDisabled 1 -Type DWord -Force -EA 0; "Apps en segundo plano bloqueadas" }
+Add-Opt "monitor" "Guia Monitor" "Configurar Hz maximo y overdrive." "Pro" "Bajo" @("Guia: 1) Config. pantalla > Avanzado > Frecuencia maxima", "2) NVIDIA Panel > Sin escalado", "3) Menu OSD > Overdrive: Medio") { "Guia: 1) Config. pantalla > Avanzado > Frecuencia maxima"; "2) NVIDIA Panel > Sin escalado"; "3) Menu OSD > Overdrive: Medio" }
 
 # Elite
 Add-Opt "msimode" "MSI Mode (GPU+NVMe+USB)" "Activa MSI en dispositivos. Reduce latencia DPC." "Elite" "Medio" @('Set-ItemProperty -Path "HKLM:\...\MessageSignaledInterruptProperties" -Name MSISupported -Value 1') { $devices = Get-ChildItem "HKLM:\SYSTEM\CurrentControlSet\Enum\PCI" -Recurse -EA 0 | Where-Object { $_.GetValue("DeviceDesc") -match "NVIDIA|AMD|NVMe|Storage|USB|Network" }; $count = 0; foreach ($d in $devices) { $p = "$($d.PSPath)\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties"; if (Test-Path $p) { Set-ItemProperty -Path $p -Name MSISupported -Value 1 -Type DWord -Force -EA 0; $count++ } }; "MSI Mode activado en $count dispositivos" }
 Add-Opt "dpclatency" "Guia DPC Latency" "Recomendaciones BIOS para minima latencia." "Elite" "Bajo" @("powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR PROCTHROTTLEMAX 100") { powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR PROCTHROTTLEMAX 100 2>$null; "Guia: 1) BIOS > C-States: Disable  2) SpeedStep: Disable  3) Global C-States: Disable" }
 Add-Opt "ramtimings" "Guia RAM Timings" "Recomendaciones personalizadas para BIOS." "Elite" "Bajo" @("Consultar timings optimos con Get-CimInstance") { $mem = Get-CimInstance Win32_PhysicalMemory | Select-Object -First 1; "RAM: $([math]::Round($mem.Capacity/1GB,0)) GB @ $($mem.Speed) MHz"; "tCL: $(($mem.Speed/100 - 6) -as [int]) | tRCD: $(($mem.Speed/100 - 4) -as [int]) | tRP: $(($mem.Speed/100 - 4) -as [int]) | tRAS: 58-68"; "Usar MemTest86 despues de cambios" }
-Add-Opt "overclock" "Guia Overclock + Undervolt" "Guia personalizada CPU/GPU." "Elite" "Bajo" @("CPU Ratio: +1-2 | Voltage Offset: -0.05V","MSI Afterburner > Core +150 | Mem +750 | Power 110%") { $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1; "CPU: $($cpu.Name) | BIOS > CPU Ratio: +1-2 | Voltage Offset: -0.05V"; "GPU: MSI Afterburner > Core +150 | Mem +750 | Power 110%" }
-Add-Opt "benchmark" "Benchmark Rapido" "CPU, RAM, Disco y Ping." "Elite" "Bajo" @("Get-CimInstance Win32_Processor","Get-CimInstance Win32_OperatingSystem > FreePhysicalMemory","Test-Connection 1.1.1.1 -Count 3") { $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1; $os = Get-CimInstance Win32_OperatingSystem; $disk = Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" | Where-Object DeviceID -eq "C:"; $ping = Test-Connection "1.1.1.1" -Count 3 -EA 0; "CPU: $($cpu.Name) | RAM: $([math]::Round($os.FreePhysicalMemory/1MB,1)) GB libre | Disco: $([math]::Round($disk.FreeSpace/1GB,1)) GB libre | Ping: $(if($ping){[math]::Round(($ping|Measure-Object -Property ResponseTime -Average).Average,1)}else{'N/A'}) ms" }
+Add-Opt "overclock" "Guia Overclock + Undervolt" "Guia personalizada CPU/GPU." "Elite" "Bajo" @("CPU Ratio: +1-2 | Voltage Offset: -0.05V", "MSI Afterburner > Core +150 | Mem +750 | Power 110%") { $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1; "CPU: $($cpu.Name) | BIOS > CPU Ratio: +1-2 | Voltage Offset: -0.05V"; "GPU: MSI Afterburner > Core +150 | Mem +750 | Power 110%" }
+Add-Opt "benchmark" "Benchmark Rapido" "CPU, RAM, Disco y Ping." "Elite" "Bajo" @("Get-CimInstance Win32_Processor", "Get-CimInstance Win32_OperatingSystem > FreePhysicalMemory", "Test-Connection 1.1.1.1 -Count 3") { $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1; $os = Get-CimInstance Win32_OperatingSystem; $disk = Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" | Where-Object DeviceID -eq "C:"; $ping = Test-Connection "1.1.1.1" -Count 3 -EA 0; "CPU: $($cpu.Name) | RAM: $([math]::Round($os.FreePhysicalMemory/1MB,1)) GB libre | Disco: $([math]::Round($disk.FreeSpace/1GB,1)) GB libre | Ping: $(if($ping){[math]::Round(($ping|Measure-Object -Property ResponseTime -Average).Average,1)}else{'N/A'}) ms" }
 Add-Opt "restorepoint" "Crear Punto de Restauracion" "Deshace todos los cambios si algo falla." "Elite" "Bajo" @("New-RestorePoint") { $r = New-RestorePoint; $r.msg }
 
 # ═══════════════════════════════════════════════════════════════
@@ -94,7 +93,8 @@ function Test-LicenseKey($key) {
     try {
         $resp = Invoke-RestMethod -Uri "https://leledesign.vercel.app/api/validate-license.js?key=$key" -TimeoutSec 10 -EA 0
         if ($resp.valid) { return $resp.plan }
-    } catch {}
+    }
+    catch {}
     return $null
 }
 
@@ -113,26 +113,26 @@ function Save-License($key) {
 #  GUI COLORS
 # ═══════════════════════════════════════════════════════════════
 
-$CLR_BG       = "#0a0a0f"
-$CLR_CARD     = "#141420"
-$CLR_CARD2    = "#1a1a2e"
-$CLR_BORDER   = "#2a2a3a"
-$CLR_TEXT     = "#ffffff"
-$CLR_TEXT2    = "#888888"
-$CLR_ACCENT   = "#a855f7"
-$CLR_CYAN     = "#22d3ee"
-$CLR_GREEN    = "#10b981"
-$CLR_AMBER    = "#f59e0b"
-$CLR_RED      = "#ef4444"
-$CLR_ESSENTIAL= "#10b981"
-$CLR_PRO      = "#a855f7"
-$CLR_ELITE    = "#f59e0b"
+$CLR_BG = "#0a0a0f"
+$CLR_CARD = "#141420"
+$CLR_CARD2 = "#1a1a2e"
+$CLR_BORDER = "#2a2a3a"
+$CLR_TEXT = "#ffffff"
+$CLR_TEXT2 = "#888888"
+$CLR_ACCENT = "#a855f7"
+$CLR_CYAN = "#22d3ee"
+$CLR_GREEN = "#10b981"
+$CLR_AMBER = "#f59e0b"
+$CLR_RED = "#ef4444"
+$CLR_ESSENTIAL = "#10b981"
+$CLR_PRO = "#a855f7"
+$CLR_ELITE = "#f59e0b"
 
-$FONT_TITLE   = New-Object System.Drawing.Font("Segoe UI", 16, [System.Drawing.FontStyle]::Bold)
-$FONT_BTN     = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
-$FONT_NORMAL  = New-Object System.Drawing.Font("Segoe UI", 10)
-$FONT_SMALL   = New-Object System.Drawing.Font("Segoe UI", 8)
-$FONT_MONO    = New-Object System.Drawing.Font("Consolas", 10)
+$FONT_TITLE = New-Object System.Drawing.Font("Segoe UI", 16, [System.Drawing.FontStyle]::Bold)
+$FONT_BTN = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
+$FONT_NORMAL = New-Object System.Drawing.Font("Segoe UI", 10)
+$FONT_SMALL = New-Object System.Drawing.Font("Segoe UI", 8)
+$FONT_MONO = New-Object System.Drawing.Font("Consolas", 10)
 
 # ═══════════════════════════════════════════════════════════════
 #  GUI
@@ -152,37 +152,37 @@ function Show-MainWindow {
     $form.Text = "Sabina Optimizer v$script:APP_VERSION"
     $form.Size = New-Object System.Drawing.Size(1100, 780)
     $form.StartPosition = "CenterScreen"
-    $form.BackColor = [System.Drawing.Color]::FromArgb(10,10,15)
+    $form.BackColor = [System.Drawing.Color]::FromArgb(10, 10, 15)
     $form.FormBorderStyle = "FixedSingle"
     $form.MaximizeBox = $false
 
     # ── Title bar ──
     $titleBar = New-Object System.Windows.Forms.Panel
     $titleBar.Size = New-Object System.Drawing.Size(1100, 44)
-    $titleBar.BackColor = [System.Drawing.Color]::FromArgb(15,15,26)
+    $titleBar.BackColor = [System.Drawing.Color]::FromArgb(15, 15, 26)
     $titleBar.Dock = "Top"
     $form.Controls.Add($titleBar)
 
     $titleLabel = New-Object System.Windows.Forms.Label
     $titleLabel.Text = "  Sabina Optimizer v$script:APP_VERSION"
     $titleLabel.Font = $FONT_TITLE
-    $titleLabel.ForeColor = [System.Drawing.Color]::FromArgb(168,85,247)
+    $titleLabel.ForeColor = [System.Drawing.Color]::FromArgb(168, 85, 247)
     $titleLabel.Size = New-Object System.Drawing.Size(400, 44)
-    $titleLabel.Location = New-Object System.Drawing.Point(10,0)
+    $titleLabel.Location = New-Object System.Drawing.Point(10, 0)
     $titleBar.Controls.Add($titleLabel)
 
     # ── License bar ──
     $licenseBar = New-Object System.Windows.Forms.Panel
     $licenseBar.Size = New-Object System.Drawing.Size(1100, 44)
-    $licenseBar.Location = New-Object System.Drawing.Point(0,44)
-    $licenseBar.BackColor = [System.Drawing.Color]::FromArgb(20,20,32)
+    $licenseBar.Location = New-Object System.Drawing.Point(0, 44)
+    $licenseBar.BackColor = [System.Drawing.Color]::FromArgb(20, 20, 32)
     $licenseBar.BorderStyle = "FixedSingle"
     $form.Controls.Add($licenseBar)
 
     $lockIcon = New-Object System.Windows.Forms.Label
     $lockIcon.Text = "KEY:"
     $lockIcon.Font = $FONT_BTN
-    $lockIcon.ForeColor = [System.Drawing.Color]::FromArgb(136,136,136)
+    $lockIcon.ForeColor = [System.Drawing.Color]::FromArgb(136, 136, 136)
     $lockIcon.Size = New-Object System.Drawing.Size(50, 30)
     $lockIcon.Location = New-Object System.Drawing.Point(12, 7)
     $licenseBar.Controls.Add($lockIcon)
@@ -190,7 +190,7 @@ function Show-MainWindow {
     $licenseInput = New-Object System.Windows.Forms.TextBox
     $licenseInput.Size = New-Object System.Drawing.Size(220, 28)
     $licenseInput.Location = New-Object System.Drawing.Point(60, 7)
-    $licenseInput.BackColor = [System.Drawing.Color]::FromArgb(10,10,15)
+    $licenseInput.BackColor = [System.Drawing.Color]::FromArgb(10, 10, 15)
     $licenseInput.ForeColor = [System.Drawing.Color]::White
     $licenseInput.BorderStyle = "FixedSingle"
     $licenseInput.Font = $FONT_NORMAL
@@ -200,7 +200,7 @@ function Show-MainWindow {
     $validateBtn.Text = "Validar"
     $validateBtn.Size = New-Object System.Drawing.Size(80, 28)
     $validateBtn.Location = New-Object System.Drawing.Point(286, 7)
-    $validateBtn.BackColor = [System.Drawing.Color]::FromArgb(168,85,247)
+    $validateBtn.BackColor = [System.Drawing.Color]::FromArgb(168, 85, 247)
     $validateBtn.ForeColor = [System.Drawing.Color]::White
     $validateBtn.FlatStyle = "Flat"
     $validateBtn.Font = $FONT_NORMAL
@@ -210,7 +210,7 @@ function Show-MainWindow {
     $licenseStatus = New-Object System.Windows.Forms.Label
     $licenseStatus.Text = ""
     $licenseStatus.Font = $FONT_SMALL
-    $licenseStatus.ForeColor = [System.Drawing.Color]::FromArgb(136,136,136)
+    $licenseStatus.ForeColor = [System.Drawing.Color]::FromArgb(136, 136, 136)
     $licenseStatus.Size = New-Object System.Drawing.Size(200, 28)
     $licenseStatus.Location = New-Object System.Drawing.Point(375, 8)
     $licenseBar.Controls.Add($licenseStatus)
@@ -219,19 +219,19 @@ function Show-MainWindow {
     $planBadge.Text = "SIN LICENCIA"
     $planBadge.Font = $FONT_BTN
     $planBadge.ForeColor = [System.Drawing.Color]::White
-    $planBadge.BackColor = [System.Drawing.Color]::FromArgb(239,68,68)
+    $planBadge.BackColor = [System.Drawing.Color]::FromArgb(239, 68, 68)
     $planBadge.TextAlign = "MiddleCenter"
     $planBadge.Size = New-Object System.Drawing.Size(140, 28)
     $planBadge.Location = New-Object System.Drawing.Point(920, 7)
     $licenseBar.Controls.Add($planBadge)
 
     function Update-PlanBadge {
-        $colors = @{none="#ef4444"; essential="#10b981"; pro="#a855f7"; elite="#f59e0b"}
-        $names  = @{none="SIN LICENCIA"; essential="ESSENTIAL"; pro="PRO"; elite="ELITE"}
+        $colors = @{none = "#ef4444"; essential = "#10b981"; pro = "#a855f7"; elite = "#f59e0b" }
+        $names = @{none = "SIN LICENCIA"; essential = "ESSENTIAL"; pro = "PRO"; elite = "ELITE" }
         $planBadge.BackColor = [System.Drawing.Color]::FromArgb(
-            [Convert]::ToInt32($colors[$script:UserPlan].Substring(1,2),16),
-            [Convert]::ToInt32($colors[$script:UserPlan].Substring(3,2),16),
-            [Convert]::ToInt32($colors[$script:UserPlan].Substring(5,2),16)
+            [Convert]::ToInt32($colors[$script:UserPlan].Substring(1, 2), 16),
+            [Convert]::ToInt32($colors[$script:UserPlan].Substring(3, 2), 16),
+            [Convert]::ToInt32($colors[$script:UserPlan].Substring(5, 2), 16)
         )
         $planBadge.Text = $names[$script:UserPlan]
     }
@@ -240,19 +240,19 @@ function Show-MainWindow {
     function Get-LockedCategories {
         if ($script:IsDevMode) { return @() }
         switch ($script:UserPlan) {
-            "none"      { return @("Essential","Pro","Elite") }
-            "essential" { return @("Pro","Elite") }
-            "pro"       { return @("Elite") }
-            "elite"     { return @() }
-            default     { return @("Essential","Pro","Elite") }
+            "none" { return @("Essential", "Pro", "Elite") }
+            "essential" { return @("Pro", "Elite") }
+            "pro" { return @("Elite") }
+            "elite" { return @() }
+            default { return @("Essential", "Pro", "Elite") }
         }
     }
 
     # ── Category tabs ──
     $catBar = New-Object System.Windows.Forms.Panel
     $catBar.Size = New-Object System.Drawing.Size(1100, 36)
-    $catBar.Location = New-Object System.Drawing.Point(0,88)
-    $catBar.BackColor = [System.Drawing.Color]::FromArgb(10,10,15)
+    $catBar.Location = New-Object System.Drawing.Point(0, 88)
+    $catBar.BackColor = [System.Drawing.Color]::FromArgb(10, 10, 15)
     $form.Controls.Add($catBar)
 
     $currentCat = "All"
@@ -267,16 +267,16 @@ function Show-MainWindow {
         $btn.Font = $FONT_BTN
         $btn.Cursor = "Hand"
         $btn.Tag = $cat
-        $btn.BackColor = [System.Drawing.Color]::FromArgb(26,26,46)
-        $btn.ForeColor = [System.Drawing.Color]::FromArgb(136,136,136)
+        $btn.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 46)
+        $btn.ForeColor = [System.Drawing.Color]::FromArgb(136, 136, 136)
         $catBar.Controls.Add($btn)
         return $btn
     }
 
-    $btnAll       = MakeCatBtn "Mostrar todas"       10 "All"
-    $btnEssential = MakeCatBtn "Essential (13)"      160 "Essential"
-    $btnPro       = MakeCatBtn "Pro (7)"             310 "Pro"
-    $btnElite     = MakeCatBtn "Elite (6)"           460 "Elite"
+    $btnAll = MakeCatBtn "Mostrar todas"       10 "All"
+    $btnEssential = MakeCatBtn "Essential (12)"      160 "Essential"
+    $btnPro = MakeCatBtn "Pro (6)"             310 "Pro"
+    $btnElite = MakeCatBtn "Elite (6)"           460 "Elite"
     $catButtons["All"] = $btnAll
     $catButtons["Essential"] = $btnEssential
     $catButtons["Pro"] = $btnPro
@@ -293,15 +293,15 @@ function Show-MainWindow {
     $consolePanel = New-Object System.Windows.Forms.Panel
     $consolePanel.Size = New-Object System.Drawing.Size(1080, 150)
     $consolePanel.Location = New-Object System.Drawing.Point(10, 532)
-    $consolePanel.BackColor = [System.Drawing.Color]::FromArgb(10,10,15)
+    $consolePanel.BackColor = [System.Drawing.Color]::FromArgb(10, 10, 15)
     $consolePanel.BorderStyle = "FixedSingle"
     $form.Controls.Add($consolePanel)
 
     $consoleHeader = New-Object System.Windows.Forms.Label
     $consoleHeader.Text = "  Consola"
     $consoleHeader.Size = New-Object System.Drawing.Size(1080, 24)
-    $consoleHeader.BackColor = [System.Drawing.Color]::FromArgb(20,20,32)
-    $consoleHeader.ForeColor = [System.Drawing.Color]::FromArgb(136,136,136)
+    $consoleHeader.BackColor = [System.Drawing.Color]::FromArgb(20, 20, 32)
+    $consoleHeader.ForeColor = [System.Drawing.Color]::FromArgb(136, 136, 136)
     $consoleHeader.Font = $FONT_SMALL
     $consolePanel.Controls.Add($consoleHeader)
 
@@ -310,8 +310,8 @@ function Show-MainWindow {
     $outputBox.Size = New-Object System.Drawing.Size(1076, 122)
     $outputBox.Location = New-Object System.Drawing.Point(2, 26)
     $outputBox.Font = $FONT_MONO
-    $outputBox.BackColor = [System.Drawing.Color]::FromArgb(10,10,15)
-    $outputBox.ForeColor = [System.Drawing.Color]::FromArgb(0,255,136)
+    $outputBox.BackColor = [System.Drawing.Color]::FromArgb(10, 10, 15)
+    $outputBox.ForeColor = [System.Drawing.Color]::FromArgb(0, 255, 136)
     $outputBox.BorderStyle = "None"
     $outputBox.ReadOnly = $true
     $outputBox.ScrollBars = "Vertical"
@@ -322,7 +322,7 @@ function Show-MainWindow {
     $bottomBar = New-Object System.Windows.Forms.Panel
     $bottomBar.Size = New-Object System.Drawing.Size(1100, 50)
     $bottomBar.Location = New-Object System.Drawing.Point(0, 690)
-    $bottomBar.BackColor = [System.Drawing.Color]::FromArgb(20,20,32)
+    $bottomBar.BackColor = [System.Drawing.Color]::FromArgb(20, 20, 32)
     $form.Controls.Add($bottomBar)
 
     $selAllBtn = New-Object System.Windows.Forms.Button
@@ -330,7 +330,7 @@ function Show-MainWindow {
     $selAllBtn.Size = New-Object System.Drawing.Size(140, 34)
     $selAllBtn.Location = New-Object System.Drawing.Point(20, 8)
     $selAllBtn.FlatStyle = "Flat"
-    $selAllBtn.BackColor = [System.Drawing.Color]::FromArgb(26,26,46)
+    $selAllBtn.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 46)
     $selAllBtn.ForeColor = [System.Drawing.Color]::White
     $selAllBtn.Font = $FONT_NORMAL
     $selAllBtn.Cursor = "Hand"
@@ -341,7 +341,7 @@ function Show-MainWindow {
     $desAllBtn.Size = New-Object System.Drawing.Size(140, 34)
     $desAllBtn.Location = New-Object System.Drawing.Point(170, 8)
     $desAllBtn.FlatStyle = "Flat"
-    $desAllBtn.BackColor = [System.Drawing.Color]::FromArgb(26,26,46)
+    $desAllBtn.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 46)
     $desAllBtn.ForeColor = [System.Drawing.Color]::White
     $desAllBtn.Font = $FONT_NORMAL
     $desAllBtn.Cursor = "Hand"
@@ -352,7 +352,7 @@ function Show-MainWindow {
     $restoreBtn.Size = New-Object System.Drawing.Size(150, 34)
     $restoreBtn.Location = New-Object System.Drawing.Point(330, 8)
     $restoreBtn.FlatStyle = "Flat"
-    $restoreBtn.BackColor = [System.Drawing.Color]::FromArgb(26,26,46)
+    $restoreBtn.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 46)
     $restoreBtn.ForeColor = [System.Drawing.Color]::White
     $restoreBtn.Font = $FONT_NORMAL
     $restoreBtn.Cursor = "Hand"
@@ -364,7 +364,7 @@ function Show-MainWindow {
     $runBtn.Size = New-Object System.Drawing.Size(180, 38)
     $runBtn.Location = New-Object System.Drawing.Point(690, 6)
     $runBtn.FlatStyle = "Flat"
-    $runBtn.BackColor = [System.Drawing.Color]::FromArgb(168,85,247)
+    $runBtn.BackColor = [System.Drawing.Color]::FromArgb(168, 85, 247)
     $runBtn.ForeColor = [System.Drawing.Color]::White
     $runBtn.Font = $FONT_BTN
     $runBtn.Cursor = "Hand"
@@ -375,7 +375,7 @@ function Show-MainWindow {
     $runAllBtn.Size = New-Object System.Drawing.Size(160, 38)
     $runAllBtn.Location = New-Object System.Drawing.Point(880, 6)
     $runAllBtn.FlatStyle = "Flat"
-    $runAllBtn.BackColor = [System.Drawing.Color]::FromArgb(34,211,238)
+    $runAllBtn.BackColor = [System.Drawing.Color]::FromArgb(34, 211, 238)
     $runAllBtn.ForeColor = [System.Drawing.Color]::Black
     $runAllBtn.Font = $FONT_BTN
     $runAllBtn.Cursor = "Hand"
@@ -389,14 +389,14 @@ function Show-MainWindow {
         $global:currentCat = $cat
         $global:catButtons = $catButtons
 
-        $catButtons["All"].BackColor = if ($cat -eq "All") { [System.Drawing.Color]::FromArgb(42,42,58) } else { [System.Drawing.Color]::FromArgb(26,26,46) }
-        $catButtons["All"].ForeColor = if ($cat -eq "All") { [System.Drawing.Color]::White } else { [System.Drawing.Color]::FromArgb(136,136,136) }
-        $catButtons["Essential"].BackColor = if ($cat -eq "Essential") { [System.Drawing.Color]::FromArgb(42,42,58) } else { [System.Drawing.Color]::FromArgb(26,26,46) }
-        $catButtons["Essential"].ForeColor = if ($cat -eq "Essential") { [System.Drawing.Color]::White } else { [System.Drawing.Color]::FromArgb(136,136,136) }
-        $catButtons["Pro"].BackColor = if ($cat -eq "Pro") { [System.Drawing.Color]::FromArgb(42,42,58) } else { [System.Drawing.Color]::FromArgb(26,26,46) }
-        $catButtons["Pro"].ForeColor = if ($cat -eq "Pro") { [System.Drawing.Color]::White } else { [System.Drawing.Color]::FromArgb(136,136,136) }
-        $catButtons["Elite"].BackColor = if ($cat -eq "Elite") { [System.Drawing.Color]::FromArgb(42,42,58) } else { [System.Drawing.Color]::FromArgb(26,26,46) }
-        $catButtons["Elite"].ForeColor = if ($cat -eq "Elite") { [System.Drawing.Color]::White } else { [System.Drawing.Color]::FromArgb(136,136,136) }
+        $catButtons["All"].BackColor = if ($cat -eq "All") { [System.Drawing.Color]::FromArgb(42, 42, 58) } else { [System.Drawing.Color]::FromArgb(26, 26, 46) }
+        $catButtons["All"].ForeColor = if ($cat -eq "All") { [System.Drawing.Color]::White } else { [System.Drawing.Color]::FromArgb(136, 136, 136) }
+        $catButtons["Essential"].BackColor = if ($cat -eq "Essential") { [System.Drawing.Color]::FromArgb(42, 42, 58) } else { [System.Drawing.Color]::FromArgb(26, 26, 46) }
+        $catButtons["Essential"].ForeColor = if ($cat -eq "Essential") { [System.Drawing.Color]::White } else { [System.Drawing.Color]::FromArgb(136, 136, 136) }
+        $catButtons["Pro"].BackColor = if ($cat -eq "Pro") { [System.Drawing.Color]::FromArgb(42, 42, 58) } else { [System.Drawing.Color]::FromArgb(26, 26, 46) }
+        $catButtons["Pro"].ForeColor = if ($cat -eq "Pro") { [System.Drawing.Color]::White } else { [System.Drawing.Color]::FromArgb(136, 136, 136) }
+        $catButtons["Elite"].BackColor = if ($cat -eq "Elite") { [System.Drawing.Color]::FromArgb(42, 42, 58) } else { [System.Drawing.Color]::FromArgb(26, 26, 46) }
+        $catButtons["Elite"].ForeColor = if ($cat -eq "Elite") { [System.Drawing.Color]::White } else { [System.Drawing.Color]::FromArgb(136, 136, 136) }
 
         $optScroll.Controls.Clear()
         $locked = Get-LockedCategories
@@ -405,7 +405,7 @@ function Show-MainWindow {
             $lockMsg = New-Object System.Windows.Forms.Label
             $lockMsg.Text = "  Ingresa tu license key para desbloquear las optimizaciones"
             $lockMsg.Font = New-Object System.Drawing.Font("Segoe UI", 14)
-            $lockMsg.ForeColor = [System.Drawing.Color]::FromArgb(136,136,136)
+            $lockMsg.ForeColor = [System.Drawing.Color]::FromArgb(136, 136, 136)
             $lockMsg.Size = New-Object System.Drawing.Size(600, 40)
             $lockMsg.Location = New-Object System.Drawing.Point(20, 30)
             $optScroll.Controls.Add($lockMsg)
@@ -421,9 +421,9 @@ function Show-MainWindow {
             $card = New-Object System.Windows.Forms.Panel
             $card.Size = New-Object System.Drawing.Size(1050, 70)
             $card.Location = New-Object System.Drawing.Point(5, $y)
-            $card.BackColor = [System.Drawing.Color]::FromArgb(20,20,32)
+            $card.BackColor = [System.Drawing.Color]::FromArgb(20, 20, 32)
             $card.BorderStyle = "FixedSingle"
-            if ($isLocked) { $card.BackColor = [System.Drawing.Color]::FromArgb(15,15,26) }
+            if ($isLocked) { $card.BackColor = [System.Drawing.Color]::FromArgb(15, 15, 26) }
 
             # Checkbox
             $cb = New-Object System.Windows.Forms.CheckBox
@@ -436,15 +436,15 @@ function Show-MainWindow {
             $script:Checkboxes[$opt.id] = $cb
 
             # Category badge
-            $catColors = @{Essential="#10b981"; Pro="#a855f7"; Elite="#f59e0b"}
+            $catColors = @{Essential = "#10b981"; Pro = "#a855f7"; Elite = "#f59e0b" }
             $catBadge = New-Object System.Windows.Forms.Label
             $catBadge.Text = $opt.category
             $catBadge.Font = New-Object System.Drawing.Font("Segoe UI", 7, [System.Drawing.FontStyle]::Bold)
             $catBadge.ForeColor = [System.Drawing.Color]::White
             $catBadge.BackColor = [System.Drawing.Color]::FromArgb(
-                [Convert]::ToInt32($catColors[$opt.category].Substring(1,2),16),
-                [Convert]::ToInt32($catColors[$opt.category].Substring(3,2),16),
-                [Convert]::ToInt32($catColors[$opt.category].Substring(5,2),16)
+                [Convert]::ToInt32($catColors[$opt.category].Substring(1, 2), 16),
+                [Convert]::ToInt32($catColors[$opt.category].Substring(3, 2), 16),
+                [Convert]::ToInt32($catColors[$opt.category].Substring(5, 2), 16)
             )
             $catBadge.TextAlign = "MiddleCenter"
             $catBadge.Size = New-Object System.Drawing.Size(65, 16)
@@ -452,15 +452,15 @@ function Show-MainWindow {
             $card.Controls.Add($catBadge)
 
             # Risk badge
-            $riskColors = @{Bajo="#10b981"; Medio="#f59e0b"; Alto="#ef4444"}
+            $riskColors = @{Bajo = "#10b981"; Medio = "#f59e0b"; Alto = "#ef4444" }
             $riskBadge = New-Object System.Windows.Forms.Label
             $riskBadge.Text = $opt.risk
             $riskBadge.Font = New-Object System.Drawing.Font("Segoe UI", 7, [System.Drawing.FontStyle]::Bold)
             $riskBadge.ForeColor = [System.Drawing.Color]::Black
             $riskBadge.BackColor = [System.Drawing.Color]::FromArgb(
-                [Convert]::ToInt32($riskColors[$opt.risk].Substring(1,2),16),
-                [Convert]::ToInt32($riskColors[$opt.risk].Substring(3,2),16),
-                [Convert]::ToInt32($riskColors[$opt.risk].Substring(5,2),16)
+                [Convert]::ToInt32($riskColors[$opt.risk].Substring(1, 2), 16),
+                [Convert]::ToInt32($riskColors[$opt.risk].Substring(3, 2), 16),
+                [Convert]::ToInt32($riskColors[$opt.risk].Substring(5, 2), 16)
             )
             $riskBadge.TextAlign = "MiddleCenter"
             $riskBadge.Size = New-Object System.Drawing.Size(42, 16)
@@ -480,7 +480,7 @@ function Show-MainWindow {
             $descLabel = New-Object System.Windows.Forms.Label
             $descLabel.Text = $opt.desc
             $descLabel.Font = New-Object System.Drawing.Font("Segoe UI", 8)
-            $descLabel.ForeColor = [System.Drawing.Color]::FromArgb(136,136,136)
+            $descLabel.ForeColor = [System.Drawing.Color]::FromArgb(136, 136, 136)
             $descLabel.Size = New-Object System.Drawing.Size(660, 18)
             $descLabel.Location = New-Object System.Drawing.Point(32, 30)
             $card.Controls.Add($descLabel)
@@ -490,8 +490,8 @@ function Show-MainWindow {
             $scriptToggle.Text = "Script"
             $scriptToggle.Font = New-Object System.Drawing.Font("Segoe UI", 7)
             $scriptToggle.FlatStyle = "Flat"
-            $scriptToggle.BackColor = [System.Drawing.Color]::FromArgb(26,26,46)
-            $scriptToggle.ForeColor = [System.Drawing.Color]::FromArgb(136,136,136)
+            $scriptToggle.BackColor = [System.Drawing.Color]::FromArgb(26, 26, 46)
+            $scriptToggle.ForeColor = [System.Drawing.Color]::FromArgb(136, 136, 136)
             $scriptToggle.Size = New-Object System.Drawing.Size(55, 18)
             $scriptToggle.Location = New-Object System.Drawing.Point(820, 9)
             $scriptToggle.Cursor = "Hand"
@@ -503,7 +503,7 @@ function Show-MainWindow {
             $h = 16 + ($opt.commands.Count * 18)
             $scriptDetail.Size = New-Object System.Drawing.Size(420, $h)
             $scriptDetail.Location = New-Object System.Drawing.Point(610, 32)
-            $scriptDetail.BackColor = [System.Drawing.Color]::FromArgb(10,10,15)
+            $scriptDetail.BackColor = [System.Drawing.Color]::FromArgb(10, 10, 15)
             $scriptDetail.Visible = $false
 
             $sy = 4
@@ -511,7 +511,7 @@ function Show-MainWindow {
                 $cmdLabel = New-Object System.Windows.Forms.Label
                 $cmdLabel.Text = "> $cmd"
                 $cmdLabel.Font = New-Object System.Drawing.Font("Consolas", 8)
-                $cmdLabel.ForeColor = [System.Drawing.Color]::FromArgb(34,211,238)
+                $cmdLabel.ForeColor = [System.Drawing.Color]::FromArgb(34, 211, 238)
                 $cmdLabel.Size = New-Object System.Drawing.Size(410, 16)
                 $cmdLabel.Location = New-Object System.Drawing.Point(6, $sy)
                 $scriptDetail.Controls.Add($cmdLabel)
@@ -520,8 +520,8 @@ function Show-MainWindow {
             $card.Controls.Add($scriptDetail)
 
             $scriptToggle.Add_Click({
-                $scriptDetail.Visible = -not $scriptDetail.Visible
-            })
+                    $scriptDetail.Visible = -not $scriptDetail.Visible
+                })
 
             $optScroll.Controls.Add($card)
             $y += 76
@@ -537,30 +537,32 @@ function Show-MainWindow {
     $btnElite.Add_Click({ Show-Category "Elite" })
 
     $validateBtn.Add_Click({
-        $key = $licenseInput.Text.Trim()
-        if (-not $key) { return }
-        $licenseStatus.Text = "Validando..."
-        $licenseStatus.ForeColor = [System.Drawing.Color]::Gray
-        $form.Refresh()
-        $plan = Test-LicenseKey $key
-        if ($plan) {
-            $script:UserPlan = $plan
-            Save-License $key
-            Update-PlanBadge
-            $licenseStatus.Text = "OK! Licencia $plan activa"
-            $licenseStatus.ForeColor = [System.Drawing.Color]::FromArgb(16,185,129)
-            Show-Category $currentCat
-        } else {
-            $licenseStatus.Text = "Licencia invalida"
-            $licenseStatus.ForeColor = [System.Drawing.Color]::FromArgb(239,68,68)
-        }
-    })
+            $key = $licenseInput.Text.Trim()
+            if (-not $key) { return }
+            $licenseStatus.Text = "Validando..."
+            $licenseStatus.ForeColor = [System.Drawing.Color]::Gray
+            $form.Refresh()
+            $plan = Test-LicenseKey $key
+            if ($plan) {
+                $script:UserPlan = $plan
+                Save-License $key
+                Update-PlanBadge
+                $licenseStatus.Text = "OK! Licencia $plan activa"
+                $licenseStatus.ForeColor = [System.Drawing.Color]::FromArgb(16, 185, 129)
+                Show-Category $currentCat
+            }
+            else {
+                $licenseStatus.Text = "Licencia invalida"
+                $licenseStatus.ForeColor = [System.Drawing.Color]::FromArgb(239, 68, 68)
+            }
+        })
 
     function New-RestorePointFromGUI {
         $r = New-RestorePoint
         if ($r.success) {
             [System.Windows.Forms.MessageBox]::Show($r.msg, "Restaurar Sistema", "OK", "Information")
-        } else {
+        }
+        else {
             [System.Windows.Forms.MessageBox]::Show($r.msg, "Restaurar Sistema", "OK", "Warning")
         }
     }
@@ -614,7 +616,8 @@ function Show-MainWindow {
                 $result = & $opt.action
                 Write-Log "  OK: $result"
                 $outputBox.AppendText("  OK: $result`r`n")
-            } catch {
+            }
+            catch {
                 Write-Log "  ERROR: $_"
                 $outputBox.AppendText("  ERROR: $_`r`n")
             }
@@ -633,23 +636,23 @@ function Show-MainWindow {
     $runBtn.Add_Click({ Run-Optimizations })
 
     $runAllBtn.Add_Click({
-        foreach ($cb in $script:Checkboxes.Values) {
-            if ($cb.Enabled) { $cb.Checked = $true }
-        }
-        Run-Optimizations
-    })
+            foreach ($cb in $script:Checkboxes.Values) {
+                if ($cb.Enabled) { $cb.Checked = $true }
+            }
+            Run-Optimizations
+        })
 
     $selAllBtn.Add_Click({
-        foreach ($cb in $script:Checkboxes.Values) {
-            if ($cb.Enabled) { $cb.Checked = $true }
-        }
-    })
+            foreach ($cb in $script:Checkboxes.Values) {
+                if ($cb.Enabled) { $cb.Checked = $true }
+            }
+        })
 
     $desAllBtn.Add_Click({
-        foreach ($cb in $script:Checkboxes.Values) {
-            if ($cb.Enabled) { $cb.Checked = $false }
-        }
-    })
+            foreach ($cb in $script:Checkboxes.Values) {
+                if ($cb.Enabled) { $cb.Checked = $false }
+            }
+        })
 
     # ── Show ──
     Show-Category "All"

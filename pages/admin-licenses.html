@@ -88,39 +88,34 @@
       return `${prefix}-${segments.join('-')}`;
     }
 
+    const ADMIN_SECRET = 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh';
+
+    async function generateKeysViaAPI(plan, count) {
+      const resp = await fetch('/api/create-license', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ADMIN_SECRET },
+        body: JSON.stringify({ plan, count })
+      });
+      return await resp.json();
+    }
+
     async function generateKeys() {
       const plan = document.getElementById('keyPlan').value;
       const count = parseInt(document.getElementById('keyCount').value) || 1;
       const status = document.getElementById('genStatus');
-      const sb = getSupabaseClient();
-
-      if (!sb) {
-        status.textContent = '❌ Supabase no configurado';
-        return;
-      }
-
       status.textContent = 'Generando...';
-      const keys = [];
 
-      for (let i = 0; i < count; i++) {
-        const key = generateLicenseKey(plan);
-        const { error } = await sb.from('license_keys').insert({
-          key: key,
-          plan: plan,
-          status: 'active'
-        });
-        if (!error) keys.push(key);
-      }
+      const result = await generateKeysViaAPI(plan, count);
 
-      if (keys.length > 0) {
+      if (result.keys && result.keys.length > 0) {
         const output = document.getElementById('keysOutput');
         const textarea = document.getElementById('keysText');
         output.classList.remove('hidden');
-        textarea.value = keys.join('\n');
-        status.textContent = `✅ ${keys.length} key(s) generadas`;
+        textarea.value = result.keys.join('\n');
+        status.textContent = `✅ ${result.keys.length} key(s) generadas`;
         loadStats();
       } else {
-        status.textContent = '❌ Error generando keys. ¿Tenés permisos de admin?';
+        status.textContent = '❌ ' + (result.error || 'Error generando keys');
       }
     }
 
