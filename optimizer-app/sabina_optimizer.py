@@ -66,7 +66,7 @@ add_opt("tcptune", "Optimizar TCP/IP",
     "Ajusta TCP para menor latencia de red.", "Essential", "Bajo",
     ['netsh int tcp set global autotuninglevel=normal',
      'netsh int tcp set global rss=enabled',
-     'netsh int tcp set global chimney=disabled'])
+     ])
 add_opt("cleanup", "Limpieza del sistema",
     "Limpia TEMP, Prefetch, Papelera, Update cache, DNS.", "Essential", "Bajo",
     ['Remove-Item "$env:TEMP\\*" -Recurse -Force -EA 0',
