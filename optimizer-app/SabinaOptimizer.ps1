@@ -13,7 +13,7 @@ $script:APP_VERSION = "4.0"
 $script:APP_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
 $script:DEV_FILE = Join-Path $script:APP_DIR "DEV_MODE"
 $script:LogPath = "$env:USERPROFILE\Desktop\SabinaOptimizer_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
-$script:UserPlan = "essential"
+$script:UserPlan = "none"
 $script:IsDevMode = Test-Path $script:DEV_FILE
 
 function Write-Log($msg) {
@@ -182,11 +182,13 @@ function Save-License($key) {
 # ═══════════════════════════════════════════════════════════════
 
 function Show-MainWindow {
-    # ── Load stored license ──
-    $storedKey = Get-StoredLicense
-    if ($storedKey) {
-        $plan = Test-LicenseKey $storedKey
-        if ($plan) { $script:UserPlan = $plan }
+    # ── Load stored license (unless DEV_MODE) ──
+    if (-not $script:IsDevMode) {
+        $storedKey = Get-StoredLicense
+        if ($storedKey) {
+            $plan = Test-LicenseKey $storedKey
+            if ($plan) { $script:UserPlan = $plan }
+        }
     }
 
     # ── XAML ──
@@ -299,7 +301,7 @@ function Show-MainWindow {
                 <Border Grid.Row="0" Background="#141420" CornerRadius="8,8,0,0" Padding="12,0">
                     <TextBlock Text="📋 Consola" FontSize="11" Foreground="#888" VerticalAlignment="Center"/>
                 </Border>
-                <TextBox x:Name="OutputBox" Grid.Row="1" IsReadOnly="True" FontFamily="Consolas" FontSize="11" Background="#0a0a0f" Foreground="#00ff88" BorderThickness="0" Padding="12,6" VerticalScrollBarVisibility="Auto" Text="Listo para ejecutar. Seleccioná optimizaciones y presioná EJECUTAR."/>
+                <TextBox x:Name="OutputBox" Grid.Row="1" IsReadOnly="True" FontFamily="Consolas" FontSize="11" Background="#0a0a0f" Foreground="#00ff88" BorderThickness="0" Padding="12,6" VerticalScrollBarVisibility="Auto" Text="Ingresá tu license key para comenzar."/>
             </Grid>
         </Border>
 
@@ -358,8 +360,8 @@ function Show-MainWindow {
 
     # ── Update plan badge ──
     function Update-PlanBadge {
-        $colors = @{essential="#10b981"; pro="#a855f7"; elite="#f59e0b"}
-        $names  = @{essential="ESSENTIAL"; pro="PRO"; elite="ELITE"}
+        $colors = @{none="#ef4444"; essential="#10b981"; pro="#a855f7"; elite="#f59e0b"}
+        $names  = @{none="SIN LICENCIA"; essential="ESSENTIAL"; pro="PRO"; elite="ELITE"}
         $winProps.PlanBadge.Background = [Windows.Media.BrushConverter]::new().ConvertFromString($colors[$script:UserPlan])
         $winProps.PlanText.Text = $names[$script:UserPlan]
     }
@@ -367,11 +369,13 @@ function Show-MainWindow {
 
     # ── Get locked categories for this plan ──
     function Get-LockedCategories {
+        if ($script:IsDevMode) { return @() }
         switch ($script:UserPlan) {
+            "none"      { return @("Essential","Pro","Elite") }
             "essential" { return @("Pro","Elite") }
             "pro"       { return @("Elite") }
             "elite"     { return @() }
-            default     { return @("Pro","Elite") }
+            default     { return @("Essential","Pro","Elite") }
         }
     }
 
@@ -393,6 +397,16 @@ function Show-MainWindow {
 
         $winProps.OptPanel.Children.Clear()
         $locked = Get-LockedCategories
+
+        if ($locked.Count -ge 3 -and -not $script:IsDevMode) {
+            $lockMsg = New-Object Windows.Controls.TextBlock
+            $lockMsg.Text = "🔒 Ingresá tu license key para desbloquear las optimizaciones"
+            $lockMsg.FontSize = 14
+            $lockMsg.Foreground = [Windows.Media.BrushConverter]::new().ConvertFromString("#888888")
+            $lockMsg.Margin = [Windows.Thickness]::new(20,40,0,0)
+            $winProps.OptPanel.AddChild($lockMsg)
+            return
+        }
 
         foreach ($opt in $script:Optimizations) {
             if ($cat -ne "All" -and $opt.category -ne $cat) { continue }
