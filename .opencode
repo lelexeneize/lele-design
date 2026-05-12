@@ -40,26 +40,34 @@
 - chimney=disabled quitado del código (deprecado)
 - Recompilar con: pyinstaller SabinaOptimizer.spec
 
-## Mercado Pago (pendiente)
-- MP_ACCESS_TOKEN no configurado en Vercel (no hace falta, los links directos andan)
-- create-preference.js y webhook.js existen pero no se usan porque no hay token
-- Flujo actual: usuario paga via link directo → vuelve a pago-exitoso → se genera license key manualmente
+## Mercado Pago (funcionando)
+- MP_ACCESS_TOKEN configurado en Vercel (proyecto leleoficial)
+- create-preference.js funciona: genera preferences dinámicas vía API directa de MP (fetch, no SDK)
+- /api/create-preference POST {plan} → {id, init_point, plan} — todos los planes OK
+- pago.html: botón MP llama a create-preference, redirige a init_point
+- pago-exitoso.html: detecta collection_id/payment_id en callback, genera license key
+- Links directos MP aún presentes como fallback
+- webhook.js existe pero no implementado
+
+## Email (SendGrid)
+- api/email.js reescrito con SendGrid (reemplaza Resend)
+- Funciona sin API key (graceful fallback: sent:false)
+- Para activar: crear cuenta en sendgrid.com, API key con "Mail Send", verified sender
+- Vars de entorno en Vercel: SENDGRID_API_KEY, SENDGRID_FROM_EMAIL
+- Free tier: 100 emails/día
 
 ## Páginas
 - index.html, login, register, dashboard, admin, admin-login, admin-licenses, admin-works
 - optimizer, pago, pago-exitoso, descargar
 - trabajos (galería), privacidad, terminos, eliminacion-datos
-- generator.html -> SOLO dice "Próximamente", placeholder
 
 ## Pending
-- Resend: no funciona porque Vercel dominio público (necesita dominio custom)
-- generator.html: placeholder sin backend de IA
-- Faltan enlaces a políticas legales en el footer del index
-- admin-login invisible para usuarios normales
+- Activar SendGrid: crear cuenta, API key, verified sender
+- webhook.js de MP no implementado
 
 ## Testing
-- Probar .exe en Windows Sandbox (Windows Pro)
-- Sandbox no tiene BCD, Restore Point ni GPU real
+- .exe testeado en Windows Sandbox (funciona correctamente)
+- Sandbox no tiene BCD, Restore Point ni GPU real (errores esperados)
 
 ## Local
 - Carpeta local: C:\Users\Usuario\Desktop\Lele Design

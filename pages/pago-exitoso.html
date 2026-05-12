@@ -29,8 +29,9 @@
   <main class="min-h-screen flex items-center justify-center px-6">
     <div class="text-center max-w-lg">
       <div class="text-7xl mb-6">🎉</div>
-      <h1 class="text-4xl md:text-5xl font-black mb-4 text-white">Pago exitoso</h1>
-      <p class="text-white/40 text-lg mb-2">Gracias por tu compra.</p>
+      <h1 class="text-4xl md:text-5xl font-black mb-4 text-white">¡Ya está todo listo!</h1>
+      <p class="text-white/40 text-lg mb-2">Gracias por tu compra. Tu license key se genera al instante.</p>
+      <p class="text-emerald-400/70 text-sm mb-6"><i class="fas fa-bolt mr-1"></i> Acceso inmediato — descargá Sabina Optimizer ahora mismo</p>
 
       <div id="keyLoading" class="p-6 rounded-2xl glass mb-8">
         <p class="text-white/50 text-sm">Generando tu license key...</p>
@@ -40,10 +41,15 @@
       <div id="keyReady" class="hidden p-6 rounded-2xl glass mb-8">
         <p class="text-sm text-white/50 mb-2">Tu license key:</p>
         <p id="generatedKey" class="text-2xl font-bold text-violet-400 font-mono tracking-wider mb-4 select-all">ES-XXXXXX-XXXXXX-XXXXXX-XXXXXX</p>
-        <p class="text-sm text-white/50 mb-4">Usala para descargar la app:</p>
-        <a id="downloadLink" href="descargar.html" class="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold transition-all shadow-lg shadow-violet-600/25 text-sm">
-          <i class="fas fa-download mr-2"></i> Ir a descargar
-        </a>
+        <p class="text-sm text-emerald-400/70 mb-3"><i class="fas fa-bolt mr-1"></i> Ya tenés acceso completo. Descargá la app y usá tu key para activarla.</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center mb-3">
+          <a id="downloadLink" href="descargar.html" class="flex-1 px-6 py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold transition-all shadow-lg shadow-violet-600/25 text-sm text-center">
+            <i class="fas fa-download mr-2"></i> Ir a descargar
+          </a>
+          <a href="https://github.com/lelexeneize/lele-design/raw/main/optimizer-app/SabinaOptimizer.exe" class="flex-1 px-6 py-3 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold transition-all shadow-lg shadow-emerald-600/25 text-sm text-center">
+            <i class="fas fa-file-arrow-down mr-2"></i> Descargar .exe directo
+          </a>
+        </div>
         <p class="text-white/20 text-xs mt-4">
           <i class="fas fa-save mr-1"></i> Guardá tu key para descargar cuando quieras
         </p>

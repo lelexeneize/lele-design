@@ -2,102 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generador IA — Lele Oficial</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="../css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="../js/theme.js"></script>
+  <meta http-equiv="refresh" content="0;url=dashboard.html">
+  <title>Redirigiendo...</title>
 </head>
-<body class="font-['Inter']">
-
-  <!-- SIDEBAR DESKTOP -->
-  <div class="fixed left-0 top-0 bottom-0 w-64 sidebar-theme border-r p-6 hidden lg:flex flex-col z-50" style="background: var(--bg-primary);">
-    <a href="../index.html" class="text-xl font-black tracking-tight mb-10">
-      <span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span>
-      <span class="opacity-70 font-light">Oficial</span>
-    </a>
-    <nav class="flex-1 space-y-1">
-      <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm transition-all"><span>📊</span> Dashboard</a>
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-violet-600/20 text-violet-300 text-sm font-medium"><span>🤖</span> Generar con IA</a>
-      <a href="trabajos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm transition-all"><span>🖼️</span> Galería</a>
-
-    </nav>
-    <div class="pt-6 border-t border-white/[0.06] space-y-1">
-      <a href="admin.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/20 hover:text-amber-400 text-xs transition-all"><span>🔒</span> Admin</a>
-      <a href="#" onclick="logout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-red-400 text-sm transition-all"><span>🚪</span> Cerrar sesión</a>
-    </div>
-  </div>
-
-  <!-- MAIN -->
-  <div class="lg:pl-64">
-    <header class="h-16 border-b flex items-center justify-between px-6 lg:px-10" style="border-color: var(--border-color);">
-      <div class="flex items-center gap-4">
-        <button id="menuBtn" class="lg:hidden text-xl">☰</button>
-        <h2 class="text-lg font-bold">Generador con IA</h2>
-      </div>
-      <div class="flex items-center gap-4">
-        <div id="themeToggleContainer"></div>
-        <span class="text-sm text-white/40">Hola, <span id="userGreeting" class="font-medium">Usuario</span></span>
-        <div id="userAvatar" class="w-9 h-9 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-sm font-bold shrink-0">U</div>
-      </div>
-    </header>
-
-    <main class="p-6 lg:p-10">
-      <div class="max-w-2xl mx-auto text-center py-16 lg:py-24">
-        <div class="text-7xl mb-8">🚧</div>
-        <h2 class="text-4xl md:text-5xl font-black mb-4">Generador de imágenes con IA</h2>
-        <p class="text-white/40 text-lg mb-4 max-w-lg mx-auto">
-          Estamos preparando algo increíble. Muy pronto vas a poder generar imágenes únicas con inteligencia artificial.
-        </p>
-        <div class="inline-flex items-center gap-3 px-6 py-3 rounded-full glass text-sm text-white/50 mb-10">
-          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-          Próximamente
-        </div>
-        <div class="flex justify-center gap-4">
-          <a href="dashboard.html" class="px-6 py-3 rounded-full glass-hover text-sm text-white/60 hover:text-white transition-all">← Volver al Dashboard</a>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <!-- MOBILE SIDEBAR -->
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
-  <div class="sidebar-mobile p-6 flex flex-col" id="sidebarMobile">
-    <div class="flex items-center justify-between mb-8">
-      <span class="text-xl font-black tracking-tight"><span class="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">LELE</span><span class="opacity-70 font-light">Oficial</span></span>
-      <button id="closeSidebar" class="text-xl opacity-60 hover:opacity-100">&times;</button>
-    </div>
-    <nav class="flex-1 space-y-1">
-      <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm transition-all"><span>📊</span> Dashboard</a>
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-violet-600/20 text-violet-300 text-sm font-medium"><span>🤖</span> Generar con IA</a>
-      <a href="trabajos.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.04] text-sm transition-all"><span>🖼️</span> Galería</a>
-    </nav>
-    <div class="pt-6 border-t border-white/[0.06] space-y-1">
-      <a href="admin.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/20 hover:text-amber-400 text-xs transition-all"><span>🔒</span> Admin</a>
-      <a href="#" onclick="logout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-red-400 text-sm transition-all"><span>🚪</span> Cerrar sesión</a>
-    </div>
-  </div>
-
-  <script src="../js/supabase-config.js"></script>
-  <script src="../js/supabase-db.js"></script>
-  <script src="../js/main.js"></script>
-  <script src="../js/auth.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      leleTheme.applySavedTheme();
-      const tc = document.getElementById('themeToggleContainer');
-      if (tc && !tc.querySelector('.theme-toggle')) tc.appendChild(leleTheme.createToggle());
-    });
-    const menuBtn = document.getElementById('menuBtn');
-    const sidebarMobile = document.getElementById('sidebarMobile');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const closeSidebar = document.getElementById('closeSidebar');
-    function openSidebar() { sidebarMobile?.classList.add('open'); sidebarOverlay?.classList.add('open'); }
-    function closeSidebarFn() { sidebarMobile?.classList.remove('open'); sidebarOverlay?.classList.remove('open'); }
-    menuBtn?.addEventListener('click', openSidebar);
-    closeSidebar?.addEventListener('click', closeSidebarFn);
-    sidebarOverlay?.addEventListener('click', closeSidebarFn);
-  </script>
+<body>
+  <script>window.location.href = 'dashboard.html';</script>
 </body>
 </html>
