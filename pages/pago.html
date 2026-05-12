@@ -120,9 +120,25 @@
     </div>
 
     <div id="paymentOptions" class="hidden space-y-4">
-      <div class="p-6 rounded-2xl glass text-center">
-        <h3 class="text-lg font-bold text-white mb-1" id="summaryPlan">Seleccioná un plan</h3>
-        <p class="text-white/40 text-sm mb-6" id="summaryPrice">—</p>
+      <div class="p-6 rounded-2xl glass">
+        <h3 class="text-lg font-bold text-white mb-1 text-center" id="summaryPlan">Seleccioná un plan</h3>
+        <p class="text-white/40 text-sm mb-6 text-center" id="summaryPrice">—</p>
+
+        <!-- Email del comprador -->
+        <div class="mb-5">
+          <label for="buyerEmail" class="block text-xs font-semibold text-white/50 mb-2 uppercase tracking-widest">
+            <i class="fas fa-envelope mr-1"></i> Tu correo electrónico
+          </label>
+          <input
+            type="email"
+            id="buyerEmail"
+            placeholder="tu@email.com"
+            class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-violet-500/60 focus:bg-violet-500/5 transition-all"
+            oninput="saveBuyerEmail(this.value)"
+          />
+          <p class="text-white/25 text-xs mt-2"><i class="fas fa-info-circle mr-1"></i> Te enviamos tu license key a este correo automáticamente</p>
+        </div>
+
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <a id="mpButton" href="#" target="_blank" class="flex-1 px-6 py-4 rounded-full bg-[#00BFFF] hover:bg-[#009ACD] text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#00BFFF]/25">
             <i class="fab fa-mercadopago text-lg"></i> Pagar con Mercado Pago
@@ -131,12 +147,12 @@
             <i class="fab fa-paypal text-lg"></i> Pagar con PayPal
           </a>
         </div>
-        <p class="text-white/20 text-xs mt-4"><i class="fas fa-lock mr-1"></i> Pago 100% seguro</p>
+        <p class="text-white/20 text-xs mt-4 text-center"><i class="fas fa-lock mr-1"></i> Pago 100% seguro</p>
         <div class="relative my-6">
           <div class="absolute inset-0 flex items-center"><div class="w-full border-t" style="border-color: var(--border-color);"></div></div>
           <div class="relative flex justify-center"><span class="px-4 text-xs text-white/30" style="background: var(--bg-primary);">ya pagaste?</span></div>
         </div>
-        <a id="alreadyPaidBtn" href="pago-exitoso.html" class="block w-full py-3 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm transition-all shadow-lg shadow-emerald-600/25">
+        <a id="alreadyPaidBtn" href="pago-exitoso.html" class="block w-full py-3 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm transition-all shadow-lg shadow-emerald-600/25 text-center">
           <i class="fas fa-check-circle mr-2"></i> Ya pagué — Generar license key
         </a>
       </div>
@@ -165,6 +181,12 @@
       setTimeout(() => selectPlan(urlPlan), 100);
     }
 
+    function saveBuyerEmail(email) {
+      const stored = JSON.parse(localStorage.getItem('payment_initiated') || '{}');
+      stored.email = email;
+      localStorage.setItem('payment_initiated', JSON.stringify(stored));
+    }
+
     function selectPlan(plan) {
       selectedPlan = plan;
       const p = PLANS[plan];
@@ -188,8 +210,9 @@
       document.getElementById('planDisplay').textContent = `Plan seleccionado: ${p.name}`;
       document.getElementById('paymentOptions').classList.remove('hidden');
       document.getElementById('alreadyPaidBtn').href = 'pago-exitoso.html?plan=' + plan;
-      // Marcar que el usuario inició un pago (previene acceso directo a pago-exitoso.html)
-      localStorage.setItem('payment_initiated', JSON.stringify({ plan, time: Date.now() }));
+      // Guardar plan + email actual en localStorage
+      const currentEmail = document.getElementById('buyerEmail')?.value || '';
+      localStorage.setItem('payment_initiated', JSON.stringify({ plan, time: Date.now(), email: currentEmail }));
     }
 
     async function payWithMP(plan) {
@@ -204,7 +227,8 @@
         });
         const data = await res.json();
         if (data.init_point) {
-          localStorage.setItem('payment_initiated', JSON.stringify({ plan, time: Date.now(), id: data.id }));
+          const currentEmail = document.getElementById('buyerEmail')?.value || '';
+          localStorage.setItem('payment_initiated', JSON.stringify({ plan, time: Date.now(), id: data.id, email: currentEmail }));
           window.location.href = data.init_point;
         } else {
           alert('Error al crear el pago. Usá el link directo de MP.');

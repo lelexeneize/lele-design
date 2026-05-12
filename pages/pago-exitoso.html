@@ -108,23 +108,30 @@
 
           // Intentar enviar por email
           const emailStatus = document.getElementById('emailStatus');
-          const userData = JSON.parse(localStorage.getItem('lele_user'));
-          if (userData?.email) {
+          // Buscar email en múltiples fuentes (logueado > capturado en form > MP URL)
+          const userData = JSON.parse(localStorage.getItem('lele_user') || 'null');
+          const paymentStored = JSON.parse(localStorage.getItem('payment_initiated') || '{}');
+          const mpEmail = urlParams.get('payer_email');
+          const buyerEmail = userData?.email || paymentStored?.email || mpEmail || null;
+
+          if (buyerEmail) {
             emailStatus.classList.remove('hidden');
             emailStatus.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Enviando key por correo...';
+            emailStatus.className = 'text-xs mt-3 text-white/40';
+            emailStatus.classList.remove('hidden');
             try {
               const mailRes = await fetch('/api/email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ key, plan, email: userData.email })
+                body: JSON.stringify({ key, plan, email: buyerEmail })
               });
               const mailData = await mailRes.json();
               if (mailData.sent) {
                 emailStatus.className = 'text-xs mt-3 text-emerald-400';
-                emailStatus.innerHTML = '<i class="fas fa-check mr-1"></i> Te enviamos la key por correo';
+                emailStatus.innerHTML = `<i class="fas fa-check mr-1"></i> Te enviamos la key a ${buyerEmail}`;
               } else {
                 emailStatus.className = 'text-xs mt-3 text-amber-400';
-                emailStatus.innerHTML = '<i class="fas fa-info-circle mr-1"></i> Guardá tu key, el envío por correo no está disponible';
+                emailStatus.innerHTML = '<i class="fas fa-info-circle mr-1"></i> Guardá tu key, el envío por correo no está disponible ahora';
               }
             } catch (_) {
               emailStatus.className = 'text-xs mt-3 text-amber-400';
