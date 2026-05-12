@@ -499,11 +499,13 @@ class SabinaApp:
 
     def _sel_all(self):
         for var, cb in self.checkboxes.values():
-            var.set(True)
+            if cb.cget("state") != "disabled":
+                var.set(True)
 
     def _des_all(self):
         for var, cb in self.checkboxes.values():
-            var.set(False)
+            if cb.cget("state") != "disabled":
+                var.set(False)
 
     def _restore(self):
         self._clear()
