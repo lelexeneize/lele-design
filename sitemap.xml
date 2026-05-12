@@ -9,4 +9,6 @@
   <url><loc>https://leledesign.vercel.app/pages/pago-exitoso.html</loc><priority>0.4</priority></url>
   <url><loc>https://leledesign.vercel.app/pages/dashboard.html</loc><priority>0.3</priority></url>
   <url><loc>https://leledesign.vercel.app/pages/generator.html</loc><priority>0.3</priority></url>
+  <url><loc>https://leledesign.vercel.app/pages/privacidad.html</loc><priority>0.5</priority></url>
+  <url><loc>https://leledesign.vercel.app/pages/terminos.html</loc><priority>0.5</priority></url>
 </urlset>
