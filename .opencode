@@ -1,4 +1,4 @@
-# Lele Design - Proyecto Web
+# Lele Oficial - Proyecto Web
 
 ## URLs
 - Web: https://leleoficial.vercel.app
@@ -39,6 +39,8 @@
 - Probar .exe en Windows Sandbox (Windows Pro)
 - Sandbox no tiene BCD (HPET falla), ni servicio Restore Point, ni GPU real
 
+## Local
+- Carpeta local: C:\Users\Usuario\Desktop\Lele Design
+
 ## Pending / Known Issues
-- Login con 2FA sigue pidiendo verificación aunque sea admin
 - Algunos comandos del .exe muestran advertencias de deprecación (ej: chimney)
