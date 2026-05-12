@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head><title>Generate Icon</title></head>
+<body>
+<canvas id="c" width="1024" height="1024"></canvas>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const g = ctx.createLinearGradient(0,0,1024,1024);
+g.addColorStop(0,'#7c3aed');
+g.addColorStop(.5,'#d946ef');
+g.addColorStop(1,'#22d3ee');
+function rRect(x,y,w,h,r){ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+ctx.beginPath();
+rRect(0,0,1024,1024,200);
+ctx.fillStyle=g;
+ctx.fill();
+ctx.fillStyle='white';
+ctx.font='bold 480px Inter, Arial, sans-serif';
+ctx.textAlign='center';
+ctx.textBaseline='middle';
+ctx.fillText('L',512,530);
+const link=document.createElement('a');
+link.download='lele-icon-1024.png';
+link.href=c.toDataURL('image/png');
+link.textContent='Descargar icono';
+document.body.appendChild(link);
+</script>
+</body>
+</html>
