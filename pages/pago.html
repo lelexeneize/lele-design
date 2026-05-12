@@ -149,12 +149,12 @@
 
   <script>
     const PLANS = {
-      essential: { name: 'Sabina Optimizer — Essential', priceUSD: 45, priceARS: 45000, mp: 'https://mpago.la/16LPzvD', pp: 'https://paypal.me/leleballan/45' },
-      pro:       { name: 'Sabina Optimizer — Pro',       priceUSD: 65, priceARS: 65000, mp: 'https://mpago.la/2cQ6RDK', pp: 'https://paypal.me/leleballan/65' },
-      elite:     { name: 'Sabina Optimizer — Elite',     priceUSD: 85, priceARS: 85000, mp: 'https://mpago.la/1WfM3hA', pp: 'https://paypal.me/leleballan/85' },
-      starter:   { name: 'Diseño — Starter',             priceUSD: 29, priceARS: 35000, mp: 'https://mpago.la/32yd9dp', pp: 'https://paypal.me/leleballan/29' },
-      designpro: { name: 'Diseño — Pro',                 priceUSD: 79, priceARS: 95000, mp: 'https://mpago.la/1eRVkzL', pp: 'https://paypal.me/leleballan/79' },
-      enterprise:{ name: 'Diseño — Enterprise',          priceUSD: 199, priceARS: 239000, mp: 'https://mpago.la/1WxgLEq', pp: 'https://paypal.me/leleballan/199' }
+      essential: { name: 'Sabina Optimizer — Essential', priceUSD: 45, priceARS: 45000, pp: 'https://paypal.me/leleballan/45' },
+      pro:       { name: 'Sabina Optimizer — Pro',       priceUSD: 65, priceARS: 65000, pp: 'https://paypal.me/leleballan/65' },
+      elite:     { name: 'Sabina Optimizer — Elite',     priceUSD: 85, priceARS: 85000, pp: 'https://paypal.me/leleballan/85' },
+      starter:   { name: 'Diseño — Starter',             priceUSD: 29, priceARS: 35000, pp: 'https://paypal.me/leleballan/29' },
+      designpro: { name: 'Diseño — Pro',                 priceUSD: 79, priceARS: 95000, pp: 'https://paypal.me/leleballan/79' },
+      enterprise:{ name: 'Diseño — Enterprise',          priceUSD: 199, priceARS: 239000, pp: 'https://paypal.me/leleballan/199' }
     };
 
     let selectedPlan = null;
@@ -182,14 +182,40 @@
 
       document.getElementById('summaryPlan').textContent = p.name;
       document.getElementById('summaryPrice').textContent = `u$${p.priceUSD} · $${p.priceARS.toLocaleString()} ARS`;
-      document.getElementById('mpButton').href = p.mp;
-      document.getElementById('mpButton').style.display = p.mp ? 'flex' : 'none';
+      document.getElementById('mpButton').onclick = (e) => payWithMP(plan);
+      document.getElementById('mpButton').href = '#';
       document.getElementById('ppButton').href = p.pp;
       document.getElementById('planDisplay').textContent = `Plan seleccionado: ${p.name}`;
       document.getElementById('paymentOptions').classList.remove('hidden');
       document.getElementById('alreadyPaidBtn').href = 'pago-exitoso.html?plan=' + plan;
       // Marcar que el usuario inició un pago (previene acceso directo a pago-exitoso.html)
       localStorage.setItem('payment_initiated', JSON.stringify({ plan, time: Date.now() }));
+    }
+
+    async function payWithMP(plan) {
+      const btn = document.getElementById('mpButton');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Creando preferencia...';
+      btn.style.pointerEvents = 'none';
+      try {
+        const res = await fetch('/api/create-preference', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan })
+        });
+        const data = await res.json();
+        if (data.init_point) {
+          localStorage.setItem('payment_initiated', JSON.stringify({ plan, time: Date.now(), id: data.id }));
+          window.location.href = data.init_point;
+        } else {
+          alert('Error al crear el pago. Usá el link directo de MP.');
+          btn.innerHTML = '<i class="fab fa-mercadopago text-lg"></i> Pagar con Mercado Pago';
+          btn.style.pointerEvents = 'auto';
+        }
+      } catch (e) {
+        alert('Error de conexión. Usá el link directo de MP.');
+        btn.innerHTML = '<i class="fab fa-mercadopago text-lg"></i> Pagar con Mercado Pago';
+        btn.style.pointerEvents = 'auto';
+      }
     }
   </script>
 </body>

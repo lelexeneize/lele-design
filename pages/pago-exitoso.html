@@ -56,10 +56,15 @@
 
   <script src="../js/supabase-config.js"></script>
   <script>
-    // Verificar que el pago fue iniciado desde la página de pago
+    // Verificar que el pago fue iniciado desde la página de pago o viene de MP
+    const urlParams = new URLSearchParams(window.location.search);
+    const mpPaymentId = urlParams.get('collection_id') || urlParams.get('payment_id');
     const paymentData = JSON.parse(localStorage.getItem('payment_initiated'));
     const oneHour = 60 * 60 * 1000;
-    if (!paymentData || (Date.now() - paymentData.time) > oneHour) {
+
+    if (mpPaymentId) {
+      console.log('Pago MP detectado ID:', mpPaymentId);
+    } else if (!paymentData || (Date.now() - paymentData.time) > oneHour) {
       document.getElementById('keyLoading').innerHTML = `
         <p class="text-red-400 text-sm mb-3">No se detectó un pago reciente.</p>
         <p class="text-white/30 text-xs mb-4">Para obtener tu license key, primero completá el pago.</p>
@@ -68,8 +73,7 @@
       throw new Error('No payment detected');
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const plan = urlParams.get('plan') || paymentData.plan || 'essential';
+    const plan = urlParams.get('plan') || (paymentData ? paymentData.plan : null) || 'essential';
 
     const planNames = {
       essential: { label: 'Essential', prefix: 'ES' },

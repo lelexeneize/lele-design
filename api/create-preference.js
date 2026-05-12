@@ -46,7 +46,7 @@ module.exports = async (req, res) => {
       }],
       payer: {
         name: name || 'Comprador',
-        email: email || 'comprador@email.com'
+        email: email || undefined
       },
       back_urls: {
         success: 'https://leleoficial.vercel.app/pages/pago-exitoso.html',
