@@ -55,6 +55,8 @@
   <script src="../js/auth.js"></script>
   <script>
     const REDIRECT_URL = window.location.origin + '/pages/admin-login.html';
+    const SB_URL = 'https://qovtekqxruusqhscacqn.supabase.co';
+    const SB_ANON = 'sb_publishable_iZ9oKQoxTU0ui2kAUhCcLg_CrXpI1S2';
     let _handleOAuthDone = false;
 
     document.getElementById('googleLoginBtn').addEventListener('click', () => {
@@ -70,10 +72,16 @@
     });
 
     async function checkAdminByUserId(userId) {
-      const sb = getSupabaseClient();
-      if (!sb) return null;
-      const { data: profile } = await sb.from('profiles').select('role').eq('id', userId).single();
-      return profile?.role === 'admin';
+      try {
+        const res = await fetch(SB_URL + '/rest/v1/profiles?id=eq.' + encodeURIComponent(userId) + '&select=role', {
+          headers: { 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON }
+        });
+        const data = await res.json();
+        return data?.[0]?.role === 'admin';
+      } catch (e) {
+        console.error('checkAdmin error:', e);
+        return false;
+      }
     }
 
     function handleAdminSession(session) {
@@ -98,19 +106,22 @@
 
     // Espera a que Supabase SDK esté listo y la sesión se recupere
     (function initOAuthHandler() {
+      console.log('URL hash:', window.location.hash);
       const sb = getSupabaseClient();
       if (!sb) { setTimeout(initOAuthHandler, 200); return; }
 
-      // Poll cada 300ms hasta 15 intentos buscando la sesión del OAuth redirect
+      console.log('SDK ready, waiting for session...');
       let attempts = 0;
       const poll = setInterval(async () => {
         attempts++;
-        const { data: { session } } = await sb.auth.getSession();
-        if (session?.user) {
+        const result = await sb.auth.getSession();
+        console.log('Session check #' + attempts, result?.data?.session?.user?.id);
+        if (result?.data?.session?.user) {
           clearInterval(poll);
-          handleAdminSession(session);
+          handleAdminSession(result.data.session);
         } else if (attempts >= 15) {
           clearInterval(poll);
+          console.log('No session found after 15 attempts');
         }
       }, 300);
     })();
