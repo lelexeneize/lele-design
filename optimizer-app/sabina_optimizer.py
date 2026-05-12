@@ -168,17 +168,31 @@ def save_license(key):
 # ── Restore Point ───────────────────────────────────────────────────
 def create_restore_point():
     desc = f"SabinaOptimizer_{datetime.datetime.now():%Y%m%d_%H%M%S}"
-    ps_code = (
-        "$sr = Get-CimInstance -ClassName SystemRestore -Filter \"Drive='C'\" -ErrorAction Stop; "
-        "if (-not $sr -or -not $sr.Enable) { throw 'SystemRestore disabled' }; "
-        f"Checkpoint-Computer -Description '{desc}' -RestorePointType MODIFY_SETTINGS -ErrorAction Stop"
-    )
+    # Intentar metodo directo primero (mas compatible)
+    ps_direct = f"Checkpoint-Computer -Description '{desc}' -RestorePointType MODIFY_SETTINGS -EA SilentlyContinue"
     try:
-        r = subprocess.run(["powershell", "-NoProfile", "-Command", ps_code],
+        r = subprocess.run(["powershell", "-NoProfile", "-Command", ps_direct],
                            capture_output=True, text=True, timeout=60)
         if r.returncode == 0:
             return (True, f"Punto de restauracion '{desc}' creado correctamente")
-        return (False, r.stderr.strip() or "Error desconocido")
+    except subprocess.TimeoutExpired:
+        return (False, "Timeout al crear punto de restauracion")
+    except:
+        pass
+    # Fallback: intentar con WMI
+    ps_wmi = (
+        "$sr = Get-CimInstance -ClassName SystemRestore -Filter \"Drive='C'\" -ErrorAction SilentlyContinue; "
+        f"Checkpoint-Computer -Description '{desc}' -RestorePointType MODIFY_SETTINGS -ErrorAction SilentlyContinue"
+    )
+    try:
+        r = subprocess.run(["powershell", "-NoProfile", "-Command", ps_wmi],
+                           capture_output=True, text=True, timeout=60)
+        if r.returncode == 0:
+            return (True, f"Punto de restauracion '{desc}' creado correctamente")
+        err = r.stderr.strip()
+        if "0x80041010" in err:
+            return (False, "Restaurar sistema no esta disponible. Activalo desde 'Crear punto de restauracion' en Windows.")
+        return (False, err or "Error desconocido")
     except subprocess.TimeoutExpired:
         return (False, "Timeout al crear punto de restauracion")
     except Exception as e:
@@ -485,8 +499,7 @@ class SabinaApp:
 
     def _sel_all(self):
         for var, cb in self.checkboxes.values():
-            if cb.cget("state") != "disabled":
-                var.set(True)
+            var.set(True)
 
     def _des_all(self):
         for var, cb in self.checkboxes.values():
@@ -503,7 +516,8 @@ class SabinaApp:
         if self.running:
             return
         sel = [o for o in optimizations if o["id"] in self.checkboxes
-               and self.checkboxes[o["id"]][0].get()]
+               and self.checkboxes[o["id"]][0].get()
+               and self.checkboxes[o["id"]][1].cget("state") != "disabled"]
         if not sel:
             self._log("No seleccionaste ninguna optimizacion.", "err")
             return
