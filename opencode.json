@@ -1,0 +1,148 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "ollama/qwen3:8b-ctx32k",
+  "instructions": ["Respondé SIEMPRE en español argentino. Nunca respondas en inglés o en otro idioma."],
+  "compaction": {
+    "auto": false,
+    "prune": true
+  },
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "qwen3:8b": {
+          "id": "qwen3:8b",
+          "name": "Qwen 3 8B (original)"
+        },
+        "qwen3:8b-ctx32k": {
+          "id": "qwen3:8b-ctx32k",
+          "name": "Qwen 3 8B (32k ctx) ⭐"
+        },
+        "qwen2.5-coder:7b": {
+          "id": "qwen2.5-coder:7b",
+          "name": "Qwen 2.5 Coder 7B (original)"
+        },
+        "qwen2.5-coder:7b-16k": {
+          "id": "qwen2.5-coder:7b-16k",
+          "name": "Qwen 2.5 Coder 7B (16k ctx)"
+        },
+        "qwen2.5-coder:7b-32k": {
+          "id": "qwen2.5-coder:7b-32k",
+          "name": "Qwen 2.5 Coder 7B (32k ctx)"
+        },
+        "brnpistone/Qwen3-4B-AgentCoder-q6-k:latest": {
+          "id": "brnpistone/Qwen3-4B-AgentCoder-q6-k:latest",
+          "name": "Qwen 3 4B AgentCoder (original)"
+        },
+        "Qwen3-4B-AgentCoder:32k": {
+          "id": "Qwen3-4B-AgentCoder:32k",
+          "name": "Qwen 3 4B AgentCoder (32k ctx)"
+        },
+        "llama3-groq-tool-use:8b": {
+          "id": "llama3-groq-tool-use:8b",
+          "name": "Llama 3 Groq Tool Use 8B"
+        },
+        "llama3-groq-tool-use:8b-32k": {
+          "id": "llama3-groq-tool-use:8b-32k",
+          "name": "Llama 3 Groq Tool Use 8B (32k ctx)"
+        },
+        "granite4:3b": {
+          "id": "granite4:3b",
+          "name": "Granite 4 3B (IBM)"
+        },
+        "granite4:3b-32k": {
+          "id": "granite4:3b-32k",
+          "name": "Granite 4 3B (32k ctx, IBM)"
+        },
+        "granite4.1:8b": {
+          "id": "granite4.1:8b",
+          "name": "Granite 4.1 8B (IBM)"
+        },
+        "granite4.1:8b-32k": {
+          "id": "granite4.1:8b-32k",
+          "name": "Granite 4.1 8B (32k ctx, IBM)"
+        },
+        "qwen3.5:9b": {
+          "id": "qwen3.5:9b",
+          "name": "Qwen 3.5 9B"
+        },
+        "qwen3.5:9b-32k": {
+          "id": "qwen3.5:9b-32k",
+          "name": "Qwen 3.5 9B (32k ctx)"
+        },
+        "qwen2.5-coder:14b": {
+          "id": "qwen2.5-coder:14b",
+          "name": "Qwen 2.5 Coder 14B (CPU)"
+        },
+        "deepseek-r1:7b": {
+          "id": "deepseek-r1:7b",
+          "name": "DeepSeek R1 7B (original)"
+        },
+        "deepseek-r1:7b-16k": {
+          "id": "deepseek-r1:7b-16k",
+          "name": "DeepSeek R1 7B (16k ctx)"
+        },
+        "llama3.1:latest": {
+          "id": "llama3.1:latest",
+          "name": "Llama 3.1 8B (original)"
+        },
+        "llama3.1:8b-16k": {
+          "id": "llama3.1:8b-16k",
+          "name": "Llama 3.1 8B (16k ctx)"
+        },
+        "qwen2.5vl:latest": {
+          "id": "qwen2.5vl:latest",
+          "name": "Qwen 2.5 VL (original)"
+        },
+        "qwen2.5vl:7b-8k": {
+          "id": "qwen2.5vl:7b-8k",
+          "name": "Qwen 2.5 VL 7B (8k ctx)"
+        },
+        "llama3.2-vision:11b": {
+          "id": "llama3.2-vision:11b",
+          "name": "Llama 3.2 Vision 11B (original)"
+        },
+        "llama3.2-vision:11b-8k": {
+          "id": "llama3.2-vision:11b-8k",
+          "name": "Llama 3.2 Vision 11B (8k ctx)"
+        },
+        "qwen3:14b": {
+          "id": "qwen3:14b",
+          "name": "Qwen 3 14B (CPU)"
+        },
+        "codestral:latest": {
+          "id": "codestral:latest",
+          "name": "Codestral (CPU)"
+        },
+        "codestral:22b": {
+          "id": "codestral:22b",
+          "name": "Codestral 22B (CPU)"
+        },
+        "deepseek-coder-v2:16b": {
+          "id": "deepseek-coder-v2:16b",
+          "name": "DeepSeek Coder V2 16B (CPU)"
+        },
+        "gemma4:latest": {
+          "id": "gemma4:latest",
+          "name": "Gemma 4 (CPU)"
+        },
+        "qwen3.6:latest": {
+          "id": "qwen3.6:latest",
+          "name": "Qwen 3.6 (CPU)"
+        },
+        "qwen3.6:27b": {
+          "id": "qwen3.6:27b",
+          "name": "Qwen 3.6 27B"
+        },
+        "qwen3.6:27b-16k": {
+          "id": "qwen3.6:27b-16k",
+          "name": "Qwen 3.6 27B (16k ctx)"
+        }
+      }
+    }
+  }
+}

@@ -28,6 +28,7 @@
     btn.className = 'theme-toggle';
     btn.id = 'themeToggleBtn';
     btn.title = 'Cambiar tema';
+    btn.setAttribute('aria-label', 'Cambiar tema');
     btn.innerHTML = getTheme() === 'dark' ? '☀️' : '🌙';
     btn.addEventListener('click', () => {
       toggleTheme();

@@ -17,6 +17,7 @@
   <script src="../js/theme.js"></script>
 </head>
 <body class="font-['Inter']">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-xl focus:bg-violet-600 focus:text-white focus:text-sm focus:font-semibold">Saltar al contenido principal</a>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -33,7 +34,7 @@
     </div>
   </nav>
 
-  <main class="pt-24 pb-20 px-6 max-w-2xl mx-auto">
+  <main id="main-content" class="pt-24 pb-20 px-6 max-w-2xl mx-auto">
     <div class="text-center mb-12">
       <h1 class="text-4xl md:text-5xl font-black mb-4 text-white">Completá tu compra</h1>
       <p class="text-white/40" id="planDisplay">Seleccioná un plan para continuar</p>
@@ -158,8 +159,8 @@
           <div class="absolute inset-0 flex items-center"><div class="w-full border-t" style="border-color: var(--border-color);"></div></div>
           <div class="relative flex justify-center"><span class="px-4 text-xs text-white/30" style="background: var(--bg-primary);">ya pagaste?</span></div>
         </div>
-        <a id="alreadyPaidBtn" href="pago-exitoso.html" class="block w-full py-3 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm transition-all shadow-lg shadow-emerald-600/25 text-center">
-          <i class="fas fa-check-circle mr-2"></i> Ya pagué — Generar license key
+        <a href="mailto:hola@leleoficial.com?subject=Ya%20pag%C3%A9%20y%20no%20recib%C3%AD%20mi%20license%20key&body=Hola%2C%20complet%C3%A9%20el%20pago%20pero%20no%20recib%C3%AD%20mi%20license%20key.%20Mi%20plan%20es%3A%20" class="block w-full py-3 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm transition-all shadow-lg shadow-emerald-600/25 text-center">
+          <i class="fas fa-envelope mr-2"></i> Ya pagué — Contactanos
         </a>
       </div>
     </div>

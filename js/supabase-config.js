@@ -30,12 +30,6 @@ async function getSupabaseClient() {
   return _supabaseClient;
 }
 
-// ─── Check if Supabase is available ──────────────────────
-function isSupabaseReady() {
-  const sb = getSupabaseClient();
-  return sb !== null;
-}
-
 // ─── Load Supabase SDK if not present ────────────────────
 (function ensureSupabaseSDK() {
   if (typeof supabase !== 'undefined') return;
