@@ -7,16 +7,28 @@
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="google-site-verification" content="UkfzJN5PdyYBEHn-aAB01N85CJIQUQvhs44bjp_wEq8">
   <title>Lele Oficial — Creatividad sin límites</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+  :root {
+    --bg: #0a0a0f;
+    --text: #fff;
+    --accent: #a855f7;
+    --subtle: #22d3ee;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+  }
+</style>
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="js/theme.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.12.0/tsparticles.slim.bundle.min.js"></script>
 </head>
 <body class="font-['Inter']">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.12.0/tsparticles.slim.bundle.min.js"></script>
 
   <!-- NAVBAR -->
-  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style="background: rgba(10,10,15,0.7);">
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style="background: rgba(10,10,15,0.85);">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="index.html" class="flex flex-col justify-center group transition-transform hover:scale-105">
         <div class="text-2xl md:text-[28px] font-black tracking-tighter leading-none flex items-center gap-1.5 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">
@@ -77,49 +89,6 @@
     </div>
     <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
       <svg class="w-6 h-6 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-    </div>
-  </section>
-
-  <!-- SERVICIOS -->
-  <section id="servicios" class="py-32 relative">
-    <div class="max-w-7xl mx-auto px-6">
-      <div class="text-center mb-16">
-        <span class="text-xs uppercase tracking-[0.2em] text-violet-400 font-semibold">Qué hacemos</span>
-        <h2 class="text-4xl md:text-5xl font-black mt-4 text-white">Servicios</h2>
-        <p class="text-white/40 mt-4 max-w-xl mx-auto">Todo lo que necesitas para llevar tu marca al siguiente nivel</p>
-      </div>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center mb-5 text-xl">🎨</div>
-          <h3 class="text-xl font-bold mb-3 text-white">Imágenes con IA</h3>
-          <p class="text-white/50 text-sm leading-relaxed">Generamos imágenes hiperrealistas y artísticas con inteligencia artificial para tus campañas y proyectos.</p>
-        </div>
-        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center mb-5 text-xl">✨</div>
-          <h3 class="text-xl font-bold mb-3 text-white">Animaciones</h3>
-          <p class="text-white/50 text-sm leading-relaxed">Motion graphics, animaciones 2D/3D y contenido dinámico que captura la atención al instante.</p>
-        </div>
-        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center mb-5 text-xl">🌐</div>
-          <h3 class="text-xl font-bold mb-3 text-white">Páginas Web</h3>
-          <p class="text-white/50 text-sm leading-relaxed">Sitios web modernos, rápidos y optimizados. Desde landing pages hasta plataformas completas.</p>
-        </div>
-        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-600 to-pink-600 flex items-center justify-center mb-5 text-xl">📄</div>
-          <h3 class="text-xl font-bold mb-3 text-white">Flyers & Branding</h3>
-          <p class="text-white/50 text-sm leading-relaxed">Diseños impactantes para redes sociales, flyers, brochures y identidad visual completa.</p>
-        </div>
-        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-600 to-rose-600 flex items-center justify-center mb-5 text-xl">📱</div>
-          <h3 class="text-xl font-bold mb-3 text-white">TikTok Designs</h3>
-          <p class="text-white/50 text-sm leading-relaxed">Contenido viral optimizado para TikTok: edición, efectos, transiciones y tendencias.</p>
-        </div>
-        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 to-cyan-600 flex items-center justify-center mb-5 text-xl">🚀</div>
-          <h3 class="text-xl font-bold mb-3 text-white">Consultoría Creativa</h3>
-          <p class="text-white/50 text-sm leading-relaxed">Asesoría personalizada para potenciar tu presencia digital con estrategias visuales.</p>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -190,6 +159,49 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section id="servicios" class="py-32 relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <span class="text-xs uppercase tracking-[0.2em] text-violet-400 font-semibold">Qué hacemos</span>
+        <h2 class="text-4xl md:text-5xl font-black mt-4 text-white">Servicios</h2>
+        <p class="text-white/40 mt-4 max-w-xl mx-auto">Todo lo que necesitas para llevar tu marca al siguiente nivel</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center mb-5 text-xl">🎨</div>
+          <h3 class="text-xl font-bold mb-3 text-white">Imágenes con IA</h3>
+          <p class="text-white/50 text-sm leading-relaxed">Generamos imágenes hiperrealistas y artísticas con inteligencia artificial para tus campañas y proyectos.</p>
+        </div>
+        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center mb-5 text-xl">✨</div>
+          <h3 class="text-xl font-bold mb-3 text-white">Animaciones</h3>
+          <p class="text-white/50 text-sm leading-relaxed">Motion graphics, animaciones 2D/3D y contenido dinámico que captura la atención al instante.</p>
+        </div>
+        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center mb-5 text-xl">🌐</div>
+          <h3 class="text-xl font-bold mb-3 text-white">Páginas Web</h3>
+          <p class="text-white/50 text-sm leading-relaxed">Sitios web modernos, rápidos y optimizados. Desde landing pages hasta plataformas completas.</p>
+        </div>
+        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-600 to-pink-600 flex items-center justify-center mb-5 text-xl">📄</div>
+          <h3 class="text-xl font-bold mb-3 text-white">Flyers & Branding</h3>
+          <p class="text-white/50 text-sm leading-relaxed">Diseños impactantes para redes sociales, flyers, brochures y identidad visual completa.</p>
+        </div>
+        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-600 to-rose-600 flex items-center justify-center mb-5 text-xl">📱</div>
+          <h3 class="text-xl font-bold mb-3 text-white">TikTok Designs</h3>
+          <p class="text-white/50 text-sm leading-relaxed">Contenido viral optimizado para TikTok: edición, efectos, transiciones y tendencias.</p>
+        </div>
+        <div class="group p-8 rounded-2xl glass glass-hover transition-all duration-500">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 to-cyan-600 flex items-center justify-center mb-5 text-xl">🚀</div>
+          <h3 class="text-xl font-bold mb-3 text-white">Consultoría Creativa</h3>
+          <p class="text-white/50 text-sm leading-relaxed">Asesoría personalizada para potenciar tu presencia digital con estrategias visuales.</p>
         </div>
       </div>
     </div>
@@ -353,50 +365,47 @@
 
   <script src="js/main.js"></script>
   <script>
-    // ─── Theme toggle ─────────────────────────────────
-    document.addEventListener('DOMContentLoaded', () => {
-      leleTheme.applySavedTheme();
-      document.getElementById('themeToggleContainer').appendChild(leleTheme.createToggle());
-    });
-
-    // ─── Particles ────────────────────────────────────
-    tsParticles.load("particles-canvas", {
-      fpsLimit: 60,
-      particles: {
-        number: { value: 60, density: { enable: true } },
-        color: { value: ["#a855f7", "#d946ef", "#22d3ee"] },
-        shape: { type: "circle" },
-        opacity: { value: 0.4, random: true },
-        size: { value: { min: 1, max: 3 }, random: true },
-        links: {
-          enable: true,
-          distance: 150,
-          color: "#a855f7",
-          opacity: 0.15,
-          width: 1
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isMobile = window.innerWidth < 768;
+    if (!isIOS) {
+      tsParticles.load("particles-canvas", {
+        fpsLimit: isMobile ? 30 : 60,
+        particles: {
+          number: { value: isMobile ? 20 : 60 },
+          color: { value: ["#a855f7", "#d946ef", "#22d3ee"] },
+          shape: { type: "circle" },
+          opacity: { value: isMobile ? 0.2 : 0.4, random: true },
+          size: { value: { min: 1, max: 3 }, random: true },
+          links: {
+            enable: true,
+            distance: 150,
+            color: "#a855f7",
+            opacity: isMobile ? 0.08 : 0.15,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: isMobile ? 0.5 : 1.5,
+            direction: "none",
+            random: true,
+            straight: false,
+            outModes: "bounce"
+          }
         },
-        move: {
-          enable: true,
-          speed: 1.5,
-          direction: "none",
-          random: true,
-          straight: false,
-          outModes: "bounce"
-        }
-      },
-      interactivity: {
-        events: {
-          onHover: { enable: true, mode: "grab" },
-          onClick: { enable: true, mode: "push" }
+        interactivity: {
+          events: {
+            onHover: { enable: !isMobile, mode: "grab" },
+            onClick: { enable: !isMobile, mode: "push" }
+          },
+          modes: {
+            grab: { distance: 140, links: { opacity: 0.3 } },
+            push: { quantity: isMobile ? 1 : 3 }
+          }
         },
-        modes: {
-          grab: { distance: 140, links: { opacity: 0.3 } },
-          push: { quantity: 3 }
-        }
-      },
-      background: { color: "transparent" },
-      detectRetina: true
-    });
+        background: { color: "transparent" },
+        detectRetina: !isMobile
+      });
+    }
   </script>
 </body>
 </html>
