@@ -88,6 +88,25 @@ add_opt("input", "Optimizar Input",
     ['Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Keyboard" KeyboardDataQueueSize 100 -Type DWord -Force -EA 0',
      'Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Mouse" MouseDataQueueSize 100 -Type DWord -Force -EA 0',
      'Set-ItemProperty "HKCU:\\Control Panel\\Mouse" MouseSpeed 0 -Force -EA 0'])
+add_opt("gamepriority", "Game Priority Registry",
+    "Prioridad maxima a juegos en el scheduler de Windows.", "Essential", "Bajo",
+    ['$p = "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games"; New-Item -Path $p -Force -EA 0 | Out-Null; Set-ItemProperty $p "GPU Priority" 8 -Type DWord -Force -EA 0; Set-ItemProperty $p "Priority" 6 -Type DWord -Force -EA 0; Set-ItemProperty $p "Scheduling Category" "High" -Type String -Force -EA 0; Set-ItemProperty $p "SFIO Priority" "High" -Type String -Force -EA 0; Set-ItemProperty $p "Background Only" 0 -Type DWord -Force -EA 0'])
+add_opt("sysresp", "System Responsiveness OFF",
+    "Desactiva throttling de red del scheduler multimedia.", "Essential", "Bajo",
+    ['Set-ItemProperty "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile" SystemResponsiveness 0 -Type DWord -Force -EA 0'])
+add_opt("win32prio", "Win32 Priority Separation",
+    "Optimiza la division de prioridades foreground/background.", "Essential", "Bajo",
+    ['Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl" Win32PrioritySeparation 38 -Type DWord -Force -EA 0'])
+add_opt("cortana", "Desactivar Cortana",
+    "Apaga Cortana y libera RAM (~200MB).", "Essential", "Bajo",
+    ['New-Item -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search" -Force -EA 0 | Out-Null; Set-ItemProperty "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search" AllowCortana 0 -Type DWord -Force -EA 0'])
+add_opt("p2p", "Desactivar P2P Updates",
+    "Evita que Windows use tu PC para distribuir actualizaciones.", "Essential", "Bajo",
+    ['Set-ItemProperty "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DeliveryOptimization\\Config" DODownloadMode 0 -Type DWord -Force -EA 0'])
+add_opt("gamedvr", "GameDVR Background OFF",
+    "Desactiva grabacion en segundo plano de Xbox Game Bar.", "Essential", "Bajo",
+    ['Set-ItemProperty "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\GameDVR" AppCaptureEnabled 0 -Type DWord -Force -EA 0',
+     'Set-ItemProperty "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR" HistoricalCaptureEnabled 0 -Type DWord -Force -EA 0'])
 
 # ── Pro ─────────────────────────────────────────────────────────────
 add_opt("bloatware", "Remover Bloatware",
@@ -118,6 +137,15 @@ add_opt("bgapps", "Bloquear Apps en Segundo Plano",
     "Impide que aplicaciones innecesarias se ejecuten en segundo plano consumiendo recursos.", "Pro", "Bajo",
     ['Set-ItemProperty "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications" GlobalUserDisabled 1 -Type DWord -Force -EA 0',
      'Set-ItemProperty "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy" LetAppsRunInBackground 2 -Type DWord -Force -EA 0'])
+add_opt("ultimate", "Ultimate Performance Plan",
+    "Activa el plan de energia oculto de Windows sin limitaciones.", "Pro", "Bajo",
+    ['powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 2>$null; powercfg -setactive e9a42b02-d5df-448d-aa00-03f14749eb61'])
+add_opt("corepark", "Deshabilitar Core Parking",
+    "Evita que Windows apague nucleos de CPU en idle.", "Pro", "Medio",
+    ['powercfg -setacvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 0 2>$null; powercfg -setdcvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 0 2>$null'])
+add_opt("vbsguide", "Guia VBS Detection",
+    "Detecta si Virtualization-Based Security esta activo (consume 5-15% FPS).", "Pro", "Bajo",
+    ['$vbs = (Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\\Microsoft\\Windows\\DeviceGuard 2>$null).VirtualizationBasedSecurityStatus; if ($vbs -eq 2) { Write-Output "VBS ACTIVO: Windows Security > Device Security > Core Isolation > Memory Integrity OFF (necesita reinicio)" } else { Write-Output "VBS inactivo o no disponible - OK" }'])
 
 # ── Elite ───────────────────────────────────────────────────────────
 add_opt("msimode", "MSI Mode (GPU+NVMe+USB)",
@@ -138,6 +166,12 @@ add_opt("benchmark", "Benchmark Rapido",
 add_opt("restorepoint", "Crear Punto de Restauracion",
     "Deshace todos los cambios si algo falla.", "Elite", "Bajo",
     ['Checkpoint-Computer -Description "SabinaOptimizer" -RestorePointType MODIFY_SETTINGS'])
+add_opt("memcompress", "Deshabilitar Memory Compression",
+    "Desactiva compresion de RAM para gaming (requiere +16GB).", "Elite", "Medio",
+    ['$mem = Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum; $totalGB = [math]::Round($mem.Sum / 1GB, 0); if ($totalGB -ge 16) { Disable-MMAgent -mc; Write-Output "Memory Compression desactivada" } else { Write-Output "Se requieren 16GB+ de RAM para desactivar compression (tenes $totalGB GB)" }'])
+add_opt("searchidx", "Deshabilitar Search Indexing",
+    "Apaga el indexador de busqueda de Windows. Libera CPU.", "Elite", "Bajo",
+    ['Stop-Service WSearch -Force -EA 0; Set-Service WSearch -StartupType Disabled -EA 0'])
 
 # ── License ─────────────────────────────────────────────────────────
 def validate_license(key):
