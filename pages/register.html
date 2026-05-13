@@ -6,13 +6,20 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Crear cuenta — Lele Oficial</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="Creá tu cuenta en Lele Oficial y accedé a diseños con IA, Sabina Optimizer y más.">
+  <meta property="og:title" content="Crear cuenta — Lele Oficial">
+  <meta property="og:description" content="Registrate en Lele Oficial.">
+  <meta property="og:image" content="https://leleoficial.vercel.app/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://leleoficial.vercel.app/pages/register.html">
+  <style>body { background: #0a0a0f; color: #fff; }</style>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="../js/theme.js"></script>
 </head>
 <body class="font-['Inter'] min-h-screen flex items-center justify-center">
+  <script src="https://cdn.tailwindcss.com"></script>
   <div class="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-transparent to-violet-900/20"></div>
 
   <div class="relative z-10 w-full max-w-md mx-6">
@@ -98,7 +105,7 @@
         btn.disabled = true;
 
         try {
-          const sb = getSupabaseClient();
+          const sb = await getSupabaseClient();
           if (sb) {
             const { data, error } = await sb.auth.signUp({
               email, password: pass,

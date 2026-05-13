@@ -26,7 +26,7 @@ module.exports = async (req, res) => {
       return res.status(200).json({ sent: false, note: 'SENDGRID_API_KEY no configurada' });
     }
 
-    const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'leledisco@gmail.com';
+    const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'noreply@leleoficial.com';
 
     const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',

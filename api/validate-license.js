@@ -36,11 +36,11 @@ module.exports = async (req, res) => {
       return res.status(403).json({ valid: false, error: 'Licencia ' + data.status });
     }
 
-    // Marcar como usada (usando service key para bypass RLS)
+    // Registrar última validación (no cambia el status para permitir re-descargas)
     if (process.env.SUPABASE_SERVICE_KEY) {
       await supabaseAdmin
         .from('license_keys')
-        .update({ status: 'used', used_at: new Date().toISOString() })
+        .update({ last_validated_at: new Date().toISOString() })
         .eq('key', data.key);
     }
 

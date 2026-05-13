@@ -6,15 +6,21 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Comprar — Sabina Optimizer</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="Comprá Sabina Optimizer o servicios de diseño de Lele Oficial. Pagá con Mercado Pago o PayPal.">
+  <meta property="og:title" content="Comprar — Sabina Optimizer">
+  <meta property="og:description" content="Elegí tu plan y comprá online.">
+  <meta name="twitter:card" content="summary">
+  <link rel="canonical" href="https://leleoficial.vercel.app/pages/pago.html">
+  <style>body { background: #0a0a0f; color: #fff; }</style>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="../js/theme.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="font-['Inter']">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style="background: rgba(10,10,15,0.7);">
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style="background: rgba(10,10,15,0.85);">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="../index.html" class="flex flex-col justify-center group transition-transform hover:scale-105">
         <div class="text-2xl md:text-[28px] font-black tracking-tighter leading-none flex items-center gap-1.5 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">
@@ -140,10 +146,10 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a id="mpButton" href="#" target="_blank" class="flex-1 px-6 py-4 rounded-full bg-[#00BFFF] hover:bg-[#009ACD] text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#00BFFF]/25">
+          <a id="mpButton" href="#" class="flex-1 px-6 py-4 rounded-full bg-[#00BFFF] hover:bg-[#009ACD] text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#00BFFF]/25">
             <i class="fab fa-mercadopago text-lg"></i> Pagar con Mercado Pago
           </a>
-          <a id="ppButton" href="#" target="_blank" class="flex-1 px-6 py-4 rounded-full bg-[#0070BA] hover:bg-[#005DA6] text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#0070BA]/25">
+          <a id="ppButton" href="#" onclick="payWithPP(event, this)" class="flex-1 px-6 py-4 rounded-full bg-[#0070BA] hover:bg-[#005DA6] text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#0070BA]/25">
             <i class="fab fa-paypal text-lg"></i> Pagar con PayPal
           </a>
         </div>
@@ -217,7 +223,7 @@
 
     async function payWithMP(plan) {
       const btn = document.getElementById('mpButton');
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Creando preferencia...';
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Redirigiendo a Mercado Pago...';
       btn.style.pointerEvents = 'none';
       const currentEmail = document.getElementById('buyerEmail')?.value || '';
       try {
@@ -230,7 +236,7 @@
         if (data.init_point) {
           const currentEmail = document.getElementById('buyerEmail')?.value || '';
           localStorage.setItem('payment_initiated', JSON.stringify({ plan, time: Date.now(), id: data.id, email: currentEmail }));
-          window.location.href = data.init_point;
+          window.location.assign(data.init_point);
         } else {
           alert('Error al crear el pago. Usá el link directo de MP.');
           btn.innerHTML = '<i class="fab fa-mercadopago text-lg"></i> Pagar con Mercado Pago';
@@ -240,6 +246,19 @@
         alert('Error de conexión. Usá el link directo de MP.');
         btn.innerHTML = '<i class="fab fa-mercadopago text-lg"></i> Pagar con Mercado Pago';
         btn.style.pointerEvents = 'auto';
+      }
+    }
+
+    function payWithPP(e, btn) {
+      e.preventDefault();
+      if (!selectedPlan) return;
+      const p = PLANS[selectedPlan];
+      if (p?.pp) {
+        const currentEmail = document.getElementById('buyerEmail')?.value || '';
+        localStorage.setItem('payment_initiated', JSON.stringify({ plan: selectedPlan, time: Date.now(), email: currentEmail, method: 'paypal' }));
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Redirigiendo a PayPal...';
+        btn.style.pointerEvents = 'none';
+        window.location.assign(p.pp);
       }
     }
   </script>

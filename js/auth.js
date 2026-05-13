@@ -54,7 +54,7 @@ async function checkAdminAndRedirect() {
   const user = JSON.parse(localStorage.getItem('lele_user'));
   if (!user?.email) return;
   try {
-    const sb = getSupabaseClient();
+    const sb = await getSupabaseClient();
     if (sb) {
       const { data: profile } = await sb.from('profiles').select('role').eq('email', user.email).single();
       if (profile?.role === 'admin') {
@@ -62,6 +62,15 @@ async function checkAdminAndRedirect() {
       }
     }
   } catch (_) {}
+}
+
+async function getSupabaseToken() {
+  const sb = await getSupabaseClient();
+  if (!sb) return null;
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    return session?.access_token || null;
+  } catch { return null; }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

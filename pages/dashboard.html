@@ -4,12 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — Lele Oficial</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="Panel de control de Lele Oficial. Gestioná tus proyectos y licencias.">
+  <meta property="og:title" content="Dashboard — Lele Oficial">
+  <meta name="robots" content="noindex">
+  <style>body { background: #0a0a0f; color: #fff; }</style>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="../js/theme.js"></script>
 </head>
 <body class="font-['Inter']">
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- SIDEBAR DESKTOP -->
   <div class="fixed left-0 top-0 bottom-0 w-64 sidebar-theme border-r p-6 hidden lg:flex flex-col z-50" style="background: var(--bg-primary);">
@@ -83,7 +87,7 @@
   <script src="../js/auth.js"></script>
   <script>
     async function loadDashboardData() {
-      const sb = getSupabaseClient();
+      const sb = await getSupabaseClient();
       if (sb) {
         const { data: { user } } = await sb.auth.getUser();
         if (user) {

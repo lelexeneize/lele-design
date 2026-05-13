@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Lele Oficial</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="Panel de administración de Lele Oficial.">
+  <meta name="robots" content="noindex, nofollow">
+  <style>body { background: #0a0a0f; color: #fff; }</style>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="../js/theme.js"></script>
 </head>
 <body class="font-['Inter']">
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- SIDEBAR DESKTOP -->
   <div class="fixed left-0 top-0 bottom-0 w-64 sidebar-theme border-r p-6 hidden lg:flex flex-col z-50" style="background: var(--bg-primary);">
@@ -124,17 +127,23 @@
     async function checkAdminAccess() {
       const user = JSON.parse(localStorage.getItem('lele_user'));
       if (!user) { window.location.href = 'admin-login.html'; return false; }
-      const sb = getSupabaseClient();
-      if (sb) {
-        const { data: { user: authUser } } = await sb.auth.getUser();
-        if (authUser) {
-          const { data: profile } = await sb.from('profiles').select('role').eq('id', authUser.id).single();
-          if (profile?.role !== 'admin') {
-            alert('No tenés permisos de administrador.');
-            window.location.href = '../index.html';
-            return false;
-          }
-        }
+      const sb = await getSupabaseClient();
+      if (!sb) {
+        alert('Error de conexión con la base de datos.');
+        window.location.href = 'admin-login.html';
+        return false;
+      }
+      const { data: { user: authUser } } = await sb.auth.getUser();
+      if (!authUser) {
+        alert('Sesión expirada. Iniciá sesión de nuevo.');
+        window.location.href = 'admin-login.html';
+        return false;
+      }
+      const { data: profile } = await sb.from('profiles').select('role').eq('id', authUser.id).single();
+      if (profile?.role !== 'admin') {
+        alert('No tenés permisos de administrador.');
+        window.location.href = '../index.html';
+        return false;
       }
       return true;
     }

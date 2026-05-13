@@ -4,15 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Galería — Lele Oficial</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="Galería de trabajos de Lele Oficial. Diseños con IA, animaciones, páginas web, flyers y contenido para TikTok.">
+  <meta property="og:title" content="Galería — Lele Oficial">
+  <link rel="canonical" href="https://leleoficial.vercel.app/pages/trabajos.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <style>body { background: #0a0a0f; color: #fff; }</style>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="../js/theme.js"></script>
 </head>
 <body class="font-['Inter']">
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- NAVBAR -->
-  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b" style="background: rgba(10,10,15,0.7); border-color: var(--border-color);">
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b" style="background: rgba(10,10,15,0.85); border-color: var(--border-color);">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="../index.html" class="flex flex-col justify-center group transition-transform hover:scale-105">
         <div class="text-2xl md:text-[28px] font-black tracking-tighter leading-none flex items-center gap-1.5 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">
@@ -56,7 +61,7 @@
   <!-- Lightbox -->
   <div id="lightbox" class="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 p-4">
     <button id="lightboxClose" class="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 text-white text-xl hover:bg-white/20 transition">&times;</button>
-    <img id="lightboxImg" class="max-w-full max-h-[85vh] rounded-2xl shadow-2xl" src="" alt="">
+    <div id="lightboxImg" class="max-w-full max-h-[85vh] rounded-2xl shadow-2xl w-full" style="background-size: cover; background-position: center;"></div>
     <div id="lightboxInfo" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white text-sm bg-black/50 px-6 py-3 rounded-full backdrop-blur-md"></div>
   </div>
 
@@ -113,7 +118,6 @@
       lightboxImg.style.background = work.image;
       lightboxImg.style.backgroundSize = 'cover';
       lightboxImg.style.backgroundPosition = 'center';
-      lightboxImg.removeAttribute('src');
       lightboxInfo.textContent = `${work.title} — ${work.category}`;
       lightbox.classList.remove('opacity-0', 'pointer-events-none');
     }

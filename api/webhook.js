@@ -1,4 +1,3 @@
-// Mercado Pago Webhook — Genera license key y notifica por email
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
 
@@ -11,14 +10,45 @@ function generateLicenseKey(plan) {
   return `${prefix}-${segments.join('-')}`;
 }
 
+function verifyMPSignature(req, body) {
+  const secret = process.env.MP_WEBHOOK_SECRET;
+  if (!secret) return process.env.VERCEL_ENV !== 'production';
+
+  const signature = req.headers['x-signature'];
+  if (!signature) return false;
+
+  const tsMatch = signature.match(/ts=(\d+)/);
+  const v1Match = signature.match(/v1=([a-f0-9]+)/);
+  if (!tsMatch || !v1Match) return false;
+
+  const ts = tsMatch[1];
+  const receivedHash = v1Match[1];
+  const requestId = req.headers['x-request-id'] || '';
+  const paymentId = body?.data?.id || '';
+
+  const template = `id:${paymentId};request-id:${requestId};ts:${ts};`;
+  const computedHash = crypto
+    .createHmac('sha256', secret)
+    .update(template)
+    .digest('hex');
+
+  if (computedHash.length !== receivedHash.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(computedHash), Buffer.from(receivedHash));
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).send('Method not allowed');
   }
 
+  if (!verifyMPSignature(req, req.body)) {
+    console.warn('Webhook: X-Signature inválida');
+    return res.status(403).send('Forbidden');
+  }
+
   const supabase = createClient(
     process.env.SUPABASE_URL || 'https://qovtekqxruusqhscacqn.supabase.co',
-    process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || 'public'
+    process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY
   );
 
   const { action, data } = req.body;
@@ -46,7 +76,6 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'DB insert failed', detail: error.message });
     }
 
-    // Enviar email si tenemos el correo del comprador
     const buyerEmail = data?.payer?.email || data?.metadata?.email;
     if (buyerEmail && process.env.SENDGRID_API_KEY) {
       try {
@@ -60,7 +89,7 @@ module.exports = async (req, res) => {
       }
     }
 
-    console.log(`✅ License generated: ${key} (${plan})`);
+    console.log(`License generated: ${key} (${plan})`);
     return res.status(200).json({ ok: true, key, plan });
 
   } catch (err) {

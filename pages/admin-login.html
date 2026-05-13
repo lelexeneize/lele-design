@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Login — Lele Oficial</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="Acceso al panel de administración de Lele Oficial.">
+  <meta name="robots" content="noindex, nofollow">
+  <style>body { background: #0a0a0f; color: #fff; }</style>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="../js/theme.js"></script>
 </head>
 <body class="font-['Inter'] min-h-screen flex items-center justify-center">
+  <script src="https://cdn.tailwindcss.com"></script>
   <div class="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-transparent to-orange-900/20"></div>
 
   <div class="relative z-10 w-full max-w-sm mx-6">
@@ -59,8 +62,8 @@
     const SB_ANON = 'sb_publishable_iZ9oKQoxTU0ui2kAUhCcLg_CrXpI1S2';
     let _handleOAuthDone = false;
 
-    document.getElementById('googleLoginBtn').addEventListener('click', () => {
-      const sb = getSupabaseClient();
+    document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+      const sb = await getSupabaseClient();
       if (sb) {
         sb.auth.signInWithOAuth({
           provider: 'google',
@@ -73,7 +76,7 @@
 
     async function checkAdminByUserId(userId) {
       try {
-        const sb = getSupabaseClient();
+        const sb = await getSupabaseClient();
         if (!sb) return false;
         const { data } = await sb.from('profiles').select('role').eq('id', userId).single();
         return data?.role === 'admin';
@@ -103,26 +106,27 @@
       });
     }
 
-    // Espera a que Supabase SDK esté listo y la sesión se recupere
-    (function initOAuthHandler() {
-      console.log('URL hash:', window.location.hash);
-      const sb = getSupabaseClient();
-      if (!sb) { setTimeout(initOAuthHandler, 200); return; }
+    (async function initOAuthHandler() {
+      try {
+        const sb = await getSupabaseClient();
+        if (!sb) { setTimeout(initOAuthHandler, 500); return; }
 
-      console.log('SDK ready, waiting for session...');
-      let attempts = 0;
-      const poll = setInterval(async () => {
-        attempts++;
-        const result = await sb.auth.getSession();
-        console.log('Session check #' + attempts, result?.data?.session?.user?.id);
-        if (result?.data?.session?.user) {
-          clearInterval(poll);
-          handleAdminSession(result.data.session);
-        } else if (attempts >= 15) {
-          clearInterval(poll);
-          console.log('No session found after 15 attempts');
+        if (!window.location.hash && !window.location.search.includes('code=')) {
+          return;
         }
-      }, 300);
+
+        let attempts = 0;
+        const poll = setInterval(async () => {
+          attempts++;
+          const result = await sb.auth.getSession();
+          if (result?.data?.session?.user) {
+            clearInterval(poll);
+            handleAdminSession(result.data.session);
+          } else if (attempts >= 30) {
+            clearInterval(poll);
+          }
+        }, 500);
+      } catch (_) {}
     })();
 
     document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
@@ -135,7 +139,7 @@
       btn.disabled = true;
 
       try {
-        const sb = getSupabaseClient();
+        const sb = await getSupabaseClient();
         if (sb) {
           const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
           if (!error && data.user) {

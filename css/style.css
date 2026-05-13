@@ -54,11 +54,34 @@ body {
 }
 
 /* ─── Utils ────────────────────────────────────────────── */
-.glass { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); }
+.glass { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); }
 .glass-hover:hover { background: rgba(139,92,246,0.06); border-color: var(--border-hover); }
 .glass-card { background: var(--bg-secondary); border: 1px solid var(--border-color); }
 .input-theme { background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); }
 .sidebar-theme { background: var(--sidebar-bg); border-color: var(--border-color); }
+
+/* ─── Focus visible ────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--border-hover);
+  outline-offset: 2px;
+}
+button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--border-hover);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ─── iOS fixes ───────────────────────────────────────── */
+@supports (-webkit-touch-callout: none) {
+  nav { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+  #particles-canvas { display: none !important; }
+}
+@media (max-width: 768px) {
+  nav { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .glass { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  html.light .glass { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  [class*="blur-"] { opacity: 0.35 !important; }
+}
 
 /* ─── Theme transition ─────────────────────────────────── */
 .theme-transition * { transition: background-color .3s, border-color .3s, color .3s, box-shadow .3s !important; }
@@ -94,7 +117,7 @@ body {
 .sidebar-mobile.open { transform: translateX(0); }
 
 /* ─── Light mode overrides ─────────────────────────────── */
-html.light .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); }
+html.light .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
 html.light nav { background: rgba(248,246,255,0.8) !important; }
 html.light .text-white { color: var(--text-primary) !important; }
 html.light .text-white\/40 { color: var(--text-tertiary) !important; }

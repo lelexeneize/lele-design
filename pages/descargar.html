@@ -6,15 +6,21 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Descargar — Sabina Optimizer</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="Descargá Sabina Optimizer para Windows. Ingresá tu license key y obtené el instalador.">
+  <meta property="og:title" content="Descargar Sabina Optimizer">
+  <meta property="og:description" content="Optimizá tu PC con Sabina Optimizer.">
+  <meta name="twitter:card" content="summary">
+  <link rel="canonical" href="https://leleoficial.vercel.app/pages/descargar.html">
+  <style>body { background: #0a0a0f; color: #fff; }</style>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../js/supabase-config.js"></script>
 </head>
 <body class="font-['Inter']">
-  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style="background: rgba(10,10,15,0.7);">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style="background: rgba(10,10,15,0.85);">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="../index.html" class="flex flex-col justify-center group transition-transform hover:scale-105">
         <div class="text-2xl md:text-[28px] font-black tracking-tighter leading-none flex items-center gap-1.5 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">
@@ -79,35 +85,41 @@
       btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Validando...';
 
       try {
-        const sb = getSupabaseClient();
-        if (!sb) { throw new Error('Sin conexión'); }
+        const sb = await getSupabaseClient();
 
-        const { data, error } = await sb.rpc('validate_key', { p_key: input.value.trim().toUpperCase() });
+        if (sb) {
+          const { data, error } = await sb.rpc('validate_key', { p_key: input.value.trim().toUpperCase() });
 
-        if (error) {
-          err.textContent = 'Error de validación. Intentalo de nuevo.';
-          err.classList.remove('hidden');
-          return;
+          if (!error && data && data.length > 0) {
+            const keyData = data[0];
+            if (keyData.status === 'active') {
+              const planNames = { essential: 'Plan Essential', pro: 'Plan Pro', elite: 'Plan Elite' };
+              document.getElementById('planName').textContent = planNames[keyData.plan] || keyData.plan;
+              document.getElementById('displayKey').textContent = keyData.key;
+              document.getElementById('keyScreen').classList.add('hidden');
+              document.getElementById('downloadScreen').classList.remove('hidden');
+              return;
+            }
+            err.textContent = 'Clave ' + keyData.status;
+            err.classList.remove('hidden');
+            return;
+          }
         }
 
-        if (!data || data.length === 0) {
-          err.textContent = '❌ Clave inválida o no encontrada';
-          err.classList.remove('hidden');
-          return;
-        }
+        // Fallback: validar contra API
+        const fallbackRes = await fetch('/api/validate-license?key=' + encodeURIComponent(input.value.trim().toUpperCase()));
+        const fallbackData = await fallbackRes.json();
 
-        const keyData = data[0];
-        if (keyData.status !== 'active') {
-          err.textContent = '❌ Clave ' + keyData.status;
+        if (fallbackData.valid) {
+          const planNames = { essential: 'Plan Essential', pro: 'Plan Pro', elite: 'Plan Elite' };
+          document.getElementById('planName').textContent = planNames[fallbackData.plan] || fallbackData.plan;
+          document.getElementById('displayKey').textContent = input.value.trim().toUpperCase();
+          document.getElementById('keyScreen').classList.add('hidden');
+          document.getElementById('downloadScreen').classList.remove('hidden');
+        } else {
+          err.textContent = fallbackData.error || 'Clave inválida';
           err.classList.remove('hidden');
-          return;
         }
-
-        const planNames = { essential: 'Plan Essential', pro: 'Plan Pro', elite: 'Plan Elite' };
-        document.getElementById('planName').textContent = planNames[keyData.plan] || keyData.plan;
-        document.getElementById('displayKey').textContent = keyData.key;
-        document.getElementById('keyScreen').classList.add('hidden');
-        document.getElementById('downloadScreen').classList.remove('hidden');
 
       } catch (e) {
         err.textContent = 'Error de conexión. Verificá tu internet.';

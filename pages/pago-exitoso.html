@@ -6,15 +6,18 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>Pago exitoso — Sabina Optimizer</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="Gracias por tu compra. Tu license key para Sabina Optimizer ya está lista.">
+  <meta name="robots" content="noindex, nofollow">
+  <style>body { background: #0a0a0f; color: #fff; }</style>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="../js/theme.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="font-['Inter']">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style="background: rgba(10,10,15,0.7);">
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/[0.06]" style="background: rgba(10,10,15,0.85);">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="../index.html" class="flex flex-col justify-center group transition-transform hover:scale-105">
         <div class="text-2xl md:text-[28px] font-black tracking-tighter leading-none flex items-center gap-1.5 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">
@@ -28,10 +31,12 @@
 
   <main class="min-h-screen flex items-center justify-center px-6">
     <div class="text-center max-w-lg">
-      <div class="text-7xl mb-6">🎉</div>
-      <h1 class="text-4xl md:text-5xl font-black mb-4 text-white">¡Ya está todo listo!</h1>
-      <p class="text-white/40 text-lg mb-2">Gracias por tu compra. Tu license key se genera al instante.</p>
-      <p class="text-emerald-400/70 text-sm mb-6"><i class="fas fa-bolt mr-1"></i> Acceso inmediato — descargá Sabina Optimizer ahora mismo</p>
+      <div id="successHeader" class="hidden">
+        <div class="text-7xl mb-6">🎉</div>
+        <h1 class="text-4xl md:text-5xl font-black mb-4 text-white">¡Ya está todo listo!</h1>
+        <p class="text-white/40 text-lg mb-2">Gracias por tu compra. Tu license key se genera al instante.</p>
+        <p class="text-emerald-400/70 text-sm mb-6"><i class="fas fa-bolt mr-1"></i> Acceso inmediato — descargá Sabina Optimizer ahora mismo</p>
+      </div>
 
       <div id="keyLoading" class="p-6 rounded-2xl glass mb-8">
         <p class="text-white/50 text-sm">Generando tu license key...</p>
@@ -39,7 +44,7 @@
       </div>
 
       <div id="keyReady" class="hidden p-6 rounded-2xl glass mb-8">
-        <p class="text-sm text-white/50 mb-2">Tu license key:</p>
+        <p class="text-sm text-white/50 mb-1">Tu license key <span id="planName" class="text-violet-400 font-semibold"></span>:</p>
         <p id="generatedKey" class="text-2xl font-bold text-violet-400 font-mono tracking-wider mb-4 select-all">ES-XXXXXX-XXXXXX-XXXXXX-XXXXXX</p>
         <p class="text-sm text-emerald-400/70 mb-3"><i class="fas fa-bolt mr-1"></i> Ya tenés acceso completo. Descargá la app y usá tu key para activarla.</p>
         <div class="flex flex-col sm:flex-row gap-3 justify-center mb-3">
@@ -62,98 +67,98 @@
 
   <script src="../js/supabase-config.js"></script>
   <script>
-    // Verificar que el pago fue iniciado desde la página de pago o viene de MP
     const urlParams = new URLSearchParams(window.location.search);
     const mpPaymentId = urlParams.get('collection_id') || urlParams.get('payment_id');
-    const paymentData = JSON.parse(localStorage.getItem('payment_initiated'));
-    const oneHour = 60 * 60 * 1000;
 
-    if (mpPaymentId) {
-      console.log('Pago MP detectado ID:', mpPaymentId);
-    } else if (!paymentData || (Date.now() - paymentData.time) > oneHour) {
-      document.getElementById('keyLoading').innerHTML = `
-        <p class="text-red-400 text-sm mb-3">No se detectó un pago reciente.</p>
+    async function verifyAndGenerateKey() {
+      const keyLoading = document.getElementById('keyLoading');
+      const keyReady = document.getElementById('keyReady');
+
+      // Caso 1: Viene de MP con payment_id
+      if (mpPaymentId) {
+        keyLoading.querySelector('p').textContent = 'Verificando tu pago con Mercado Pago...';
+        try {
+          const res = await fetch('/api/generate-license-after-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ payment_id: mpPaymentId, plan: urlParams.get('plan') || 'essential' })
+          });
+          const data = await res.json();
+          if (data.verified && data.key) {
+            showKey(data.key, data.plan);
+            return;
+          }
+          keyLoading.innerHTML = `
+            <p class="text-amber-400 text-sm mb-3">El pago no pudo verificarse automáticamente.</p>
+            <p class="text-white/30 text-xs mb-4">Si ya realizaste el pago, tu license key te llegará por correo en las próximas horas.</p>
+            <p class="text-white/30 text-xs">Escribinos a <a href="mailto:hola@leleoficial.com" class="text-violet-400">hola@leleoficial.com</a></p>
+            <div class="mt-4">
+              <a href="descargar.html" class="text-sm text-violet-400 hover:text-violet-300">Ir a descargar →</a>
+            </div>
+          `;
+          return;
+        } catch (e) {
+          keyLoading.innerHTML = `
+            <p class="text-red-400 text-sm mb-3">Error de conexión al verificar el pago.</p>
+            <p class="text-white/30 text-xs">Escribinos a <a href="mailto:hola@leleoficial.com" class="text-violet-400">hola@leleoficial.com</a></p>
+          `;
+          return;
+        }
+      }
+
+      // Caso 2: Sin payment_id — no se puede generar key sin verificación
+      keyLoading.innerHTML = `
+        <p class="text-amber-400 text-sm mb-3">No se detectó un pago reciente.</p>
         <p class="text-white/30 text-xs mb-4">Para obtener tu license key, primero completá el pago.</p>
         <a href="pago.html" class="inline-block px-6 py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-semibold">Ir a pagar</a>
+        <p class="text-white/20 text-xs mt-4">¿Ya pagaste y llegaste aquí? <a href="mailto:hola@leleoficial.com?subject=Ya%20pag%C3%A9%20y%20no%20recib%C3%AD%20mi%20key" class="text-violet-400 hover:text-violet-300">Contactanos</a></p>
       `;
-      throw new Error('No payment detected');
     }
 
-    const plan = urlParams.get('plan') || (paymentData ? paymentData.plan : null) || 'essential';
+    function showKey(key, plan) {
+      document.getElementById('successHeader').classList.remove('hidden');
+      document.getElementById('generatedKey').textContent = key;
+      document.getElementById('keyLoading').classList.add('hidden');
+      document.getElementById('keyReady').classList.remove('hidden');
 
-    const planNames = {
-      essential: { label: 'Essential', prefix: 'ES' },
-      pro: { label: 'Pro', prefix: 'PR' },
-      elite: { label: 'Elite', prefix: 'EL' },
-      starter: { label: 'Starter', prefix: 'ES' },
-      designpro: { label: 'Pro', prefix: 'PR' },
-      enterprise: { label: 'Enterprise', prefix: 'EL' }
-    };
+      const planLabels = { essential: 'Essential', pro: 'Pro', elite: 'Elite', starter: 'Starter', designpro: 'Pro', enterprise: 'Enterprise' };
+      document.getElementById('planName').textContent = planLabels[plan] || plan;
 
-    async function generateKey() {
-      const info = planNames[plan] || planNames.essential;
-      try {
-        const res = await fetch('/api/create-license', {
+      // Enviar key por email si tenemos el correo
+      const emailStatus = document.getElementById('emailStatus');
+      const userData = JSON.parse(localStorage.getItem('lele_user') || 'null');
+      const paymentStored = JSON.parse(localStorage.getItem('payment_initiated') || '{}');
+      const buyerEmail = userData?.email || paymentStored?.email || urlParams.get('payer_email') || null;
+
+      if (buyerEmail) {
+        emailStatus.classList.remove('hidden');
+        emailStatus.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Enviando key por correo...';
+        emailStatus.className = 'text-xs mt-3 text-white/40';
+        fetch('/api/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ plan: plan, count: 1 })
-        });
-        const data = await res.json();
-        if (data.keys && data.keys.length > 0) {
-          const key = data.keys[0];
-          document.getElementById('generatedKey').textContent = key;
-          document.getElementById('keyLoading').classList.add('hidden');
-          document.getElementById('keyReady').classList.remove('hidden');
-          document.getElementById('downloadLink').href = 'descargar.html';
-
-          // Intentar enviar por email
-          const emailStatus = document.getElementById('emailStatus');
-          // Buscar email en múltiples fuentes (logueado > capturado en form > MP URL)
-          const userData = JSON.parse(localStorage.getItem('lele_user') || 'null');
-          const paymentStored = JSON.parse(localStorage.getItem('payment_initiated') || '{}');
-          const mpEmail = urlParams.get('payer_email');
-          const buyerEmail = userData?.email || paymentStored?.email || mpEmail || null;
-
-          if (buyerEmail) {
-            emailStatus.classList.remove('hidden');
-            emailStatus.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Enviando key por correo...';
-            emailStatus.className = 'text-xs mt-3 text-white/40';
-            emailStatus.classList.remove('hidden');
-            try {
-              const mailRes = await fetch('/api/email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ key, plan, email: buyerEmail })
-              });
-              const mailData = await mailRes.json();
-              if (mailData.sent) {
-                emailStatus.className = 'text-xs mt-3 text-emerald-400';
-                emailStatus.innerHTML = `<i class="fas fa-check mr-1"></i> Te enviamos la key a ${buyerEmail}`;
-              } else {
-                emailStatus.className = 'text-xs mt-3 text-amber-400';
-                emailStatus.innerHTML = '<i class="fas fa-info-circle mr-1"></i> Guardá tu key, el envío por correo no está disponible ahora';
-              }
-            } catch (_) {
+          body: JSON.stringify({ key, plan, email: buyerEmail })
+        })
+          .then(r => r.json())
+          .then(d => {
+            if (d.sent) {
+              emailStatus.className = 'text-xs mt-3 text-emerald-400';
+              emailStatus.innerHTML = `<i class="fas fa-check mr-1"></i> Te enviamos la key a ${buyerEmail}`;
+            } else {
               emailStatus.className = 'text-xs mt-3 text-amber-400';
               emailStatus.innerHTML = '<i class="fas fa-info-circle mr-1"></i> Guardá tu key arriba';
             }
-          }
-        } else {
-          throw new Error(data.error || 'Error al generar');
-        }
-      } catch (e) {
-        document.getElementById('keyLoading').innerHTML = `
-          <p class="text-white/50 text-sm mb-3">No se pudo generar automáticamente.</p>
-          <p class="text-white/30 text-xs mb-4">Te vamos a enviar tu license key por correo en las próximas 24 horas.</p>
-          <p class="text-white/30 text-xs">Escribinos a <a href="mailto:hola@leleoficial.com" class="text-violet-400">hola@leleoficial.com</a></p>
-          <div class="mt-4">
-            <a href="descargar.html" class="text-sm text-violet-400 hover:text-violet-300">Ir a descargar →</a>
-          </div>
-        `;
+          })
+          .catch(() => {
+            emailStatus.className = 'text-xs mt-3 text-amber-400';
+            emailStatus.innerHTML = '<i class="fas fa-info-circle mr-1"></i> Guardá tu key arriba';
+          });
       }
+
+      localStorage.removeItem('payment_initiated');
     }
 
-    generateKey();
+    verifyAndGenerateKey();
   </script>
 </body>
 </html>

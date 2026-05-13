@@ -7,7 +7,7 @@
 // ─── USERS ────────────────────────────────────────────────────────
 
 async function dbGetUsers() {
-  const sb = getSupabaseClient();
+  const sb = await getSupabaseClient();
   if (sb) {
     const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
     if (!error && data) return data;
@@ -25,7 +25,7 @@ function uuidFallback() {
 }
 
 async function dbSaveUser(user) {
-  const sb = getSupabaseClient();
+  const sb = await getSupabaseClient();
   if (sb) {
     try {
       // Upsert: insert if not exists, update if exists (matched by email)
@@ -53,7 +53,7 @@ async function dbSaveUser(user) {
 }
 
 async function dbRemoveUser(userId) {
-  const sb = getSupabaseClient();
+  const sb = await getSupabaseClient();
   if (sb) {
     await sb.from('profiles').delete().eq('id', userId);
     return;
@@ -67,7 +67,7 @@ async function dbRemoveUser(userId) {
 // ─── WORKS (Gallery) ─────────────────────────────────────────────
 
 async function dbGetWorks() {
-  const sb = getSupabaseClient();
+  const sb = await getSupabaseClient();
   if (sb) {
     const { data, error } = await sb.from('works').select('*').order('created_at', { ascending: false });
     if (!error && data) return data;
@@ -77,7 +77,7 @@ async function dbGetWorks() {
 }
 
 async function dbAddWork(work) {
-  const sb = getSupabaseClient();
+  const sb = await getSupabaseClient();
   if (sb) {
     const { data: user } = await sb.auth.getUser();
     const { error } = await sb.from('works').insert({
@@ -96,18 +96,20 @@ async function dbAddWork(work) {
 }
 
 async function dbDeleteWork(workId) {
-  const sb = getSupabaseClient();
+  const sb = await getSupabaseClient();
   if (sb) {
     await sb.from('works').delete().eq('id', workId);
     return;
   }
   const works = JSON.parse(localStorage.getItem('lele_works') || '[]');
-  works.splice(workId, 1);
+  let idx = works.findIndex(w => w.id === workId || w.createdAt === workId);
+  if (idx === -1) idx = parseInt(workId, 10);
+  if (idx >= 0 && idx < works.length) works.splice(idx, 1);
   localStorage.setItem('lele_works', JSON.stringify(works));
 }
 
 async function dbDeleteAllWorks() {
-  const sb = getSupabaseClient();
+  const sb = await getSupabaseClient();
   if (sb) {
     const { data: all } = await sb.from('works').select('id');
     if (all) for (const w of all) await sb.from('works').delete().eq('id', w.id);
@@ -119,7 +121,7 @@ async function dbDeleteAllWorks() {
 // ─── AUTH ────────────────────────────────────────────────────────
 
 async function dbSignOut() {
-  const sb = getSupabaseClient();
+  const sb = await getSupabaseClient();
   if (sb) {
     await sb.auth.signOut();
   }
@@ -127,7 +129,7 @@ async function dbSignOut() {
 }
 
 async function dbGetCurrentUser() {
-  const sb = getSupabaseClient();
+  const sb = await getSupabaseClient();
   if (sb) {
     const { data: { user } } = await sb.auth.getUser();
     if (user) {
@@ -140,8 +142,8 @@ async function dbGetCurrentUser() {
 }
 
 // ─── Session listener (for Supabase) ────────────────────────────
-function dbOnAuthStateChange(callback) {
-  const sb = getSupabaseClient();
+async function dbOnAuthStateChange(callback) {
+  const sb = await getSupabaseClient();
   if (sb) {
     sb.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {

@@ -1,15 +1,5 @@
-// ─── Admin: Create License Keys ──────────────────────────
-// POST /api/create-license
-// Body: { plan: "essential"|"pro"|"elite", count: 1 }
-// ─────────────────────────────────────────────────────────
-
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
-
-const supabase = createClient(
-  process.env.SUPABASE_URL || 'https://qovtekqxruusqhscacqn.supabase.co',
-  process.env.SUPABASE_ANON_KEY
-);
 
 function generateKey(plan) {
   const prefix = plan.substring(0, 2).toUpperCase();
@@ -23,6 +13,35 @@ function generateKey(plan) {
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Verify admin JWT
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Se requiere autorización' });
+  }
+  const token = authHeader.replace('Bearer ', '');
+
+  const supabase = createClient(
+    process.env.SUPABASE_URL || 'https://qovtekqxruusqhscacqn.supabase.co',
+    process.env.SUPABASE_ANON_KEY
+  );
+
+  try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Token inválido o expirado' });
+    }
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (!profile || profile.role !== 'admin') {
+      return res.status(403).json({ error: 'Se requiere rol de administrador' });
+    }
+  } catch (e) {
+    return res.status(500).json({ error: 'Error verificando autorización' });
   }
 
   const { plan = 'essential', count = 1 } = req.body;
