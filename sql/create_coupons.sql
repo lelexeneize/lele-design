@@ -74,9 +74,18 @@ BEGIN
 END;
 $$;
 
--- 5. RPC: redeem_coupon (SECURITY DEFINER — runs as admin)
--- p_user_id es opcional, si no se pasa usa auth.uid()
-CREATE OR REPLACE FUNCTION redeem_coupon(p_code TEXT, p_user_id UUID DEFAULT NULL)
+-- 5. RPC: get_user_by_email (bypass RLS para buscar perfil propio)
+CREATE OR REPLACE FUNCTION get_user_by_email(p_email TEXT)
+RETURNS TABLE(id UUID, name TEXT, plan TEXT, credits INT)
+SECURITY DEFINER
+LANGUAGE sql
+AS $$
+  SELECT id, name, plan, credits FROM profiles WHERE email = p_email LIMIT 1;
+$$;
+
+-- 6. RPC: redeem_coupon (SECURITY DEFINER — runs as admin)
+-- p_email es opcional, si no se pasa usa auth.uid()
+CREATE OR REPLACE FUNCTION redeem_coupon(p_code TEXT, p_email TEXT DEFAULT NULL)
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -84,12 +93,17 @@ SET search_path = public
 AS $$
 DECLARE
   v_coupon coupons%ROWTYPE;
-  v_user_id UUID := COALESCE(p_user_id, auth.uid());
+  v_user_id UUID;
   v_license_key TEXT;
   v_prefix TEXT;
   v_seg TEXT;
 BEGIN
-  -- Must be authenticated or have user_id
+  -- Get user_id: from auth or from email
+  v_user_id := auth.uid();
+  IF v_user_id IS NULL AND p_email IS NOT NULL THEN
+    SELECT id INTO v_user_id FROM profiles WHERE email = p_email;
+  END IF;
+
   IF v_user_id IS NULL THEN
     RETURN jsonb_build_object('success', false, 'error', 'No autenticado');
   END IF;

@@ -236,20 +236,19 @@
         const sb = await getSupabaseClient();
         if (!sb) throw new Error('Sin conexión');
 
-        // Get user ID from Supabase session or fallback to localStorage
-        let userId = null;
+        // Get user email for RPC fallback
+        let userEmail = null;
         const { data: { user: supaUser } } = await sb.auth.getUser();
-        if (supaUser) {
-          userId = supaUser.id;
+        if (supaUser?.email) {
+          userEmail = supaUser.email;
         } else {
           const localUser = JSON.parse(localStorage.getItem('lele_user'));
-          if (localUser?.email) {
-            const { data: profiles } = await sb.from('profiles').select('id').eq('email', localUser.email);
-            if (profiles?.[0]) userId = profiles[0].id;
-          }
+          if (localUser?.email) userEmail = localUser.email;
         }
 
-        const { data: rpcData, error: rpcError } = await sb.rpc('redeem_coupon', { p_code: code, p_user_id: userId });
+        const rpcParams = { p_code: code };
+        if (userEmail) rpcParams.p_email = userEmail;
+        const { data: rpcData, error: rpcError } = await sb.rpc('redeem_coupon', rpcParams);
 
         if (rpcError) throw rpcError;
 
