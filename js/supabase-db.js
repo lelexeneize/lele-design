@@ -28,7 +28,7 @@ async function dbSaveUser(user) {
   const sb = await getSupabaseClient();
   if (sb) {
     try {
-      // Upsert: insert if not exists, update if exists (matched by email)
+      const { data: existing } = await sb.from('profiles').select('role').eq('email', user.email).single();
       const { error } = await sb.from('profiles').upsert({
         id: user.id || uuidFallback(),
         name: user.name || '',
@@ -36,7 +36,7 @@ async function dbSaveUser(user) {
         picture: user.picture || '',
         plan: 'free',
         credits: 10,
-        role: 'user'
+        role: existing?.role || 'user'
       }, { onConflict: 'email', ignoreDuplicates: false });
       if (error) console.warn('Supabase upsert error:', error.message);
     } catch (e) {

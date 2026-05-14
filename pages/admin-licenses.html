@@ -195,14 +195,21 @@
         const { data: { user: authUser } } = await sb.auth.getUser();
         if (authUser) {
           const { data: profile } = await sb.from('profiles').select('role').eq('id', authUser.id).single();
-          if (profile?.role !== 'admin') {
-            alert('No tenés permisos de administrador.');
-            window.location.href = '../index.html';
-            return false;
+          if (profile?.role === 'admin') {
+            localStorage.setItem('lele_user', JSON.stringify({ ...user, isAdmin: true, role: 'admin' }));
+            return true;
           }
-          return true;
         }
       } catch (_) {}
+      if (user?.email) {
+        try {
+          const { data: profile } = await sb.from('profiles').select('role').eq('email', user.email).single();
+          if (profile?.role === 'admin') {
+            localStorage.setItem('lele_user', JSON.stringify({ ...user, isAdmin: true, role: 'admin' }));
+            return true;
+          }
+        } catch (_) {}
+      }
       if (user.isAdmin || user.role === 'admin') return true;
       alert('Sesión expirada.');
       window.location.href = 'admin-login.html';

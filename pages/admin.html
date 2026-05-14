@@ -133,19 +133,28 @@
         window.location.href = 'admin-login.html';
         return false;
       }
+      // Intentar 1: getUser() con sesión de Supabase
       try {
         const { data: { user: authUser } } = await sb.auth.getUser();
         if (authUser) {
           const { data: profile } = await sb.from('profiles').select('role').eq('id', authUser.id).single();
-          if (profile?.role !== 'admin') {
-            alert('No tenés permisos de administrador.');
-            window.location.href = '../index.html';
-            return false;
+          if (profile?.role === 'admin') {
+            localStorage.setItem('lele_user', JSON.stringify({ ...user, isAdmin: true, role: 'admin' }));
+            return true;
           }
-          return true;
         }
       } catch (_) {}
-      // Fallback: si Supabase auth falla, confiar en localStorage
+      // Intentar 2: verificar por email directamente en profiles
+      if (user?.email) {
+        try {
+          const { data: profile } = await sb.from('profiles').select('role').eq('email', user.email).single();
+          if (profile?.role === 'admin') {
+            localStorage.setItem('lele_user', JSON.stringify({ ...user, isAdmin: true, role: 'admin' }));
+            return true;
+          }
+        } catch (_) {}
+      }
+      // Intentar 3: fallback localStorage
       if (user.isAdmin || user.role === 'admin') return true;
       alert('Sesión expirada. Iniciá sesión de nuevo.');
       window.location.href = 'admin-login.html';
