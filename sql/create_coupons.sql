@@ -60,7 +60,7 @@ CREATE POLICY "Admins can insert license_keys"
 -- 3. ADD user_id TO license_keys (for assigned licenses)
 ALTER TABLE license_keys ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES profiles(id) ON DELETE SET NULL;
 
--- 4. RPC: admin_get_all_profiles (para el panel de admin, bypass RLS)
+-- 4. RPC: admin_get_all_profiles (para listar usuarios en admin, bypass RLS)
 CREATE OR REPLACE FUNCTION admin_get_all_profiles()
 RETURNS SETOF profiles
 SECURITY DEFINER
