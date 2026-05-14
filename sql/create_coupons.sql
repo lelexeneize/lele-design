@@ -60,7 +60,21 @@ CREATE POLICY "Admins can insert license_keys"
 -- 3. ADD user_id TO license_keys (for assigned licenses)
 ALTER TABLE license_keys ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES profiles(id) ON DELETE SET NULL;
 
--- 4. RPC: redeem_coupon (SECURITY DEFINER — runs as admin)
+-- 4. RPC: admin_insert_coupon (para generar cupones desde las API sin service key)
+CREATE OR REPLACE FUNCTION admin_insert_coupon(
+  p_code TEXT, p_type TEXT, p_value INT, p_detail TEXT
+) RETURNS JSONB
+SECURITY DEFINER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  INSERT INTO coupons (code, type, value, detail, status)
+  VALUES (p_code, p_type, p_value, p_detail, 'active');
+  RETURN jsonb_build_object('success', true);
+END;
+$$;
+
+-- 5. RPC: redeem_coupon (SECURITY DEFINER — runs as admin)
 CREATE OR REPLACE FUNCTION redeem_coupon(p_code TEXT)
 RETURNS JSONB
 LANGUAGE plpgsql

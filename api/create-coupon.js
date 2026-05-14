@@ -27,27 +27,21 @@ module.exports = async (req, res) => {
 
     for (let i = 0; i < count; i++) {
       const code = (prefix + '-' + seg() + '-' + seg()).toUpperCase();
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/coupons`, {
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_insert_coupon`, {
         method: 'POST',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
+        headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          code,
-          type,
-          value: type === 'credits' ? value : 1,
-          detail: type === 'license' ? detail : String(value),
-          status: 'active'
+          p_code: code,
+          p_type: type,
+          p_value: type === 'credits' ? value : 1,
+          p_detail: type === 'license' ? detail : String(value)
         })
       });
       if (r.ok) {
         codes.push(code);
       } else {
         const errBody = await r.text();
-        errors.push(errBody.substring(0, 100));
+        errors.push(errBody.substring(0, 200));
       }
     }
 
