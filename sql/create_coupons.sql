@@ -20,6 +20,12 @@ CREATE TABLE IF NOT EXISTS coupons (
 
 ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies first, then create
+DROP POLICY IF EXISTS "Admins can read coupons" ON coupons;
+DROP POLICY IF EXISTS "Admins can insert coupons" ON coupons;
+DROP POLICY IF EXISTS "Admins can update coupons" ON coupons;
+DROP POLICY IF EXISTS "Users can read own used coupons" ON coupons;
+
 -- Admins can read all coupons
 CREATE POLICY "Admins can read coupons"
   ON coupons FOR SELECT
