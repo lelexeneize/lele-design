@@ -57,6 +57,12 @@
   <script src="../js/supabase-db.js"></script>
   <script src="../js/auth.js"></script>
   <script>
+    // Auto-redirect si ya está logueado
+    try {
+      const u = JSON.parse(localStorage.getItem('lele_user'));
+      if (u && (u.isAdmin || u.role === 'admin')) window.location.href = 'admin.html';
+    } catch (_) {}
+
     const REDIRECT_URL = window.location.origin + '/pages/admin-login.html';
     const SB_URL = 'https://qovtekqxruusqhscacqn.supabase.co';
     const SB_ANON = 'sb_publishable_iZ9oKQoxTU0ui2kAUhCcLg_CrXpI1S2';
@@ -92,13 +98,13 @@
 
       checkAdminByUserId(session.user.id).then(isAdmin => {
         if (isAdmin) {
-          const user = {
+          localStorage.setItem('lele_user', JSON.stringify({
             name: session.user.user_metadata?.name || session.user.email,
             email: session.user.email,
             picture: session.user.user_metadata?.picture || '',
-            isAdmin: true
-          };
-          localStorage.setItem('lele_user', JSON.stringify(user));
+            isAdmin: true,
+            role: 'admin'
+          }));
           window.location.href = 'admin.html';
         } else {
           alert('Esta cuenta no tiene permisos de administrador.');
@@ -145,7 +151,7 @@
           if (!error && data.user) {
             const isAdmin = await checkAdminByUserId(data.user.id);
             if (isAdmin) {
-              localStorage.setItem('lele_user', JSON.stringify({ name: email, email, picture: '', isAdmin: true }));
+              localStorage.setItem('lele_user', JSON.stringify({ name: email, email, picture: '', isAdmin: true, role: 'admin' }));
               window.location.href = 'admin.html';
               return;
             } else {
