@@ -94,18 +94,40 @@ Cuando te pregunten "qué archivos hay", "en qué carpeta estamos", o "cuál es 
 
 | Modelo | Tamaño |
 |--------|--------|
-| llama3.2-vision:11b | 7.8 GB |
-| qwen2.5vl:latest | 6.0 GB |
+| qwen3.6:latest | 23 GB |
+| qwen3.6:27b | 17 GB |
+| qwen3.6:27b-16k | 17 GB |
+| fredrezones55/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive:IQ2_M | 12 GB |
+| llama2-uncensored:latest | 3.8 GB |
+| granite4.1:8b | 5.3 GB |
+| granite4.1:8b-32k | 5.3 GB |
+| granite4:3b | 2.1 GB |
+| granite4:3b-32k | 2.1 GB |
+| qwen3.5:9b | 6.6 GB |
+| qwen3.5:9b-32k | 6.6 GB |
 | qwen3:14b | 9.3 GB |
-| codestral:latest | 12 GB |
-| deepseek-r1:7b | 4.7 GB |
-| codestral:22b | 12 GB |
-| qwen2.5-coder:14b | 9.0 GB |
-| deepseek-coder-v2:16b | 8.9 GB |
-| qwen2.5-coder:7b | 4.7 GB |
-| gemma4:latest | 9.6 GB |
 | qwen3:8b | 5.2 GB |
+| qwen3:8b-ctx32k | 5.2 GB |
 | llama3.1:latest | 4.9 GB |
+| llama3.1:8b-16k | 4.9 GB |
+| llama3-groq-tool-use:8b | 4.7 GB |
+| llama3-groq-tool-use:8b-32k | 4.7 GB |
+| llama3.2-vision:11b | 7.8 GB |
+| llama3.2-vision:11b-8k | 7.8 GB |
+| qwen2.5vl:latest | 6.0 GB |
+| qwen2.5vl:7b-8k | 6.0 GB |
+| qwen2.5-coder:7b | 4.7 GB |
+| qwen2.5-coder:7b-16k | 4.7 GB |
+| qwen2.5-coder:7b-32k | 4.7 GB |
+| qwen2.5-coder:14b | 9.0 GB |
+| codestral:latest | 12 GB |
+| codestral:22b | 12 GB |
+| deepseek-r1:7b | 4.7 GB |
+| deepseek-r1:7b-16k | 4.7 GB |
+| deepseek-coder-v2:16b | 8.9 GB |
+| gemma4:latest | 9.6 GB |
+| Qwen3-4B-AgentCoder:32k | 3.3 GB |
+| brnpistone/Qwen3-4B-AgentCoder-q6-k:latest | 3.3 GB |
 
 \### Tool Calls en modelos locales
 

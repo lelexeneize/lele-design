@@ -4,7 +4,7 @@ function saveUserToRegistry(user) {
   dbSaveUser(user);
 }
 
-function handleGoogleLogin(response) {
+async function handleGoogleLogin(response) {
   const payload = decodeJwtResponse(response.credential);
   const user = {
     name: payload.name,
@@ -14,10 +14,31 @@ function handleGoogleLogin(response) {
   };
   localStorage.setItem('lele_user', JSON.stringify(user));
   saveUserToRegistry(user);
+
+  // Create Supabase session with Google token
+  try {
+    const sb = await getSupabaseClient();
+    if (sb) {
+      await sb.auth.signInWithIdToken({ provider: 'google', token: response.credential });
+    }
+  } catch (_) {}
+
+  // Redirect admin to admin panel
+  try {
+    const sb = await getSupabaseClient();
+    if (sb) {
+      const { data: profile } = await sb.from('profiles').select('role').eq('email', user.email).single();
+      if (profile?.role === 'admin') {
+        window.location.href = 'admin.html';
+        return;
+      }
+    }
+  } catch (_) {}
+
   window.location.href = 'dashboard.html';
 }
 
-function handleGoogleRegister(response) {
+async function handleGoogleRegister(response) {
   const payload = decodeJwtResponse(response.credential);
   const user = {
     name: payload.name,
@@ -27,6 +48,15 @@ function handleGoogleRegister(response) {
   };
   localStorage.setItem('lele_user', JSON.stringify(user));
   saveUserToRegistry(user);
+
+  // Create Supabase session with Google token
+  try {
+    const sb = await getSupabaseClient();
+    if (sb) {
+      await sb.auth.signInWithIdToken({ provider: 'google', token: response.credential });
+    }
+  } catch (_) {}
+
   window.location.href = 'dashboard.html';
 }
 

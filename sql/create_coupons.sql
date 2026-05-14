@@ -23,27 +23,38 @@ ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
 -- Admins can read all coupons
 CREATE POLICY "Admins can read coupons"
   ON coupons FOR SELECT
-  USING (auth.jwt() ->> 'role' = 'admin');
+  USING (auth.uid() IN (SELECT id FROM profiles WHERE role = 'admin'));
 
 -- Admins can insert coupons
 CREATE POLICY "Admins can insert coupons"
   ON coupons FOR INSERT
-  WITH CHECK (auth.jwt() ->> 'role' = 'admin');
+  WITH CHECK (auth.uid() IN (SELECT id FROM profiles WHERE role = 'admin'));
 
 -- Admins can update coupons
 CREATE POLICY "Admins can update coupons"
   ON coupons FOR UPDATE
-  USING (auth.jwt() ->> 'role' = 'admin');
+  USING (auth.uid() IN (SELECT id FROM profiles WHERE role = 'admin'));
 
 -- Users can only read coupons they used
 CREATE POLICY "Users can read own used coupons"
   ON coupons FOR SELECT
   USING (used_by = auth.uid());
 
--- 2. ADD user_id TO license_keys (for assigned licenses)
+-- 2. FIX license_keys RLS policies (same issue: JWT role claim is always 'authenticated')
+DROP POLICY IF EXISTS "Admins can read license_keys" ON license_keys;
+CREATE POLICY "Admins can read license_keys"
+  ON license_keys FOR SELECT
+  USING (auth.uid() IN (SELECT id FROM profiles WHERE role = 'admin'));
+
+DROP POLICY IF EXISTS "Admins can insert license_keys" ON license_keys;
+CREATE POLICY "Admins can insert license_keys"
+  ON license_keys FOR INSERT
+  WITH CHECK (auth.uid() IN (SELECT id FROM profiles WHERE role = 'admin'));
+
+-- 3. ADD user_id TO license_keys (for assigned licenses)
 ALTER TABLE license_keys ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES profiles(id) ON DELETE SET NULL;
 
--- 3. RPC: redeem_coupon (SECURITY DEFINER — runs as admin)
+-- 4. RPC: redeem_coupon (SECURITY DEFINER — runs as admin)
 CREATE OR REPLACE FUNCTION redeem_coupon(p_code TEXT)
 RETURNS JSONB
 LANGUAGE plpgsql

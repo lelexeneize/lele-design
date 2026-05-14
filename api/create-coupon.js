@@ -1,14 +1,4 @@
 const { createClient } = require('@supabase/supabase-js');
-const crypto = require('crypto');
-
-function generateKey(plan) {
-  const prefix = plan.substring(0, 2).toUpperCase();
-  const segments = [];
-  for (let i = 0; i < 4; i++) {
-    segments.push(crypto.randomBytes(3).toString('hex').toUpperCase());
-  }
-  return `${prefix}-${segments.join('-')}`;
-}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -49,29 +39,34 @@ module.exports = async (req, res) => {
     return res.status(401).json({ error: 'Se requiere autorización (token JWT o adminSecret)' });
   }
 
-  const { plan = 'essential', count = 1 } = req.body;
+  const { type = 'credits', value = 10, detail = '', count = 1, prefix = 'REGALO' } = req.body;
 
-  const keys = [];
+  function generateCode(pref) {
+    const seg = () => Math.random().toString(36).substring(2, 6).toUpperCase();
+    return (pref || 'REGALO') + '-' + seg() + '-' + seg();
+  }
+
+  const codes = [];
   const errors = [];
   for (let i = 0; i < count; i++) {
-    const key = generateKey(plan);
-    const maxAct = req.body.max_activations || 3;
-    const { error } = await supabase.from('license_keys').insert({
-      key: key,
-      plan: plan,
+    const code = generateCode(prefix);
+    const { error } = await supabase.from('coupons').insert({
+      code,
+      type,
+      value: type === 'credits' ? value : 1,
+      detail: type === 'license' ? detail : value.toString(),
       status: 'active',
-      max_activations: maxAct,
-      activated_devices: []
+      created_by: user.id
     });
     if (error) {
       errors.push(error.message);
     } else {
-      keys.push(key);
+      codes.push(code);
     }
   }
 
   if (errors.length > 0) {
-    return res.json({ created: keys.length, keys, error: errors.join(' | ') });
+    return res.json({ created: codes.length, codes, error: errors.join(' | ') });
   }
-  return res.json({ created: keys.length, keys });
+  return res.json({ created: codes.length, codes });
 };

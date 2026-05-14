@@ -212,36 +212,30 @@
       const status = document.getElementById('couponGenStatus');
       status.textContent = 'Generando...';
 
-      const sb = await getSupabaseClient();
-      if (!sb) { status.textContent = '❌ Sin conexión'; return; }
+      const token = await getSupabaseToken();
+      const body = { type, value, detail, count, prefix };
 
-      const { data: { user } } = await sb.auth.getUser();
-      if (!user) { status.textContent = '❌ No autenticado'; return; }
+      // Fallback admin secret if no Supabase session
+      if (!token) body.adminSecret = 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh';
 
-      const codes = [];
-      const errors = [];
-
-      for (let i = 0; i < count; i++) {
-        const code = generateCouponCode(prefix);
-        const { error } = await sb.from('coupons').insert({
-          code,
-          type,
-          value: type === 'credits' ? value : 1,
-          detail: type === 'license' ? detail : value.toString(),
-          created_by: user.id
+      try {
+        const resp = await fetch('/api/create-coupon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+          body: JSON.stringify(body)
         });
-        if (error) errors.push(error.message);
-        else codes.push(code);
-      }
-
-      if (codes.length > 0) {
-        document.getElementById('couponOutput').classList.remove('hidden');
-        document.getElementById('couponText').value = codes.join('\n');
-        status.textContent = `✅ ${codes.length} cupón(es) generados`;
-        if (errors.length) status.textContent += ` | ❌ ${errors.length} error(es)`;
-        loadCouponStats();
-      } else {
-        status.textContent = '❌ ' + (errors[0] || 'Error desconocido');
+        const result = await resp.json();
+        if (result.codes && result.codes.length > 0) {
+          document.getElementById('couponOutput').classList.remove('hidden');
+          document.getElementById('couponText').value = result.codes.join('\n');
+          status.textContent = `✅ ${result.codes.length} cupón(es) generados`;
+          if (result.error) status.textContent += ` | ⚠️ ${result.error}`;
+          loadCouponStats();
+        } else {
+          status.textContent = '❌ ' + (result.error || 'Error desconocido');
+        }
+      } catch (e) {
+        status.textContent = '❌ ' + e.message;
       }
     }
 
@@ -307,12 +301,16 @@
       status.textContent = 'Generando...';
 
       const token = await getSupabaseToken();
+      const body = { plan, count };
+
+      // Fallback admin secret if no Supabase session
+      if (!token) body.adminSecret = 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh';
 
       try {
         const resp = await fetch('/api/create-license', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
-          body: JSON.stringify({ plan, count })
+          body: JSON.stringify(body)
         });
         const result = await resp.json();
         if (result.keys && result.keys.length > 0) {
