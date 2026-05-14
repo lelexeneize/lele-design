@@ -46,20 +46,79 @@
     </header>
 
     <main class="p-6 lg:p-10 space-y-8">
+
+      <!-- Stats -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Proyectos</p><p class="text-2xl font-black" id="statProjects">0</p><span class="text-xs text-white/30">Disponible próximamente</span></div>
-        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Diseños IA</p><p class="text-2xl font-black" id="statDesigns">0</p><span class="text-xs text-white/30">Disponible próximamente</span></div>
         <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Plan actual</p><p class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400" id="statPlan">Gratis</p><span class="text-xs text-white/30" id="statPlanDetail">Sin plan activo</span></div>
-        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Créditos</p><p class="text-2xl font-black" id="statCredits">—</p><span class="text-xs text-white/30" id="statCreditsDetail">Generador próximamente</span></div>
+        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Créditos</p><p class="text-2xl font-black" id="statCredits">—</p><span class="text-xs text-white/30">Para diseños y servicios</span></div>
+        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Licencias</p><p class="text-2xl font-black" id="statLicenses">0</p><span class="text-xs text-white/30">Sabina Optimizer</span></div>
+        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Diseños IA</p><p class="text-2xl font-black" id="statDesigns">0</p><span class="text-xs text-white/30">Disponible próximamente</span></div>
       </div>
 
-      <div>
-        <h3 class="text-lg font-bold mb-4">Proyectos recientes</h3>
-        <div id="recentProjects" class="text-center text-white/30 py-10">
-          Aún no hay proyectos.
+      <!-- Canjear Cupón -->
+      <div class="p-8 rounded-2xl glass bg-gradient-to-br from-violet-600/5 via-fuchsia-600/5 to-cyan-600/5 border-violet-500/20">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div>
+            <h3 class="text-lg font-bold flex items-center gap-2">
+              <span>🎁</span> Canjear cupón o clave
+            </h3>
+            <p class="text-sm text-white/40 mt-1">¿Tenés un código de regalo? Ingresalo acá para obtener créditos, licencias o beneficios.</p>
+          </div>
+          <div class="flex gap-3 w-full lg:w-auto">
+            <input id="couponInput" type="text" placeholder="Ej: LELE-REGALO-2026" class="flex-1 lg:w-64 px-4 py-3 rounded-xl input-theme text-sm focus:outline-none focus:border-violet-500/50 uppercase tracking-wider font-mono">
+            <button onclick="redeemCoupon()" id="redeemBtn" class="px-6 py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25 shrink-0">
+              Canjear
+            </button>
+          </div>
+        </div>
+        <div id="couponResult" class="mt-4 text-sm hidden"></div>
+      </div>
+
+      <!-- Mis Licencias + Descargas -->
+      <div class="grid lg:grid-cols-2 gap-6">
+        <div class="p-6 rounded-2xl glass">
+          <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+            <span>🔑</span> Mis licencias — Sabina Optimizer
+          </h3>
+          <div id="licensesList" class="space-y-3">
+            <div class="text-center text-white/30 py-6 text-sm">
+              No tenés licencias aún. <a href="optimizer.html" class="text-violet-400 hover:text-violet-300 transition font-medium">Comprar una</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-2xl glass">
+          <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+            <span>⚡</span> Acción rápida
+          </h3>
+          <div class="space-y-3">
+            <a href="descargar.html" class="flex items-center gap-4 p-4 rounded-xl glass-hover hover:bg-white/[0.04] transition-all border border-white/[0.06]">
+              <div class="w-10 h-10 rounded-xl bg-cyan-600/20 flex items-center justify-center text-cyan-400 text-lg">⬇</div>
+              <div><p class="text-sm font-medium">Descargar Sabina Optimizer</p><p class="text-xs text-white/40">Validá tu license key y descargá la app</p></div>
+            </a>
+            <a href="optimizer.html" class="flex items-center gap-4 p-4 rounded-xl glass-hover hover:bg-white/[0.04] transition-all border border-white/[0.06]">
+              <div class="w-10 h-10 rounded-xl bg-violet-600/20 flex items-center justify-center text-violet-400 text-lg">🛒</div>
+              <div><p class="text-sm font-medium">Comprar licencia</p><p class="text-xs text-white/40">Essential, Pro o Elite</p></div>
+            </a>
+            <a href="https://wa.me/5491123456789" target="_blank" class="flex items-center gap-4 p-4 rounded-xl glass-hover hover:bg-white/[0.04] transition-all border border-white/[0.06]">
+              <div class="w-10 h-10 rounded-xl bg-emerald-600/20 flex items-center justify-center text-emerald-400 text-lg">💬</div>
+              <div><p class="text-sm font-medium">Soporte por WhatsApp</p><p class="text-xs text-white/40">Respondemos en el día</p></div>
+            </a>
+          </div>
         </div>
       </div>
 
+      <!-- Historial / Actividad -->
+      <div class="p-6 rounded-2xl glass">
+        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+          <span>📋</span> Actividad reciente
+        </h3>
+        <div id="recentActivity" class="space-y-3">
+          <div class="text-center text-white/30 py-6 text-sm">
+            Todavía no hay actividad. ¡Empezá a usar tus beneficios!
+          </div>
+        </div>
+      </div>
 
     </main>
   </div>
@@ -86,18 +145,107 @@
   <script src="../js/main.js"></script>
   <script src="../js/auth.js"></script>
   <script>
+    let currentUserId = null;
+
     async function loadDashboardData() {
       const sb = await getSupabaseClient();
-      if (sb) {
-        const { data: { user } } = await sb.auth.getUser();
-        if (user) {
-          const { data: profile } = await sb.from('profiles').select('plan, credits').eq('id', user.id).single();
-          if (profile) {
-            document.getElementById('statPlan').textContent = profile.plan === 'free' ? 'Gratis' : profile.plan;
-            document.getElementById('statCredits').textContent = profile.credits ?? '—';
-          }
-        }
+      if (!sb) return;
+
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return;
+      currentUserId = user.id;
+
+      // Profile
+      const { data: profile } = await sb.from('profiles').select('plan, credits').eq('id', user.id).single();
+      if (profile) {
+        document.getElementById('statPlan').textContent = profile.plan === 'free' ? 'Gratis' : profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1);
+        document.getElementById('statPlanDetail').textContent = profile.plan === 'free' ? 'Sin plan activo' : 'Plan ' + profile.plan;
+        document.getElementById('statCredits').textContent = profile.credits ?? 0;
       }
+
+      // Licenses
+      const { data: licenses } = await sb.from('license_keys').select('key, plan, status, created_at').eq('user_id', user.id).order('created_at', { ascending: false });
+      const licContainer = document.getElementById('licensesList');
+      if (licenses && licenses.length > 0) {
+        document.getElementById('statLicenses').textContent = licenses.length;
+        licContainer.innerHTML = licenses.map(l => `
+          <div class="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            <div class="flex items-center gap-3">
+              <span class="text-lg">${l.plan === 'elite' ? '💎' : l.plan === 'pro' ? '⭐' : '🔑'}</span>
+              <div>
+                <p class="text-sm font-mono text-cyan-400">${l.key}</p>
+                <p class="text-[10px] text-white/30 uppercase tracking-wider">${l.plan} · ${new Date(l.created_at).toLocaleDateString()}</p>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-medium ${l.status === 'active' ? 'bg-emerald-600/20 text-emerald-400' : 'bg-red-600/20 text-red-400'}">${l.status}</span>
+          </div>
+        `).join('');
+      } else {
+        licContainer.innerHTML = `<div class="text-center text-white/30 py-6 text-sm">No tenés licencias aún. <a href="optimizer.html" class="text-violet-400 hover:text-violet-300 transition font-medium">Comprar una</a></div>`;
+      }
+
+      // Activity — coupons redeemed
+      const { data: coupons } = await sb.from('coupons').select('type, value, detail, used_at').eq('used_by', user.id).order('used_at', { ascending: false });
+      const actContainer = document.getElementById('recentActivity');
+      if (coupons && coupons.length > 0) {
+        actContainer.innerHTML = coupons.map(c => {
+          const icon = c.type === 'credits' ? '🎁' : '🔑';
+          const label = c.type === 'credits' ? `+${c.value} créditos` : `Licencia ${c.detail} obtenida`;
+          return `<div class="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            <span>${icon}</span>
+            <div class="flex-1"><p class="text-sm">${label}</p><p class="text-[10px] text-white/30">${c.detail} · ${new Date(c.used_at).toLocaleDateString()}</p></div>
+          </div>`;
+        }).join('');
+      } else {
+        actContainer.innerHTML = `<div class="text-center text-white/30 py-6 text-sm">Todavía no hay actividad. ¡Canjeá un cupón para empezar!</div>`;
+      }
+    }
+
+    async function redeemCoupon() {
+      const input = document.getElementById('couponInput');
+      const code = input.value.trim().toUpperCase();
+      const btn = document.getElementById('redeemBtn');
+      const result = document.getElementById('couponResult');
+
+      if (!code) {
+        result.className = 'mt-4 text-sm text-red-400';
+        result.textContent = 'Ingresá un código';
+        result.classList.remove('hidden');
+        return;
+      }
+
+      btn.textContent = 'Canjeando...';
+      btn.disabled = true;
+      result.classList.add('hidden');
+
+      try {
+        const sb = await getSupabaseClient();
+        if (!sb) throw new Error('Sin conexión');
+
+        const { data: rpcData, error: rpcError } = await sb.rpc('redeem_coupon', { p_code: code });
+
+        if (rpcError) throw rpcError;
+
+        if (rpcData?.success) {
+          const msgs = [];
+          if (rpcData.type === 'credits') msgs.push(`🎉 Recibiste ${rpcData.value} créditos`);
+          if (rpcData.type === 'license') msgs.push(`🎉 Licencia ${rpcData.detail} obtenida: <span class="font-mono text-cyan-400">${rpcData.license_key}</span>`);
+          result.className = 'mt-4 text-sm text-emerald-400';
+          result.innerHTML = msgs.join('<br>');
+          input.value = '';
+          loadDashboardData();
+        } else {
+          result.className = 'mt-4 text-sm text-red-400';
+          result.textContent = rpcData?.error || 'Error al canjear el código';
+        }
+      } catch (e) {
+        result.className = 'mt-4 text-sm text-red-400';
+        result.textContent = 'Error: ' + (e.message || 'Sin conexión con el servidor');
+      }
+
+      btn.textContent = 'Canjear';
+      btn.disabled = false;
+      result.classList.remove('hidden');
     }
 
     document.addEventListener('DOMContentLoaded', () => {

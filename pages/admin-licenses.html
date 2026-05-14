@@ -38,60 +38,144 @@
 
     <main class="p-6 lg:p-10 space-y-8">
 
-      <!-- Generator -->
-      <div class="p-8 rounded-2xl glass max-w-2xl">
-        <h3 class="text-lg font-bold mb-1">Generar licencias</h3>
-        <p class="text-sm opacity-40 mb-6">Creá keys para Sabina Optimizer</p>
-        <div class="space-y-4">
-          <div class="flex gap-4">
-            <select id="keyPlan" style="background:#1a1a2e;color:white;border:1px solid #2a2a3a;" class="flex-1 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-violet-500/50">
-              <option value="essential" style="background:#1a1a2e;color:white;">Essential</option>
-              <option value="pro" style="background:#1a1a2e;color:white;">Pro</option>
-              <option value="elite" style="background:#1a1a2e;color:white;">Elite</option>
-            </select>
-            <input id="keyCount" type="number" value="1" min="1" max="50" style="background:#1a1a2e;color:white;border:1px solid #2a2a3a;" class="w-20 px-4 py-3 rounded-xl text-sm text-center focus:outline-none focus:border-violet-500/50">
+      <!-- Tabs -->
+      <div class="flex gap-2 border-b border-white/[0.06] pb-2">
+        <button onclick="switchTab('licenses')" id="tabLicenses" class="px-5 py-2 rounded-t-lg text-sm font-medium bg-violet-600/20 text-violet-300 transition-all">🔑 Licencias</button>
+        <button onclick="switchTab('coupons')" id="tabCoupons" class="px-5 py-2 rounded-t-lg text-sm font-medium text-white/40 hover:text-white transition-all">🎁 Cupones</button>
+      </div>
+
+      <!-- Licenses Tab -->
+      <div id="licensesTab">
+        <!-- Generator -->
+        <div class="p-8 rounded-2xl glass max-w-2xl">
+          <h3 class="text-lg font-bold mb-1">Generar licencias</h3>
+          <p class="text-sm opacity-40 mb-6">Creá keys para Sabina Optimizer</p>
+          <div class="space-y-4">
+            <div class="flex gap-4">
+              <select id="keyPlan" style="background:#1a1a2e;color:white;border:1px solid #2a2a3a;" class="flex-1 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-violet-500/50">
+                <option value="essential" style="background:#1a1a2e;color:white;">Essential</option>
+                <option value="pro" style="background:#1a1a2e;color:white;">Pro</option>
+                <option value="elite" style="background:#1a1a2e;color:white;">Elite</option>
+              </select>
+              <input id="keyCount" type="number" value="1" min="1" max="50" style="background:#1a1a2e;color:white;border:1px solid #2a2a3a;" class="w-20 px-4 py-3 rounded-xl text-sm text-center focus:outline-none focus:border-violet-500/50">
+            </div>
+            <div class="flex items-center gap-4">
+              <button onclick="generateKeys()" class="px-8 py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25">
+                Generar keys
+              </button>
+              <span id="genStatus" class="text-sm opacity-40"></span>
+            </div>
           </div>
-          <div class="flex items-center gap-4">
-            <button onclick="generateKeys()" class="px-8 py-3 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold text-sm transition-all shadow-lg shadow-violet-600/25">
-              Generar keys
-            </button>
-            <span id="genStatus" class="text-sm opacity-40"></span>
+          <div id="keysOutput" class="mt-4 hidden">
+            <label class="text-sm font-medium opacity-60 block mb-2">Keys generadas:</label>
+            <textarea id="keysText" rows="5" style="background:#0a0a0f;color:#00ff88;border:1px solid #2a2a3a;" class="w-full px-4 py-3 rounded-xl text-xs font-mono focus:outline-none" readonly></textarea>
+            <button onclick="copyKeys()" class="mt-2 px-4 py-2 rounded-full glass text-sm text-white/60 hover:text-white transition">📋 Copiar</button>
           </div>
         </div>
-        <div id="keysOutput" class="mt-4 hidden">
-          <label class="text-sm font-medium opacity-60 block mb-2">Keys generadas:</label>
-          <textarea id="keysText" rows="5" style="background:#0a0a0f;color:#00ff88;border:1px solid #2a2a3a;" class="w-full px-4 py-3 rounded-xl text-xs font-mono focus:outline-none" readonly></textarea>
-          <button onclick="copyKeys()" class="mt-2 px-4 py-2 rounded-full glass text-sm text-white/60 hover:text-white transition">📋 Copiar</button>
+
+        <!-- License Stats -->
+        <div class="grid grid-cols-4 gap-4 max-w-3xl">
+          <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Essential</p><p class="text-2xl font-black" id="countEssential">0</p></div>
+          <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Pro</p><p class="text-2xl font-black" id="countPro">0</p></div>
+          <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Elite</p><p class="text-2xl font-black" id="countElite">0</p></div>
+          <div class="p-5 rounded-2xl glass" title="Keys que llegaron al límite de activaciones"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">⚠️ Bloqueadas</p><p class="text-2xl font-black" id="countBlocked">0</p></div>
+        </div>
+
+        <!-- License list -->
+        <div class="p-6 rounded-2xl glass max-w-4xl">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold">Todas las licencias</h3>
+            <span class="text-xs text-white/40" id="totalKeys">0 keys</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-white/40 text-xs uppercase tracking-wider border-b border-white/[0.06]">
+                  <th class="text-left p-3 font-medium">Key</th>
+                  <th class="text-center p-3 font-medium">Plan</th>
+                  <th class="text-center p-3 font-medium">Usuario</th>
+                  <th class="text-center p-3 font-medium">Activaciones</th>
+                  <th class="text-center p-3 font-medium">Estado</th>
+                  <th class="text-center p-3 font-medium">Creada</th>
+                </tr>
+              </thead>
+              <tbody id="keysTableBody" class="text-white/60"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- Stats -->
-      <div class="grid grid-cols-4 gap-4 max-w-3xl">
-        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Essential</p><p class="text-2xl font-black" id="countEssential">0</p></div>
-        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Pro</p><p class="text-2xl font-black" id="countPro">0</p></div>
-        <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Elite</p><p class="text-2xl font-black" id="countElite">0</p></div>
-        <div class="p-5 rounded-2xl glass" title="Keys que llegaron al límite de activaciones"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">⚠️ Bloqueadas</p><p class="text-2xl font-black" id="countBlocked">0</p></div>
-      </div>
-
-      <!-- Activation list -->
-      <div class="p-6 rounded-2xl glass max-w-4xl">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-bold">Keys activas</h3>
-          <span class="text-xs text-white/40" id="totalKeys">0 keys</span>
+      <!-- Coupons Tab -->
+      <div id="couponsTab" class="hidden">
+        <!-- Coupon Generator -->
+        <div class="p-8 rounded-2xl glass max-w-2xl">
+          <h3 class="text-lg font-bold mb-1">Generar cupones de regalo</h3>
+          <p class="text-sm opacity-40 mb-6">Cupones que los usuarios pueden canjear desde su dashboard</p>
+          <div class="space-y-4">
+            <div class="flex gap-4">
+              <select id="couponType" style="background:#1a1a2e;color:white;border:1px solid #2a2a3a;" class="flex-1 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-violet-500/50">
+                <option value="credits" style="background:#1a1a2e;color:white;">🎁 Créditos</option>
+                <option value="license" style="background:#1a1a2e;color:white;">🔑 Licencia Sabina Optimizer</option>
+              </select>
+              <input id="couponValue" type="number" value="10" min="1" max="9999" style="background:#1a1a2e;color:white;border:1px solid #2a2a3a;" class="w-24 px-4 py-3 rounded-xl text-sm text-center focus:outline-none focus:border-violet-500/50">
+              <select id="couponDetail" style="background:#1a1a2e;color:white;border:1px solid #2a2a3a;" class="w-32 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-violet-500/50">
+                <option value="">—</option>
+                <option value="essential">Essential</option>
+                <option value="pro">Pro</option>
+                <option value="elite">Elite</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-4">
+              <div>
+                <label class="text-xs text-white/40 block mb-1">Cantidad</label>
+                <input id="couponCount" type="number" value="1" min="1" max="50" style="background:#1a1a2e;color:white;border:1px solid #2a2a3a;" class="w-20 px-4 py-2 rounded-xl text-sm text-center focus:outline-none focus:border-violet-500/50">
+              </div>
+              <div>
+                <label class="text-xs text-white/40 block mb-1">Prefijo del código</label>
+                <input id="couponPrefix" type="text" value="REGALO" style="background:#1a1a2e;color:white;border:1px solid #2a2a3a;" class="w-28 px-4 py-2 rounded-xl text-sm uppercase focus:outline-none focus:border-violet-500/50">
+              </div>
+              <button onclick="generateCoupons()" class="px-8 py-3 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm transition-all shadow-lg shadow-emerald-600/25 mt-5">
+                Generar cupones
+              </button>
+            </div>
+          </div>
+          <div id="couponOutput" class="mt-4 hidden">
+            <label class="text-sm font-medium opacity-60 block mb-2">Cupones generados:</label>
+            <textarea id="couponText" rows="4" style="background:#0a0a0f;color:#fbbf24;border:1px solid #2a2a3a;" class="w-full px-4 py-3 rounded-xl text-xs font-mono focus:outline-none" readonly></textarea>
+            <button onclick="copyCoupons()" class="mt-2 px-4 py-2 rounded-full glass text-sm text-white/60 hover:text-white transition">📋 Copiar</button>
+          </div>
+          <div id="couponGenStatus" class="mt-2 text-sm opacity-40"></div>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-white/40 text-xs uppercase tracking-wider border-b border-white/[0.06]">
-                <th class="text-left p-3 font-medium">Key</th>
-                <th class="text-center p-3 font-medium">Plan</th>
-                <th class="text-center p-3 font-medium">Activaciones</th>
-                <th class="text-center p-3 font-medium">Estado</th>
-                <th class="text-center p-3 font-medium">Creada</th>
-              </tr>
-            </thead>
-            <tbody id="keysTableBody" class="text-white/60"></tbody>
-          </table>
+
+        <!-- Coupon Stats -->
+        <div class="grid grid-cols-4 gap-4 max-w-3xl">
+          <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Activos</p><p class="text-2xl font-black text-emerald-400" id="couponActive">0</p></div>
+          <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Usados</p><p class="text-2xl font-black" id="couponUsed">0</p></div>
+          <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Créditos</p><p class="text-2xl font-black text-cyan-400" id="couponCredits">0</p></div>
+          <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Licencias</p><p class="text-2xl font-black text-violet-400" id="couponLicenses">0</p></div>
+        </div>
+
+        <!-- Coupon List -->
+        <div class="p-6 rounded-2xl glass max-w-4xl">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold">Todos los cupones</h3>
+            <span class="text-xs text-white/40" id="totalCoupons">0 cupones</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-white/40 text-xs uppercase tracking-wider border-b border-white/[0.06]">
+                  <th class="text-left p-3 font-medium">Código</th>
+                  <th class="text-center p-3 font-medium">Tipo</th>
+                  <th class="text-center p-3 font-medium">Valor</th>
+                  <th class="text-center p-3 font-medium">Estado</th>
+                  <th class="text-center p-3 font-medium">Usado por</th>
+                  <th class="text-center p-3 font-medium">Creado</th>
+                </tr>
+              </thead>
+              <tbody id="couponTableBody" class="text-white/60"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -102,6 +186,108 @@
   <script src="../js/supabase-db.js"></script>
   <script src="../js/auth.js"></script>
   <script>
+    // ─── Tab switching ─────────────────────────────────
+    function switchTab(tab) {
+      ['licenses','coupons'].forEach(t => {
+        document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).className = t === tab
+          ? 'px-5 py-2 rounded-t-lg text-sm font-medium bg-violet-600/20 text-violet-300 transition-all'
+          : 'px-5 py-2 rounded-t-lg text-sm font-medium text-white/40 hover:text-white transition-all';
+        document.getElementById(t + 'Tab').classList.toggle('hidden', t !== tab);
+      });
+      if (tab === 'coupons') loadCouponStats();
+    }
+
+    // ─── Coupon helpers ────────────────────────────────
+    function generateCouponCode(prefix) {
+      const seg = () => Math.random().toString(36).substring(2, 6).toUpperCase();
+      return (prefix || 'REGALO') + '-' + seg() + '-' + seg();
+    }
+
+    async function generateCoupons() {
+      const type = document.getElementById('couponType').value;
+      const value = parseInt(document.getElementById('couponValue').value) || 10;
+      const detail = document.getElementById('couponDetail').value;
+      const count = parseInt(document.getElementById('couponCount').value) || 1;
+      const prefix = document.getElementById('couponPrefix').value.trim().toUpperCase() || 'REGALO';
+      const status = document.getElementById('couponGenStatus');
+      status.textContent = 'Generando...';
+
+      const sb = await getSupabaseClient();
+      if (!sb) { status.textContent = '❌ Sin conexión'; return; }
+
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) { status.textContent = '❌ No autenticado'; return; }
+
+      const codes = [];
+      const errors = [];
+
+      for (let i = 0; i < count; i++) {
+        const code = generateCouponCode(prefix);
+        const { error } = await sb.from('coupons').insert({
+          code,
+          type,
+          value: type === 'credits' ? value : 1,
+          detail: type === 'license' ? detail : value.toString(),
+          created_by: user.id
+        });
+        if (error) errors.push(error.message);
+        else codes.push(code);
+      }
+
+      if (codes.length > 0) {
+        document.getElementById('couponOutput').classList.remove('hidden');
+        document.getElementById('couponText').value = codes.join('\n');
+        status.textContent = `✅ ${codes.length} cupón(es) generados`;
+        if (errors.length) status.textContent += ` | ❌ ${errors.length} error(es)`;
+        loadCouponStats();
+      } else {
+        status.textContent = '❌ ' + (errors[0] || 'Error desconocido');
+      }
+    }
+
+    function copyCoupons() {
+      const textarea = document.getElementById('couponText');
+      textarea.select();
+      document.execCommand('copy');
+      document.getElementById('couponGenStatus').textContent = '✅ Copiado';
+    }
+
+    async function loadCouponStats() {
+      const sb = await getSupabaseClient();
+      if (!sb) return;
+
+      const { data } = await sb.from('coupons').select('*');
+      if (!data) return;
+
+      const active = data.filter(c => c.status === 'active');
+      const used = data.filter(c => c.status === 'used');
+      const credits = data.filter(c => c.type === 'credits');
+      const licenses = data.filter(c => c.type === 'license');
+
+      document.getElementById('couponActive').textContent = active.length;
+      document.getElementById('couponUsed').textContent = used.length;
+      document.getElementById('couponCredits').textContent = credits.length;
+      document.getElementById('couponLicenses').textContent = licenses.length;
+      document.getElementById('totalCoupons').textContent = data.length + ' cupones';
+
+      const tbody = document.getElementById('couponTableBody');
+      const sorted = data.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      tbody.innerHTML = sorted.map(c => {
+        const val = c.type === 'credits' ? c.value + ' créditos' : c.detail;
+        const usedBy = c.used_by ? c.used_by.substring(0, 8) + '...' : '—';
+        const typeIcon = c.type === 'credits' ? '🎁' : '🔑';
+        return `<tr class="border-b border-white/[0.04]">
+          <td class="p-3 font-mono text-xs text-amber-400">${c.code}</td>
+          <td class="text-center p-3">${typeIcon} ${c.type}</td>
+          <td class="text-center p-3">${val}</td>
+          <td class="text-center p-3"><span class="${c.status === 'active' ? 'text-emerald-400' : c.status === 'used' ? 'text-white/40' : 'text-red-400'}">${c.status}</span></td>
+          <td class="text-center p-3 text-xs text-white/30">${usedBy}</td>
+          <td class="text-center p-3 text-xs text-white/30">${new Date(c.created_at || Date.now()).toLocaleDateString()}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ─── License functions ─────────────────────────────
     function generateLicenseKey(plan) {
       const prefix = plan.substring(0, 2).toUpperCase();
       const segments = [];
@@ -153,7 +339,7 @@
       const sb = await getSupabaseClient();
       if (!sb) return;
 
-      const { data } = await sb.from('license_keys').select('plan,status,activated_devices,max_activations');
+      const { data } = await sb.from('license_keys').select('*');
       if (!data) return;
 
       document.getElementById('countEssential').textContent = data.filter(k => k.plan === 'essential').length;
@@ -172,9 +358,11 @@
         const devs = k.activated_devices || [];
         const max = k.max_activations || 3;
         const blocked = devs.length >= max;
+        const userId = k.user_id || '';
         return `<tr class="border-b border-white/[0.04]">
           <td class="p-3 font-mono text-xs">${k.key?.substring(0, 14)}...</td>
           <td class="text-center p-3"><span class="px-2 py-0.5 rounded-full text-[10px] uppercase ${k.plan === 'pro' ? 'bg-blue-600/20 text-blue-400' : k.plan === 'elite' ? 'bg-violet-600/20 text-violet-400' : 'bg-emerald-600/20 text-emerald-400'}">${k.plan}</span></td>
+          <td class="text-center p-3 text-xs text-white/30">${userId ? userId.substring(0, 8) + '...' : '—'}</td>
           <td class="text-center p-3">${blocked ? '🔴 ' : ''}${devs.length}/${max}</td>
           <td class="text-center p-3"><span class="${k.status === 'active' ? 'text-emerald-400' : 'text-red-400'}">${k.status}</span></td>
           <td class="text-center p-3 text-white/30 text-xs">${new Date(k.created_at || Date.now()).toLocaleDateString()}</td>
@@ -221,6 +409,13 @@
       leleTheme.applySavedTheme();
       document.getElementById('themeToggleContainer')?.appendChild(leleTheme.createToggle());
       loadStats();
+      // Init coupon type change handler
+      document.getElementById('couponType')?.addEventListener('change', function() {
+        const isLicense = this.value === 'license';
+        document.getElementById('couponDetail').style.display = isLicense ? '' : 'none';
+        document.getElementById('couponValue').style.display = isLicense ? 'none' : '';
+      });
+      document.getElementById('couponType')?.dispatchEvent(new Event('change'));
     });
   </script>
 </body>

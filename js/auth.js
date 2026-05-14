@@ -41,6 +41,34 @@ function decodeJwtResponse(token) {
   return JSON.parse(jsonPayload);
 }
 
+function updateNavbarAuth() {
+  const navLogin = document.getElementById('navLoginBtn');
+  const navRegister = document.getElementById('navRegisterBtn');
+  const navUser = document.getElementById('authNavUser');
+  const navSection = document.getElementById('authNavSection');
+  const navAvatar = document.getElementById('navAvatar');
+
+  const user = JSON.parse(localStorage.getItem('lele_user'));
+  if (user && navSection && navUser) {
+    navSection.classList.add('hidden');
+    navSection.classList.remove('flex');
+    navUser.classList.remove('hidden');
+    navUser.classList.add('flex');
+    if (navAvatar) {
+      if (user.picture) {
+        navAvatar.innerHTML = `<img src="${user.picture}" alt="avatar" class="w-full h-full rounded-full object-cover">`;
+      } else {
+        navAvatar.textContent = (user.name || 'U').charAt(0).toUpperCase();
+      }
+    }
+  } else if (navSection && navUser) {
+    navSection.classList.remove('hidden');
+    navSection.classList.add('flex');
+    navUser.classList.add('hidden');
+    navUser.classList.remove('flex');
+  }
+}
+
 function logout() {
   dbSignOut().then(() => {
     window.location.href = '../index.html';
@@ -99,6 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!user && isProtected) {
     window.location.href = 'login.html';
   }
+
+  updateNavbarAuth();
 
   if (user) {
     const nameEl = document.getElementById('userGreeting');
