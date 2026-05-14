@@ -40,139 +40,143 @@ def add_opt(id_, name, desc, cat, risk, commands):
 # ── Essential ───────────────────────────────────────────────────────
 add_opt("powerplan", "Power Plan: Alto Rendimiento",
     "Activa el plan de energia de alto rendimiento.", "Essential", "Bajo",
-    ['powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'])
+    ['powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c; "Power Plan: Alto Rendimiento activado"'])
 add_opt("hpet", "Desactivar HPET",
     "Reduce latencia y mejora FPS. Requiere reinicio.", "Essential", "Medio",
-    ['bcdedit /deletevalue useplatformclock'])
+    ['bcdedit /deletevalue useplatformclock 2>$null; "HPET desactivado (requiere reinicio)"'])
 add_opt("gamemode", "Game Mode",
     "Prioriza recursos para juegos.", "Essential", "Bajo",
-    ['Set-ItemProperty "HKCU:\\Software\\Microsoft\\GameBar" AutoGameModeEnabled 1 -Type DWord -Force'])
+    ['Set-ItemProperty "HKCU:\\Software\\Microsoft\\GameBar" AutoGameModeEnabled 1 -Type DWord -Force -EA 0; "Game Mode activado"'])
 add_opt("xbox", "Deshabilitar Xbox Game Bar",
     "Elimina superposicion de Xbox.", "Essential", "Bajo",
-    ['Set-ItemProperty "HKCU:\\Software\\Microsoft\\GameBar" ShowStartupPanel 0 -Type DWord -Force'])
+    ['Set-ItemProperty "HKCU:\\Software\\Microsoft\\GameBar" ShowStartupPanel 0 -Type DWord -Force -EA 0; "Xbox Game Bar deshabilitada"'])
 add_opt("gpusched", "GPU Hardware Scheduling",
     "Reduce latencia de GPU. Requiere reinicio.", "Essential", "Medio",
-    ['Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers" HwSchMode 2 -Type DWord -Force'])
+    ['Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers" HwSchMode 2 -Type DWord -Force -EA 0; "GPU Scheduling: Hardware Accelerated (requiere reinicio)"'])
 add_opt("timer", "Timer Resolution",
     "Ajusta temporizador del sistema para menor latencia.", "Essential", "Bajo",
-    ['Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\kernel" TimerResolution 10000 -Type DWord -Force'])
+    ['Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\kernel" TimerResolution 10000 -Type DWord -Force -EA 0; "Timer Resolution optimizado"'])
 add_opt("nagle", "Deshabilitar Nagle",
     "Reduce ping en juegos online.", "Essential", "Bajo",
-    ['Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\*" TcpAckFrequency 1 -Type DWord -Force',
-     'Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\*" TCPNoDelay 1 -Type DWord -Force'])
+    ['Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\*" TcpAckFrequency 1 -Type DWord -Force -EA 0; "TcpAckFrequency = 1 (Nagle deshabilitado)"',
+     'Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\*" TCPNoDelay 1 -Type DWord -Force -EA 0; "TCPNoDelay = 1 (Nagle deshabilitado)"'])
 add_opt("dns", "DNS Cloudflare",
     "Cambia DNS a 1.1.1.1 (mas rapido y seguro).", "Essential", "Bajo",
-    ['$a = Get-NetAdapter | Where-Object {$_.Status -eq "Up"}; foreach ($ad in $a) { Set-DnsClientServerAddress -InterfaceIndex $ad.ifIndex -ServerAddresses ("1.1.1.1","1.0.0.1") -EA 0 }'])
+    ['$a = Get-NetAdapter | Where-Object {$_.Status -eq "Up"}; $c = 0; foreach ($ad in $a) { Set-DnsClientServerAddress -InterfaceIndex $ad.ifIndex -ServerAddresses ("1.1.1.1","1.0.0.1") -EA 0; $c++ }; "DNS cambiado a Cloudflare en $c adaptador(es)"'])
 add_opt("tcptune", "Optimizar TCP/IP",
     "Ajusta TCP para menor latencia de red.", "Essential", "Bajo",
-    ['netsh int tcp set global autotuninglevel=normal',
-     'netsh int tcp set global rss=enabled',
+    ['netsh int tcp set global autotuninglevel=normal; "TCP auto-tuning: normal"',
+     'netsh int tcp set global rss=enabled; "TCP RSS: enabled"',
      ])
 add_opt("cleanup", "Limpieza del sistema",
     "Limpia TEMP, Prefetch, Papelera, Update cache, DNS.", "Essential", "Bajo",
-    ['Remove-Item "$env:TEMP\\*" -Recurse -Force -EA 0',
-     'Remove-Item "$env:WINDIR\\Temp\\*" -Recurse -Force -EA 0',
-     'Clear-RecycleBin -Force -EA 0',
-     'ipconfig /flushdns | Out-Null'])
+    ['$f = (Get-ChildItem "$env:TEMP\\*" -Recurse -EA 0 | Measure-Object).Count; $d = (Get-ChildItem "$env:TEMP\\*" -Directory -EA 0 | Measure-Object).Count; Remove-Item "$env:TEMP\\*" -Recurse -Force -EA 0; "TEMP: $f archivos, $d carpetas eliminados"',
+     '$f = (Get-ChildItem "$env:WINDIR\\Temp\\*" -Recurse -EA 0 | Measure-Object).Count; $d = (Get-ChildItem "$env:WINDIR\\Temp\\*" -Directory -EA 0 | Measure-Object).Count; Remove-Item "$env:WINDIR\\Temp\\*" -Recurse -Force -EA 0; "Windows TEMP: $f archivos, $d carpetas eliminados"',
+     'Clear-RecycleBin -Force -EA 0; "Papelera de reciclaje vaciada"',
+     '$f = (Get-ChildItem "$env:WINDIR\\Prefetch\\*" -EA 0 | Measure-Object).Count; Remove-Item "$env:WINDIR\\Prefetch\\*" -Force -EA 0; "Prefetch: $f archivos eliminados"',
+     'Stop-Service wuauserv -Force -EA 0; $f = (Get-ChildItem "$env:WINDIR\\SoftwareDistribution\\Download\\*" -Recurse -EA 0 | Measure-Object).Count; Remove-Item "$env:WINDIR\\SoftwareDistribution\\Download\\*" -Recurse -Force -EA 0; Start-Service wuauserv -EA 0; "Update cache: $f archivos eliminados"',
+     'ipconfig /flushdns; "Cache DNS limpiado"'])
 add_opt("telemetry", "Telemetria y Rastreo",
     "Apaga servicios de diagnostico de Windows que envian datos a Microsoft. Libera CPU, RAM y disco.", "Essential", "Bajo",
-    ['Stop-Service DiagTrack -Force -EA 0; Set-Service DiagTrack -StartupType Disabled -EA 0',
-     'Stop-Service dmwappushservice -Force -EA 0; Set-Service dmwappushservice -StartupType Disabled -EA 0',
-     'Set-ItemProperty "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" AllowTelemetry 0 -Type DWord -Force -EA 0',
-     'Set-ItemProperty "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection" AllowTelemetry 0 -Type DWord -Force -EA 0'])
+    ['Stop-Service DiagTrack -Force -EA 0; Set-Service DiagTrack -StartupType Disabled -EA 0; "Servicio DiagTrack detenido y deshabilitado"',
+     'Stop-Service dmwappushservice -Force -EA 0; Set-Service dmwappushservice -StartupType Disabled -EA 0; "Servicio dmwappushservice detenido y deshabilitado"',
+     'Set-ItemProperty "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" AllowTelemetry 0 -Type DWord -Force -EA 0; "AllowTelemetry (HKLM\\Policies) = 0"',
+     'Set-ItemProperty "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection" AllowTelemetry 0 -Type DWord -Force -EA 0; "AllowTelemetry (HKLM\\CurrentVersion) = 0"'])
 add_opt("visualfx", "Efectos Visuales Ultrarrápidos",
     "Desactiva animaciones lentas (minimizar/maximizar, taskbar). Mantiene fuentes suaves y aspecto visual.", "Essential", "Medio",
-    ['Set-ItemProperty "HKCU:\\Control Panel\\Desktop\\WindowMetrics" MinAnimate 0 -Type DWord -Force -EA 0',
-     'Set-ItemProperty "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" TaskbarAnimations 0 -Type DWord -Force -EA 0'])
+    ['Set-ItemProperty "HKCU:\\Control Panel\\Desktop\\WindowMetrics" MinAnimate 0 -Type DWord -Force -EA 0; "MinAnimate = 0 (animaciones OFF)"',
+     'Set-ItemProperty "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" TaskbarAnimations 0 -Type DWord -Force -EA 0; "TaskbarAnimations = 0"'])
 add_opt("input", "Optimizar Input",
     "Raw Buffer, mouse acceleration OFF, prioridad foreground.", "Essential", "Bajo",
-    ['Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Keyboard" KeyboardDataQueueSize 100 -Type DWord -Force -EA 0',
-     'Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Mouse" MouseDataQueueSize 100 -Type DWord -Force -EA 0',
-     'Set-ItemProperty "HKCU:\\Control Panel\\Mouse" MouseSpeed 0 -Force -EA 0'])
+    ['Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Keyboard" KeyboardDataQueueSize 100 -Type DWord -Force -EA 0; "Keyboard buffer = 100"',
+     'Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Mouse" MouseDataQueueSize 100 -Type DWord -Force -EA 0; "Mouse buffer = 100"',
+     'Set-ItemProperty "HKCU:\\Control Panel\\Mouse" MouseSpeed 0 -Force -EA 0; "Mouse acceleration OFF"'])
 add_opt("gamepriority", "Game Priority Registry",
     "Prioridad maxima a juegos en el scheduler de Windows.", "Essential", "Bajo",
-    ['$p = "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games"; New-Item -Path $p -Force -EA 0 | Out-Null; Set-ItemProperty $p "GPU Priority" 8 -Type DWord -Force -EA 0; Set-ItemProperty $p "Priority" 6 -Type DWord -Force -EA 0; Set-ItemProperty $p "Scheduling Category" "High" -Type String -Force -EA 0; Set-ItemProperty $p "SFIO Priority" "High" -Type String -Force -EA 0; Set-ItemProperty $p "Background Only" 0 -Type DWord -Force -EA 0'])
+    ['$p = "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games"; New-Item -Path $p -Force -EA 0 | Out-Null; Set-ItemProperty $p "GPU Priority" 8 -Type DWord -Force -EA 0; Set-ItemProperty $p "Priority" 6 -Type DWord -Force -EA 0; Set-ItemProperty $p "Scheduling Category" "High" -Type String -Force -EA 0; Set-ItemProperty $p "SFIO Priority" "High" -Type String -Force -EA 0; Set-ItemProperty $p "Background Only" 0 -Type DWord -Force -EA 0; "Game Priority: GPU=8, Priority=6, High, Background=0"'])
 add_opt("sysresp", "System Responsiveness OFF",
     "Desactiva throttling de red del scheduler multimedia.", "Essential", "Bajo",
-    ['Set-ItemProperty "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile" SystemResponsiveness 0 -Type DWord -Force -EA 0'])
+    ['Set-ItemProperty "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile" SystemResponsiveness 0 -Type DWord -Force -EA 0; "SystemResponsiveness = 0 (throttling OFF)"'])
 add_opt("win32prio", "Win32 Priority Separation",
     "Optimiza la division de prioridades foreground/background.", "Essential", "Bajo",
-    ['Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl" Win32PrioritySeparation 38 -Type DWord -Force -EA 0'])
+    ['Set-ItemProperty "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl" Win32PrioritySeparation 38 -Type DWord -Force -EA 0; "Win32PrioritySeparation = 38"'])
 add_opt("cortana", "Desactivar Cortana",
     "Apaga Cortana y libera RAM (~200MB).", "Essential", "Bajo",
-    ['New-Item -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search" -Force -EA 0 | Out-Null; Set-ItemProperty "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search" AllowCortana 0 -Type DWord -Force -EA 0'])
+    ['New-Item -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search" -Force -EA 0 | Out-Null; Set-ItemProperty "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search" AllowCortana 0 -Type DWord -Force -EA 0; "Cortana desactivada via policy"'])
 add_opt("p2p", "Desactivar P2P Updates",
     "Evita que Windows use tu PC para distribuir actualizaciones.", "Essential", "Bajo",
-    ['Set-ItemProperty "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DeliveryOptimization\\Config" DODownloadMode 0 -Type DWord -Force -EA 0'])
+    ['Set-ItemProperty "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DeliveryOptimization\\Config" DODownloadMode 0 -Type DWord -Force -EA 0; "P2P Updates: DODownloadMode = 0"'])
 add_opt("gamedvr", "GameDVR Background OFF",
     "Desactiva grabacion en segundo plano de Xbox Game Bar.", "Essential", "Bajo",
-    ['Set-ItemProperty "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\GameDVR" AppCaptureEnabled 0 -Type DWord -Force -EA 0',
-     'Set-ItemProperty "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR" HistoricalCaptureEnabled 0 -Type DWord -Force -EA 0'])
+    ['Set-ItemProperty "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\GameDVR" AppCaptureEnabled 0 -Type DWord -Force -EA 0; "GameDVR AppCaptureEnabled = 0 (HKLM)"',
+     'Set-ItemProperty "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR" HistoricalCaptureEnabled 0 -Type DWord -Force -EA 0; "GameDVR HistoricalCaptureEnabled = 0 (HKCU)"'])
 
 # ── Pro ─────────────────────────────────────────────────────────────
 add_opt("bloatware", "Remover Bloatware",
     "Desinstala apps preinstaladas (Xbox, Cortana, Skype, Copilot...).", "Pro", "Medio",
-    ['$apps = "Microsoft.BingWeather","Microsoft.GetHelp","Microsoft.Microsoft3DViewer","Microsoft.MicrosoftOfficeHub","Microsoft.MicrosoftSolitaireCollection","Microsoft.Office.OneNote","Microsoft.People","Microsoft.Print3D","Microsoft.SkypeApp","Microsoft.Wallet","Microsoft.WindowsAlarms","Microsoft.WindowsCamera","Microsoft.WindowsFeedbackHub","Microsoft.WindowsMaps","Microsoft.WindowsSoundRecorder","Microsoft.YourPhone","Microsoft.ZuneMusic","Microsoft.ZuneVideo","Microsoft.Copilot","Clipchamp.Clipchamp"; foreach ($app in $apps) { Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage -AllUsers -EA 0; Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like "$app*" | Remove-AppxProvisionedPackage -Online -EA 0 }'])
+    ['$apps = "Microsoft.BingWeather","Microsoft.GetHelp","Microsoft.Microsoft3DViewer","Microsoft.MicrosoftOfficeHub","Microsoft.MicrosoftSolitaireCollection","Microsoft.Office.OneNote","Microsoft.People","Microsoft.Print3D","Microsoft.SkypeApp","Microsoft.Wallet","Microsoft.WindowsAlarms","Microsoft.WindowsCamera","Microsoft.WindowsFeedbackHub","Microsoft.WindowsMaps","Microsoft.WindowsSoundRecorder","Microsoft.YourPhone","Microsoft.ZuneMusic","Microsoft.ZuneVideo","Microsoft.Copilot","Clipchamp.Clipchamp"; $r = 0; foreach ($app in $apps) { Get-AppxPackage -Name $app -AllUsers -EA 0 | Remove-AppxPackage -AllUsers -EA 0; Get-AppxProvisionedPackage -Online -EA 0 | Where-Object DisplayName -like "$app*" | Remove-AppxProvisionedPackage -Online -EA 0; $r++ }; "Bloatware: $r apps procesadas"'])
 add_opt("onedrive", "Desinstalar OneDrive",
     "Elimina OneDrive completamente del sistema.", "Pro", "Medio",
-    ['Stop-Process -Name OneDrive -Force -EA 0; $od = "$env:SYSTEMROOT\\SysWOW64\\OneDriveSetup.exe"; if (Test-Path $od) { Start-Process $od -ArgumentList "/uninstall" -NoNewWindow -Wait }'])
+    ['Stop-Process -Name OneDrive -Force -EA 0; $od = "$env:SYSTEMROOT\\SysWOW64\\OneDriveSetup.exe"; if (Test-Path $od) { Start-Process $od -ArgumentList "/uninstall" -NoNewWindow -Wait; "OneDrive desinstalado" } else { "OneDrive no encontrado en el sistema" }'])
 add_opt("ssd", "Optimizar SSD/NVMe",
     "Hibernacion OFF, SuperFetch OFF, TRIM.", "Pro", "Bajo",
-    ['powercfg -h off 2>$null',
-     'Stop-Service SysMain -Force -EA 0; Set-Service SysMain -StartupType Disabled -EA 0',
-     'Optimize-Volume -DriveLetter C -ReTrim -EA 0'])
+    ['powercfg -h off 2>$null; "Hibernacion desactivada"',
+     'Stop-Service SysMain -Force -EA 0; Set-Service SysMain -StartupType Disabled -EA 0; "SysMain (SuperFetch) detenido y deshabilitado"',
+     'Optimize-Volume -DriveLetter C -ReTrim -EA 0; "TRIM ejecutado en C:"'])
 add_opt("gpucache", "Shader Cache GPU",
     "Maximiza cache de shaders NVIDIA.", "Pro", "Bajo",
-    ['Set-ItemProperty "HKLM:\\SOFTWARE\\NVIDIA Corporation\\Global" ShaderCacheSize 4294967295 -Type DWord -Force -EA 0',
-     'powercfg -setdcvalueindex SCHEME_CURRENT SUB_GRAPHICS GPUPREFERENCE 1 2>$null',
-     'powercfg -setacvalueindex SCHEME_CURRENT SUB_GRAPHICS GPUPREFERENCE 1 2>$null'])
+    ['Set-ItemProperty "HKLM:\\SOFTWARE\\NVIDIA Corporation\\Global" ShaderCacheSize 4294967295 -Type DWord -Force -EA 0; "ShaderCacheSize = 4GB (NVIDIA)"',
+     'powercfg -setdcvalueindex SCHEME_CURRENT SUB_GRAPHICS GPUPREFERENCE 1 2>$null; "GPU Preference (DC) = High Performance"',
+     'powercfg -setacvalueindex SCHEME_CURRENT SUB_GRAPHICS GPUPREFERENCE 1 2>$null; "GPU Preference (AC) = High Performance"'])
 add_opt("driverclean", "Limpiar Drivers Fantasma",
     "Escanea y detecta drivers huerfanos.", "Pro", "Bajo",
-    ['Get-PnpDevice | Where-Object { $_.Problem -eq 22 -and $_.Class -ne "SoftwareDevice" } | ForEach-Object { "Driver huerfano: $($_.FriendlyName)" }'])
+    ['$d = Get-PnpDevice -EA 0 | Where-Object { $_.Problem -eq 22 -and $_.Class -ne "SoftwareDevice" }; if ($d) { $d | ForEach-Object { "Driver huerfano: $($_.FriendlyName)" } } else { "No se detectaron drivers fantasma" }'])
 add_opt("monitor", "Guia Monitor",
     "Configurar Hz maximo y overdrive.", "Pro", "Bajo",
-    ['Write-Output "Guia: 1) Config. pantalla > Avanzado > Frecuencia maxima"',
-     'Write-Output "2) NVIDIA Panel > Sin escalado"',
-     'Write-Output "3) Menu OSD > Overdrive: Medio"'])
+    ['"Guia: 1) Config. pantalla > Avanzado > Frecuencia maxima"',
+     '"Guia: 2) NVIDIA Panel > Sin escalado"',
+     '"Guia: 3) Menu OSD > Overdrive: Medio"'])
 add_opt("bgapps", "Bloquear Apps en Segundo Plano",
     "Impide que aplicaciones innecesarias se ejecuten en segundo plano consumiendo recursos.", "Pro", "Bajo",
-    ['Set-ItemProperty "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications" GlobalUserDisabled 1 -Type DWord -Force -EA 0',
-     'Set-ItemProperty "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy" LetAppsRunInBackground 2 -Type DWord -Force -EA 0'])
+    ['Set-ItemProperty "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications" GlobalUserDisabled 1 -Type DWord -Force -EA 0; "Background apps (HKCU) = deshabilitado"',
+     'Set-ItemProperty "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy" LetAppsRunInBackground 2 -Type DWord -Force -EA 0; "Background apps (HKLM) = deshabilitado"'])
 add_opt("ultimate", "Ultimate Performance Plan",
     "Activa el plan de energia oculto de Windows sin limitaciones.", "Elite", "Bajo",
-    ['powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 2>$null; powercfg -setactive e9a42b02-d5df-448d-aa00-03f14749eb61'])
+    ['powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 2>$null; powercfg -setactive e9a42b02-d5df-448d-aa00-03f14749eb61; "Ultimate Performance Plan activado"'])
 add_opt("corepark", "Deshabilitar Core Parking",
     "Evita que Windows apague nucleos de CPU en idle.", "Elite", "Medio",
-    ['powercfg -setacvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 0 2>$null; powercfg -setdcvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 0 2>$null'])
+    ['powercfg -setacvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 0 2>$null; powercfg -setdcvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 0 2>$null; "Core Parking deshabilitado (AC + DC)"'])
 add_opt("vbsguide", "Guia VBS Detection",
     "Detecta si Virtualization-Based Security esta activo (consume 5-15% FPS).", "Pro", "Bajo",
-    ['$vbs = (Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\\Microsoft\\Windows\\DeviceGuard 2>$null).VirtualizationBasedSecurityStatus; if ($vbs -eq 2) { Write-Output "VBS ACTIVO: Windows Security > Device Security > Core Isolation > Memory Integrity OFF (necesita reinicio)" } else { Write-Output "VBS inactivo o no disponible - OK" }'])
+    ['$vbs = (Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\\Microsoft\\Windows\\DeviceGuard 2>$null).VirtualizationBasedSecurityStatus; if ($vbs -eq 2) { "VBS ACTIVO: Windows Security > Device Security > Core Isolation > Memory Integrity OFF (necesita reinicio)" } else { "VBS inactivo o no disponible - OK" }'])
 
 # ── Elite ───────────────────────────────────────────────────────────
 add_opt("msimode", "MSI Mode (GPU+NVMe+USB)",
     "Activa MSI en dispositivos. Reduce latencia DPC.", "Elite", "Medio",
-    ['$devices = Get-ChildItem "HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\PCI" -Recurse -EA 0 | Where-Object { $_.GetValue("DeviceDesc") -match "NVIDIA|AMD|NVMe|Storage|USB|Network" }; $count = 0; foreach ($d in $devices) { $p = "$($d.PSPath)\\Device Parameters\\Interrupt Management\\MessageSignaledInterruptProperties"; if (Test-Path $p) { Set-ItemProperty -Path $p -Name MSISupported -Value 1 -Type DWord -Force -EA 0; $count++ } }; Write-Output "MSI Mode activado en $count dispositivos"'])
+    ['$devices = Get-ChildItem "HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\PCI" -Recurse -EA 0 | Where-Object { $_.GetValue("DeviceDesc") -match "NVIDIA|AMD|NVMe|Storage|USB|Network" }; $count = 0; foreach ($d in $devices) { $p = "$($d.PSPath)\\Device Parameters\\Interrupt Management\\MessageSignaledInterruptProperties"; if (Test-Path $p) { Set-ItemProperty -Path $p -Name MSISupported -Value 1 -Type DWord -Force -EA 0; $count++ } }; "MSI Mode activado en $count dispositivos"'])
 add_opt("dpclatency", "Guia DPC Latency",
     "Recomendaciones BIOS para minima latencia.", "Elite", "Bajo",
-    ['Write-Output "Guia: 1) BIOS > C-States: Disable   2) SpeedStep: Disable   3) Global C-States: Disable"'])
+    ['"Guia: 1) BIOS > C-States: Disable   2) SpeedStep: Disable   3) Global C-States: Disable"'])
 add_opt("ramtimings", "Guia RAM Timings",
     "Recomendaciones personalizadas para BIOS.", "Elite", "Bajo",
-    ['$mem = Get-CimInstance Win32_PhysicalMemory | Select-Object -First 1; Write-Output "RAM: $([math]::Round($mem.Capacity/1GB,0)) GB @ $($mem.Speed) MHz"; Write-Output "tCL: $(($mem.Speed/100 - 6) -as [int]) | tRCD: $(($mem.Speed/100 - 4) -as [int]) | tRP: $(($mem.Speed/100 - 4) -as [int]) | tRAS: 58-68"'])
+    ['$mem = Get-CimInstance Win32_PhysicalMemory | Select-Object -First 1; "RAM: $([math]::Round($mem.Capacity/1GB,0)) GB @ $($mem.Speed) MHz"'])
+
 add_opt("overclock", "Guia Overclock + Undervolt",
     "Guia personalizada CPU/GPU.", "Elite", "Bajo",
-    ['$cpu = Get-CimInstance Win32_Processor | Select-Object -First 1; Write-Output "CPU: $($cpu.Name) | BIOS > CPU Ratio: +1-2 | Voltage Offset: -0.05V"; Write-Output "GPU: MSI Afterburner > Core +150 | Mem +750 | Power 110%"'])
+    ['$cpu = Get-CimInstance Win32_Processor | Select-Object -First 1; "CPU: $($cpu.Name) | BIOS > CPU Ratio: +1-2 | Voltage Offset: -0.05V"'])
+
 add_opt("benchmark", "Benchmark Rapido",
     "CPU, RAM, Disco y Ping.", "Essential", "Bajo",
-    ["$cpu = Get-CimInstance Win32_Processor | Select-Object -First 1; $os = Get-CimInstance Win32_OperatingSystem; $disk = Get-CimInstance Win32_LogicalDisk -Filter 'DriveType=3' | Where-Object DeviceID -eq 'C:'; $ping = Test-Connection '1.1.1.1' -Count 3 -EA 0; Write-Output \"CPU: $($cpu.Name) | RAM: $([math]::Round($os.FreePhysicalMemory/1MB,1)) GB libre | Disco: $([math]::Round($disk.FreeSpace/1GB,1)) GB libre | Ping: $(if($ping){[math]::Round(($ping|Measure-Object -Property ResponseTime -Average).Average,1)}else{'N/A'}) ms\""])
+    ["$cpu = Get-CimInstance Win32_Processor | Select-Object -First 1; $os = Get-CimInstance Win32_OperatingSystem; $disk = Get-CimInstance Win32_LogicalDisk -Filter 'DriveType=3' | Where-Object DeviceID -eq 'C:'; $ping = Test-Connection '1.1.1.1' -Count 3 -EA 0; \"CPU: $($cpu.Name) | RAM: $([math]::Round($os.FreePhysicalMemory/1MB,1)) GB libre | Disco: $([math]::Round($disk.FreeSpace/1GB,1)) GB libre | Ping: $(if($ping){[math]::Round(($ping|Measure-Object -Property ResponseTime -Average).Average,1)}else{'N/A'}) ms\""])
 add_opt("restorepoint", "Crear Punto de Restauracion",
     "Deshace todos los cambios si algo falla.", "Essential", "Bajo",
-    ['Checkpoint-Computer -Description "SabinaOptimizer" -RestorePointType MODIFY_SETTINGS'])
+    ['Checkpoint-Computer -Description "SabinaOptimizer" -RestorePointType MODIFY_SETTINGS; "Punto de restauracion creado"'])
 add_opt("memcompress", "Deshabilitar Memory Compression",
     "Desactiva compresion de RAM para gaming (requiere +16GB).", "Elite", "Medio",
-    ['$mem = Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum; $totalGB = [math]::Round($mem.Sum / 1GB, 0); if ($totalGB -ge 16) { Disable-MMAgent -mc; Write-Output "Memory Compression desactivada" } else { Write-Output "Se requieren 16GB+ de RAM para desactivar compression (tenes $totalGB GB)" }'])
+    ['$mem = Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum; $totalGB = [math]::Round($mem.Sum / 1GB, 0); if ($totalGB -ge 16) { Disable-MMAgent -mc; "Memory Compression desactivada ($totalGB GB disponibles)" } else { "Se requieren 16GB+ de RAM para desactivar compression (tenes $totalGB GB)" }'])
 add_opt("searchidx", "Deshabilitar Search Indexing",
     "Apaga el indexador de busqueda de Windows. Libera CPU.", "Elite", "Bajo",
-    ['Stop-Service WSearch -Force -EA 0; Set-Service WSearch -StartupType Disabled -EA 0'])
+    ['Stop-Service WSearch -Force -EA 0; Set-Service WSearch -StartupType Disabled -EA 0; "Windows Search indexing detenido y deshabilitado"'])
 
 # ── License ─────────────────────────────────────────────────────────
 def get_device_id():
