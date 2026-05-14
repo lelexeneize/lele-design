@@ -24,6 +24,7 @@ module.exports = async (req, res) => {
   // Verify admin: JWT from header OR admin secret from body
   const authHeader = req.headers.authorization;
   const adminSecret = req.body.adminSecret;
+  let adminUserId = null;
 
   if (authHeader) {
     const token = authHeader.replace('Bearer ', '');
@@ -40,6 +41,7 @@ module.exports = async (req, res) => {
       if (!profile || profile.role !== 'admin') {
         return res.status(403).json({ error: 'Se requiere rol de administrador' });
       }
+      adminUserId = user.id;
     } catch (e) {
       return res.status(500).json({ error: 'Error verificando autorización' });
     }

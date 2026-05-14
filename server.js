@@ -12,6 +12,20 @@ app.use(express.static(path.join(__dirname)));
 
 // ─── API mock handlers (local dev) ───────────────────────
 
+// POST /api/create-coupon + GET /api/create-coupon
+app.all('/api/create-coupon', (req, res) => {
+  if (req.method === 'GET') {
+    return res.json([]);
+  }
+  const { type = 'credits', value = 10, detail = '', count = 1, prefix = 'REGALO' } = req.body;
+  const codes = [];
+  for (let i = 0; i < count; i++) {
+    const seg = () => Math.random().toString(36).substring(2, 6).toUpperCase();
+    codes.push((prefix || 'REGALO') + '-' + seg() + '-' + seg());
+  }
+  res.json({ created: codes.length, codes });
+});
+
 // POST /api/create-license
 app.post('/api/create-license', (req, res) => {
   const { plan = 'essential', count = 1 } = req.body;
