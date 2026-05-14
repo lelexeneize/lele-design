@@ -148,5 +148,5 @@ EOF
 
 \- \[cite\_start]Activar SendGrid con cuenta real y API key. \[cite: 2]
 
-\- \[cite\_start]Implementar `webhook.js` para Mercado Pago. \[cite: 2]
+\- \[cite\_start]~~Implementar `webhook.js` para Mercado Pago.~~ ✅ Ya implementado con verificación de firma y generación automática de licencias. \[cite: 2]
 
