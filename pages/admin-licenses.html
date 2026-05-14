@@ -212,17 +212,11 @@
       const status = document.getElementById('couponGenStatus');
       status.textContent = 'Generando...';
 
-      const token = await getSupabaseToken();
-      const body = { type, value, detail, count, prefix };
-
-      // Fallback admin secret if no Supabase session
-      if (!token) body.adminSecret = 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh';
-
       try {
         const resp = await fetch('/api/create-coupon', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
-          body: JSON.stringify(body)
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type, value, detail, count, prefix, adminSecret: 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh' })
         });
         const result = await resp.json();
         if (result.codes && result.codes.length > 0) {
@@ -302,17 +296,11 @@
       const status = document.getElementById('genStatus');
       status.textContent = 'Generando...';
 
-      const token = await getSupabaseToken();
-      const body = { plan, count };
-
-      // Fallback admin secret if no Supabase session
-      if (!token) body.adminSecret = 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh';
-
       try {
         const resp = await fetch('/api/create-license', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
-          body: JSON.stringify(body)
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan, count, adminSecret: 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh' })
         });
         const result = await resp.json();
         if (result.keys && result.keys.length > 0) {

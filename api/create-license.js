@@ -1,5 +1,7 @@
-const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://qovtekqxruusqhscacqn.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+const ADMIN_SECRET = process.env.ADMIN_SECRET || 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh';
 
 function generateKey(plan) {
   const prefix = plan.substring(0, 2).toUpperCase();
@@ -11,69 +13,36 @@ function generateKey(plan) {
 }
 
 module.exports = async (req, res) => {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  // Use service key (bypass RLS) when available, fallback to anon key
-  const supabase = createClient(
-    process.env.SUPABASE_URL || 'https://qovtekqxruusqhscacqn.supabase.co',
-    process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY
-  );
-
-  // Verify admin: JWT from header OR admin secret from body
-  const authHeader = req.headers.authorization;
-  const adminSecret = req.body.adminSecret;
-  let adminUserId = null;
-
-  if (authHeader) {
-    const token = authHeader.replace('Bearer ', '');
-    try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-      if (authError || !user) {
-        return res.status(401).json({ error: 'Token inválido o expirado' });
-      }
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-      if (!profile || profile.role !== 'admin') {
-        return res.status(403).json({ error: 'Se requiere rol de administrador' });
-      }
-      adminUserId = user.id;
-    } catch (e) {
-      return res.status(500).json({ error: 'Error verificando autorización' });
+  try {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
     }
-  } else if (adminSecret && adminSecret === (process.env.ADMIN_SECRET || 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh')) {
-    // Admin secret accepted - skip JWT verification
-  } else {
-    return res.status(401).json({ error: 'Se requiere autorización (token JWT o adminSecret)' });
-  }
 
-  const { plan = 'essential', count = 1 } = req.body;
-
-  const keys = [];
-  const errors = [];
-  for (let i = 0; i < count; i++) {
-    const key = generateKey(plan);
-    const maxAct = req.body.max_activations || 3;
-    const { error } = await supabase.from('license_keys').insert({
-      key: key,
-      plan: plan,
-      status: 'active',
-      max_activations: maxAct,
-      activated_devices: []
-    });
-    if (error) {
-      errors.push(error.message);
-    } else {
-      keys.push(key);
+    const adminSecret = req.body.adminSecret;
+    if (!adminSecret || adminSecret !== ADMIN_SECRET) {
+      return res.status(401).json({ error: 'Se requiere autorización' });
     }
-  }
 
-  if (errors.length > 0) {
-    return res.json({ created: keys.length, keys, error: errors.join(' | ') });
+    const { plan = 'essential', count = 1 } = req.body;
+    const keys = [];
+
+    for (let i = 0; i < count; i++) {
+      const key = generateKey(plan);
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/license_keys`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ key, plan, status: 'active', max_activations: 3, activated_devices: [] })
+      });
+      if (r.ok) keys.push(key);
+    }
+
+    return res.json({ created: keys.length, keys });
+  } catch (e) {
+    return res.status(500).json({ error: e.message || 'Error interno' });
   }
-  return res.json({ created: keys.length, keys });
 };
