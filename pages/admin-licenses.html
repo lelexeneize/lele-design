@@ -247,11 +247,13 @@
     }
 
     async function loadCouponStats() {
-      const sb = await getSupabaseClient();
-      if (!sb) return;
+      let data = null;
+      try {
+        const resp = await fetch('/api/create-coupon');
+        data = await resp.json();
+      } catch (_) {}
 
-      const { data } = await sb.from('coupons').select('*');
-      if (!data) return;
+      if (!data || !Array.isArray(data)) return;
 
       const active = data.filter(c => c.status === 'active');
       const used = data.filter(c => c.status === 'used');
