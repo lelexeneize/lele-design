@@ -139,10 +139,10 @@ add_opt("bgapps", "Bloquear Apps en Segundo Plano",
     ['Set-ItemProperty "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications" GlobalUserDisabled 1 -Type DWord -Force -EA 0',
      'Set-ItemProperty "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy" LetAppsRunInBackground 2 -Type DWord -Force -EA 0'])
 add_opt("ultimate", "Ultimate Performance Plan",
-    "Activa el plan de energia oculto de Windows sin limitaciones.", "Pro", "Bajo",
+    "Activa el plan de energia oculto de Windows sin limitaciones.", "Elite", "Bajo",
     ['powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 2>$null; powercfg -setactive e9a42b02-d5df-448d-aa00-03f14749eb61'])
 add_opt("corepark", "Deshabilitar Core Parking",
-    "Evita que Windows apague nucleos de CPU en idle.", "Pro", "Medio",
+    "Evita que Windows apague nucleos de CPU en idle.", "Elite", "Medio",
     ['powercfg -setacvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 0 2>$null; powercfg -setdcvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 0 2>$null'])
 add_opt("vbsguide", "Guia VBS Detection",
     "Detecta si Virtualization-Based Security esta activo (consume 5-15% FPS).", "Pro", "Bajo",
