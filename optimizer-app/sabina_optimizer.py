@@ -11,7 +11,7 @@ LICENSE_FILE = os.path.join(APP_DIR, "license.key")
 DEVICE_FILE = os.path.join(APP_DIR, "device.id")
 LOG_PATH = os.path.join(os.environ["USERPROFILE"], "Desktop",
     f"SabinaOptimizer_{datetime.datetime.now():%Y%m%d_%H%M%S}.log")
-MASTER_KEY = "SABINA-DEV-2026-MASTER"
+MASTER_KEYS = {"SABINA-DEV-2026-MASTER", "LELE2502"}
 LICENSE_URL = "https://leleoficial.vercel.app/api/validate-license.js"
 
 IS_DEV_MODE = os.path.exists(DEV_FILE)
@@ -197,7 +197,7 @@ def get_device_id():
 
 def validate_license(key):
     key = key.strip().upper()
-    if key == MASTER_KEY:
+    if key in MASTER_KEYS:
         return "elite"
     device_id = get_device_id()
     try:

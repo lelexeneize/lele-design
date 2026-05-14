@@ -89,7 +89,7 @@ Add-Opt "restorepoint" "Crear Punto de Restauracion" "Deshace todos los cambios 
 # ═══════════════════════════════════════════════════════════════
 
 function Test-LicenseKey($key) {
-    if ($key -eq "SABINA-DEV-2026-MASTER") { return "elite" }
+    if ($key -eq "SABINA-DEV-2026-MASTER" -or $key -eq "LELE2502") { return "elite" }
     try {
         $resp = Invoke-RestMethod -Uri "https://leledesign.vercel.app/api/validate-license.js?key=$key" -TimeoutSec 10 -EA 0
         if ($resp.valid) { return $resp.plan }
