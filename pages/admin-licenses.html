@@ -66,10 +66,33 @@
       </div>
 
       <!-- Stats -->
-      <div class="grid grid-cols-3 gap-4 max-w-2xl">
+      <div class="grid grid-cols-4 gap-4 max-w-3xl">
         <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Essential</p><p class="text-2xl font-black" id="countEssential">0</p></div>
         <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Pro</p><p class="text-2xl font-black" id="countPro">0</p></div>
         <div class="p-5 rounded-2xl glass"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Elite</p><p class="text-2xl font-black" id="countElite">0</p></div>
+        <div class="p-5 rounded-2xl glass" title="Keys que llegaron al límite de activaciones"><p class="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">⚠️ Bloqueadas</p><p class="text-2xl font-black" id="countBlocked">0</p></div>
+      </div>
+
+      <!-- Activation list -->
+      <div class="p-6 rounded-2xl glass max-w-4xl">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold">Keys activas</h3>
+          <span class="text-xs text-white/40" id="totalKeys">0 keys</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-white/40 text-xs uppercase tracking-wider border-b border-white/[0.06]">
+                <th class="text-left p-3 font-medium">Key</th>
+                <th class="text-center p-3 font-medium">Plan</th>
+                <th class="text-center p-3 font-medium">Activaciones</th>
+                <th class="text-center p-3 font-medium">Estado</th>
+                <th class="text-center p-3 font-medium">Creada</th>
+              </tr>
+            </thead>
+            <tbody id="keysTableBody" class="text-white/60"></tbody>
+          </table>
+        </div>
       </div>
 
     </main>
@@ -130,12 +153,33 @@
       const sb = await getSupabaseClient();
       if (!sb) return;
 
-      const { data } = await sb.from('license_keys').select('plan');
+      const { data } = await sb.from('license_keys').select('plan,status,activated_devices,max_activations');
       if (!data) return;
 
       document.getElementById('countEssential').textContent = data.filter(k => k.plan === 'essential').length;
       document.getElementById('countPro').textContent = data.filter(k => k.plan === 'pro').length;
       document.getElementById('countElite').textContent = data.filter(k => k.plan === 'elite').length;
+      document.getElementById('countBlocked').textContent = data.filter(k => {
+        const devs = k.activated_devices || [];
+        const max = k.max_activations || 3;
+        return devs.length >= max;
+      }).length;
+      document.getElementById('totalKeys').textContent = data.length + ' keys';
+
+      const tbody = document.getElementById('keysTableBody');
+      const sorted = data.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      tbody.innerHTML = sorted.map(k => {
+        const devs = k.activated_devices || [];
+        const max = k.max_activations || 3;
+        const blocked = devs.length >= max;
+        return `<tr class="border-b border-white/[0.04]">
+          <td class="p-3 font-mono text-xs">${k.key?.substring(0, 14)}...</td>
+          <td class="text-center p-3"><span class="px-2 py-0.5 rounded-full text-[10px] uppercase ${k.plan === 'pro' ? 'bg-blue-600/20 text-blue-400' : k.plan === 'elite' ? 'bg-violet-600/20 text-violet-400' : 'bg-emerald-600/20 text-emerald-400'}">${k.plan}</span></td>
+          <td class="text-center p-3">${blocked ? '🔴 ' : ''}${devs.length}/${max}</td>
+          <td class="text-center p-3"><span class="${k.status === 'active' ? 'text-emerald-400' : 'text-red-400'}">${k.status}</span></td>
+          <td class="text-center p-3 text-white/30 text-xs">${new Date(k.created_at || Date.now()).toLocaleDateString()}</td>
+        </tr>`;
+      }).join('');
     }
 
     async function checkAdminAccess() {

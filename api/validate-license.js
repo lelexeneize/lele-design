@@ -15,7 +15,7 @@ const supabaseAdmin = createClient(
 );
 
 module.exports = async (req, res) => {
-  const { key } = req.query;
+  const { key, device_id } = req.query;
 
   if (!key) {
     return res.status(400).json({ valid: false, error: 'Key requerida' });
@@ -36,18 +36,39 @@ module.exports = async (req, res) => {
       return res.status(403).json({ valid: false, error: 'Licencia ' + data.status });
     }
 
-    // Registrar última validación (no cambia el status para permitir re-descargas)
+    const maxAct = data.max_activations || 3;
+    const devices = data.activated_devices || [];
+
+    // Verificar límite de activaciones si se envía device_id
+    if (device_id) {
+      if (devices.includes(device_id)) {
+        // Este dispositivo ya está registrado — permitir
+      } else if (devices.length >= maxAct) {
+        return res.status(403).json({
+          valid: false,
+          error: `Límite de activaciones alcanzado (${maxAct}/${maxAct}). Desactivá otro dispositivo desde el panel o contactá a soporte.`
+        });
+      }
+    }
+
+    // Actualizar last_validated_at y registrar device_id
     if (process.env.SUPABASE_SERVICE_KEY) {
+      const updatePayload = { last_validated_at: new Date().toISOString() };
+      if (device_id && !devices.includes(device_id)) {
+        updatePayload.activated_devices = [...devices, device_id];
+      }
       await supabaseAdmin
         .from('license_keys')
-        .update({ last_validated_at: new Date().toISOString() })
+        .update(updatePayload)
         .eq('key', data.key);
     }
 
     return res.json({
       valid: true,
       plan: data.plan,
-      expires: data.expires_at
+      expires: data.expires_at,
+      activations: device_id ? (devices.includes(device_id) ? devices.length : devices.length + 1) : devices.length,
+      max_activations: maxAct
     });
 
   } catch (err) {

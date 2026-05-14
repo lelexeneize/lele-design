@@ -1,17 +1,18 @@
-import os, sys, json, threading, subprocess, datetime, time
+import os, sys, json, threading, subprocess, datetime, time, hashlib
 import urllib.request, urllib.error, urllib.parse
 import tkinter as tk
 from tkinter import messagebox
 
 # ── Config ──────────────────────────────────────────────────────────
-APP_VERSION = "4.0"
+APP_VERSION = "5.0"
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 DEV_FILE = os.path.join(APP_DIR, "DEV_MODE")
 LICENSE_FILE = os.path.join(APP_DIR, "license.key")
+DEVICE_FILE = os.path.join(APP_DIR, "device.id")
 LOG_PATH = os.path.join(os.environ["USERPROFILE"], "Desktop",
     f"SabinaOptimizer_{datetime.datetime.now():%Y%m%d_%H%M%S}.log")
 MASTER_KEY = "SABINA-DEV-2026-MASTER"
-LICENSE_URL = "https://leleoficial.vercel.app/api/validate-license.js?key="
+LICENSE_URL = "https://leleoficial.vercel.app/api/validate-license.js"
 
 IS_DEV_MODE = os.path.exists(DEV_FILE)
 user_plan = "none"
@@ -174,19 +175,48 @@ add_opt("searchidx", "Deshabilitar Search Indexing",
     ['Stop-Service WSearch -Force -EA 0; Set-Service WSearch -StartupType Disabled -EA 0'])
 
 # ── License ─────────────────────────────────────────────────────────
+def get_device_id():
+    if os.path.exists(DEVICE_FILE):
+        with open(DEVICE_FILE, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    try:
+        r = subprocess.run(["powershell", "-NoProfile", "-Command",
+            "(Get-CimInstance Win32_ComputerSystemProduct).UUID + (Get-CimInstance SoftwareLicensingProduct -Filter 'ApplicationId like \"55c92734-d682-4d71-983e-d6ec3f16059f\"' | Select-Object -First 1).PartialProductKey"],
+            capture_output=True, text=True, timeout=10)
+        raw = r.stdout.strip().replace("\r", "").replace("\n", "") if r.returncode == 0 else "unknown"
+        did = hashlib.md5(raw.encode()).hexdigest().upper()
+        with open(DEVICE_FILE, "w", encoding="utf-8") as f:
+            f.write(did)
+        return did
+    except Exception:
+        return "unknown"
+
 def validate_license(key):
     key = key.strip().upper()
     if key == MASTER_KEY:
         return "elite"
+    device_id = get_device_id()
     try:
-        req = urllib.request.Request(LICENSE_URL + urllib.parse.quote(key),
-                                     headers={"User-Agent": "SabinaOptimizer/4.0"})
+        url = f"{LICENSE_URL}?key={urllib.parse.quote(key)}&device_id={urllib.parse.quote(device_id)}"
+        req = urllib.request.Request(url, headers={"User-Agent": "SabinaOptimizer/5.0"})
         with urllib.request.urlopen(req, timeout=10) as r:
             data = json.loads(r.read().decode())
             if data.get("valid"):
                 return data.get("plan")
-    except Exception:
-        pass
+            err_msg = data.get("error", "")
+            if "activaciones" in err_msg.lower() or "límite" in err_msg.lower():
+                raise Exception(err_msg)
+    except urllib.error.HTTPError as e:
+        try:
+            body = json.loads(e.read().decode())
+            err = body.get("error", str(e))
+        except Exception:
+            err = str(e)
+        if "activaciones" in err.lower() or "límite" in err.lower():
+            raise Exception(err)
+    except Exception as e:
+        if "activaciones" in str(e).lower() or "límite" in str(e).lower():
+            raise e
     return None
 
 def get_stored_license():
@@ -307,7 +337,7 @@ class SabinaApp:
         bar = tk.Frame(self.root, bg="#0f0f1a", height=44)
         bar.place(x=0, y=0, width=1100, height=44)
         bar.pack_propagate(False)
-        self._lbl(bar, "Sabina Optimizer v4.0", ACCENT, 16, True,
+        self._lbl(bar, "Sabina Optimizer v5.0", ACCENT, 16, True,
                   "#0f0f1a").place(x=10, y=8)
         tk.Button(bar, text="X", command=self.root.destroy,
                   bg="#0f0f1a", fg=TEXT2, font=("Segoe UI", 11, "bold"),
@@ -357,16 +387,26 @@ class SabinaApp:
 
     def _do_validate(self, key):
         global user_plan
-        plan = validate_license(key)
-        if plan:
-            user_plan = plan
-            save_license(key)
-            c = PLAN_COLORS.get(plan, RED)
-            self.plan_badge.config(text=f"PLAN {plan.upper()}", bg=c)
-            self.lic_status.config(text="OK! Licencia activa", fg=GREEN)
-            self._show_category(self.current_cat)
-        else:
-            self.lic_status.config(text="Licencia invalida", fg=RED)
+        try:
+            plan = validate_license(key)
+            if plan:
+                user_plan = plan
+                save_license(key)
+                c = PLAN_COLORS.get(plan, RED)
+                self.plan_badge.config(text=f"PLAN {plan.upper()}", bg=c)
+                self.lic_status.config(text="OK! Licencia activa (" + plan.upper() + ")", fg=GREEN)
+                self._show_category(self.current_cat)
+            else:
+                self.lic_status.config(text="Licencia invalida", fg=RED)
+        except Exception as e:
+            err = str(e)
+            if "límite" in err.lower() or "activaciones" in err.lower():
+                self.lic_status.config(text=err[:50] + "...", fg=RED)
+                messagebox.showerror("Límite de activaciones",
+                    f"{err}\n\nPodés desactivar dispositivos desde el panel de administración o contactar a soporte.")
+            else:
+                self.lic_status.config(text="Error de validacion", fg=RED)
+                messagebox.showerror("Error", err)
 
     # ── Category Bar ────────────────────────────────────────────────
     def _build_category_bar(self):

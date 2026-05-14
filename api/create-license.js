@@ -50,10 +50,13 @@ module.exports = async (req, res) => {
   const errors = [];
   for (let i = 0; i < count; i++) {
     const key = generateKey(plan);
+    const maxAct = req.body.max_activations || 3;
     const { error } = await supabase.from('license_keys').insert({
       key: key,
       plan: plan,
-      status: 'active'
+      status: 'active',
+      max_activations: maxAct,
+      activated_devices: []
     });
     if (error) {
       errors.push(error.message);

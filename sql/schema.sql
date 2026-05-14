@@ -69,8 +69,11 @@ CREATE TABLE IF NOT EXISTS license_keys (
   key TEXT UNIQUE NOT NULL,
   plan TEXT NOT NULL,
   status TEXT DEFAULT 'active',
+  max_activations INT DEFAULT 3,
+  activated_devices JSONB DEFAULT '[]'::jsonb,
   emailed_at TIMESTAMPTZ,
   used_at TIMESTAMPTZ,
+  last_validated_at TIMESTAMPTZ,
   expires_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
