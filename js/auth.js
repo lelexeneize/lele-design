@@ -6,56 +6,63 @@ function saveUserToRegistry(user) {
 
 async function handleGoogleLogin(response) {
   const payload = decodeJwtResponse(response.credential);
+  const sb = await getSupabaseClient();
+
+  // Create Supabase session first to get auth user ID
+  let authId = null;
+  if (sb) {
+    try {
+      const { data } = await sb.auth.signInWithIdToken({ provider: 'google', token: response.credential });
+      authId = data?.user?.id;
+    } catch (_) {}
+  }
+
   const user = {
+    id: authId,
     name: payload.name,
     email: payload.email,
     picture: payload.picture,
     isGoogle: true
   };
   localStorage.setItem('lele_user', JSON.stringify(user));
-  saveUserToRegistry(user);
-
-  // Create Supabase session with Google token
-  try {
-    const sb = await getSupabaseClient();
-    if (sb) {
-      await sb.auth.signInWithIdToken({ provider: 'google', token: response.credential });
-    }
-  } catch (_) {}
+  if (authId) saveUserToRegistry(user);
 
   // Redirect admin to admin panel
-  try {
-    const sb = await getSupabaseClient();
-    if (sb) {
+  if (sb && user.email) {
+    try {
       const { data: profile } = await sb.from('profiles').select('role').eq('email', user.email).single();
       if (profile?.role === 'admin') {
         window.location.href = 'admin.html';
         return;
       }
-    }
-  } catch (_) {}
+    } catch (_) {}
+  }
 
   window.location.href = 'dashboard.html';
 }
 
 async function handleGoogleRegister(response) {
   const payload = decodeJwtResponse(response.credential);
+  const sb = await getSupabaseClient();
+
+  // Create Supabase session first to get auth user ID
+  let authId = null;
+  if (sb) {
+    try {
+      const { data } = await sb.auth.signInWithIdToken({ provider: 'google', token: response.credential });
+      authId = data?.user?.id;
+    } catch (_) {}
+  }
+
   const user = {
+    id: authId,
     name: payload.name,
     email: payload.email,
     picture: payload.picture,
     isGoogle: true
   };
   localStorage.setItem('lele_user', JSON.stringify(user));
-  saveUserToRegistry(user);
-
-  // Create Supabase session with Google token
-  try {
-    const sb = await getSupabaseClient();
-    if (sb) {
-      await sb.auth.signInWithIdToken({ provider: 'google', token: response.credential });
-    }
-  } catch (_) {}
+  if (authId) saveUserToRegistry(user);
 
   window.location.href = 'dashboard.html';
 }

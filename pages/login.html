@@ -100,7 +100,9 @@
           if (sb) {
             const { data, error } = await sb.auth.signInWithPassword({ email, password });
             if (!error && data.user) {
-              localStorage.setItem('lele_user', JSON.stringify({ name: email, email, picture: '' }));
+              const uData = { id: data.user.id, name: email, email, picture: '' };
+              localStorage.setItem('lele_user', JSON.stringify(uData));
+              saveUserToRegistry(uData);
               window.location.href = 'dashboard.html';
               return;
             }

@@ -117,8 +117,16 @@
               setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
               return;
             }
+            // Save profile with the auth user's ID
+            if (data?.user) {
+              const userData = { id: data.user.id, name, email, picture: '' };
+              saveUserToRegistry(userData);
+              localStorage.setItem('lele_user', JSON.stringify(userData));
+            }
           }
-          localStorage.setItem('lele_user', JSON.stringify({ name, email, picture: '' }));
+          if (!localStorage.getItem('lele_user')) {
+            localStorage.setItem('lele_user', JSON.stringify({ name, email, picture: '' }));
+          }
           window.location.href = 'dashboard.html';
         } catch (_) {
           btn.textContent = 'Error de conexión';
