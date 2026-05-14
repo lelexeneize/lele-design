@@ -452,14 +452,18 @@ class SabinaApp:
         self.canvas.bind_all("<MouseWheel>", _mw)
 
     def _build_card(self, opt):
-        f = tk.Frame(self.card_frame, bg=CARD, height=76)
+        f = tk.Frame(self.card_frame, bg=CARD)
         f.pack(fill="x", pady=4)
-        f.pack_propagate(False)
 
         locked = not self._can_access(opt)
 
+        # Header row (fixed at 70px)
+        hdr = tk.Frame(f, bg=CARD, height=70)
+        hdr.pack(fill="x")
+        hdr.pack_propagate(False)
+
         var = tk.BooleanVar()
-        cb = tk.Checkbutton(f, variable=var, bg=CARD, activebackground=CARD,
+        cb = tk.Checkbutton(hdr, variable=var, bg=CARD, activebackground=CARD,
                              fg=TEXT, selectcolor=CARD,
                              disabledforeground=TEXT2)
         cb.place(x=8, y=5, width=20, height=60)
@@ -467,33 +471,34 @@ class SabinaApp:
             cb.config(state="disabled")
         self.checkboxes[opt["id"]] = (var, cb)
 
-        # Category badge
-        tk.Label(f, text=opt["category"], fg=TEXT,
+        tk.Label(hdr, text=opt["category"], fg=TEXT,
                  bg=CAT_COLORS.get(opt["category"], RED),
                  font=("Segoe UI", 9, "bold")
                  ).place(x=700, y=8, width=72, height=20)
-        # Risk badge
-        tk.Label(f, text=opt["risk"], fg="#000",
+        tk.Label(hdr, text=opt["risk"], fg="#000",
                  bg=RISK_COLORS.get(opt["risk"], RED),
                  font=("Segoe UI", 9, "bold")
                  ).place(x=780, y=8, width=48, height=20)
 
-        self._lbl(f, opt["name"], TEXT, 12, True, CARD
+        self._lbl(hdr, opt["name"], TEXT, 12, True, CARD
                   ).place(x=32, y=6, width=500, height=24)
-        self._lbl(f, opt["desc"], TEXT2, 10, False, CARD
+        self._lbl(hdr, opt["desc"], TEXT2, 10, False, CARD
                   ).place(x=32, y=32, width=660, height=20)
 
         # Script toggle
-        self._btn(f, "Script", lambda o=opt: self._toggle_script(o),
+        self._btn(hdr, "Script", lambda o=opt: self._toggle_script(o),
                   CARD2, TEXT2, 10).place(x=850, y=8, width=60, height=20)
 
-        # Script detail (hidden)
+        # Script detail (hidden by default)
         dtxt = "\n".join(f"PS> {c}" for c in opt["commands"])
         detail = tk.Text(f, bg=DARK_INPUT, fg="#22d3ee",
                           font=("Consolas", 10), relief="flat",
                           height=len(opt["commands"]), wrap="none")
         detail.insert("1.0", dtxt)
         detail.config(state="disabled")
+        # pack it hidden initially
+        detail.pack(fill="x", padx=8, pady=(0, 4))
+        detail.pack_forget()
         self.script_details[opt["id"]] = detail
 
     def _toggle_script(self, opt):
@@ -503,7 +508,7 @@ class SabinaApp:
         if d.winfo_viewable():
             d.pack_forget()
         else:
-            d.pack(fill="x", padx=610, pady=(0, 4))
+            d.pack(fill="x", padx=8, pady=(0, 4))
 
     def _show_category(self, cat):
         self.current_cat = cat
