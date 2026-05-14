@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://qovtekqxruusqhscacqn.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || 'sb_publishable_iZ9oKQoxTU0ui2kAUhCcLg_CrXpI1S2';
 const ADMIN_SECRET = process.env.ADMIN_SECRET || 'n6PgGztTRf3ruweEicLB18Q0YyFAM5oh';
 
 function generateKey(plan) {
@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
 
     const { plan = 'essential', count = 1 } = req.body;
     const keys = [];
+    const errors = [];
 
     for (let i = 0; i < count; i++) {
       const key = generateKey(plan);
@@ -38,10 +39,17 @@ module.exports = async (req, res) => {
         },
         body: JSON.stringify({ key, plan, status: 'active', max_activations: 3, activated_devices: [] })
       });
-      if (r.ok) keys.push(key);
+      if (r.ok) {
+        keys.push(key);
+      } else {
+        const errBody = await r.text();
+        errors.push(errBody.substring(0, 100));
+      }
     }
 
-    return res.json({ created: keys.length, keys });
+    const result = { created: keys.length, keys };
+    if (errors.length > 0) result.error = errors.join(' | ');
+    return res.status(keys.length > 0 ? 200 : 500).json(result);
   } catch (e) {
     return res.status(500).json({ error: e.message || 'Error interno' });
   }
