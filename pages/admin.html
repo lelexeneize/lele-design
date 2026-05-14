@@ -93,7 +93,15 @@
   <script src="../js/auth.js"></script>
   <script>
     async function renderUsers(filter = '') {
-      let users = await dbGetUsers();
+      let users = [];
+      try {
+        const sb = await getSupabaseClient();
+        if (sb) {
+          const { data } = await sb.rpc('admin_get_all_profiles');
+          if (data) users = data;
+        }
+      } catch (_) {}
+      if (users.length === 0) users = await dbGetUsers();
       const currentUser = JSON.parse(localStorage.getItem('lele_user'));
       if (currentUser && !users.some(u => u.email === currentUser.email)) {
         users.push({ ...currentUser, registeredAt: Date.now() });
@@ -119,7 +127,15 @@
     }
     document.getElementById('searchInput').addEventListener('input', (e) => renderUsers(e.target.value));
     document.getElementById('exportBtn').addEventListener('click', async () => {
-      const users = await dbGetUsers();
+      let users = [];
+      try {
+        const sb = await getSupabaseClient();
+        if (sb) {
+          const { data } = await sb.rpc('admin_get_all_profiles');
+          if (data) users = data;
+        }
+      } catch (_) {}
+      if (users.length === 0) users = await dbGetUsers();
       const csv = 'Nombre,Email,Registro,Método,Plan\n' + users.map(u => `"${u.name||''}","${u.email||''}","${new Date(u.created_at || u.registeredAt).toLocaleString()}","${u.isGoogle?'Google':'Email'}","${u.plan || 'Gratis'}"`).join('\n');
       const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'}); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `usuarios_lele_${new Date().toISOString().slice(0,10)}.csv`; link.click();
     });

@@ -60,7 +60,16 @@ CREATE POLICY "Admins can insert license_keys"
 -- 3. ADD user_id TO license_keys (for assigned licenses)
 ALTER TABLE license_keys ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES profiles(id) ON DELETE SET NULL;
 
--- 4. RPC: admin_insert_coupon (para generar cupones desde las API sin service key)
+-- 4. RPC: admin_get_all_profiles (para el panel de admin, bypass RLS)
+CREATE OR REPLACE FUNCTION admin_get_all_profiles()
+RETURNS SETOF profiles
+SECURITY DEFINER
+LANGUAGE sql
+AS $$
+  SELECT * FROM profiles ORDER BY created_at DESC;
+$$;
+
+-- 5. RPC: admin_insert_coupon (para generar cupones desde las API sin service key)
 CREATE OR REPLACE FUNCTION admin_insert_coupon(
   p_code TEXT, p_type TEXT, p_value INT, p_detail TEXT
 ) RETURNS JSONB
