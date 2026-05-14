@@ -162,10 +162,10 @@ add_opt("overclock", "Guia Overclock + Undervolt",
     "Guia personalizada CPU/GPU.", "Elite", "Bajo",
     ['$cpu = Get-CimInstance Win32_Processor | Select-Object -First 1; Write-Output "CPU: $($cpu.Name) | BIOS > CPU Ratio: +1-2 | Voltage Offset: -0.05V"; Write-Output "GPU: MSI Afterburner > Core +150 | Mem +750 | Power 110%"'])
 add_opt("benchmark", "Benchmark Rapido",
-    "CPU, RAM, Disco y Ping.", "Elite", "Bajo",
+    "CPU, RAM, Disco y Ping.", "Essential", "Bajo",
     ["$cpu = Get-CimInstance Win32_Processor | Select-Object -First 1; $os = Get-CimInstance Win32_OperatingSystem; $disk = Get-CimInstance Win32_LogicalDisk -Filter 'DriveType=3' | Where-Object DeviceID -eq 'C:'; $ping = Test-Connection '1.1.1.1' -Count 3 -EA 0; Write-Output \"CPU: $($cpu.Name) | RAM: $([math]::Round($os.FreePhysicalMemory/1MB,1)) GB libre | Disco: $([math]::Round($disk.FreeSpace/1GB,1)) GB libre | Ping: $(if($ping){[math]::Round(($ping|Measure-Object -Property ResponseTime -Average).Average,1)}else{'N/A'}) ms\""])
 add_opt("restorepoint", "Crear Punto de Restauracion",
-    "Deshace todos los cambios si algo falla.", "Elite", "Bajo",
+    "Deshace todos los cambios si algo falla.", "Essential", "Bajo",
     ['Checkpoint-Computer -Description "SabinaOptimizer" -RestorePointType MODIFY_SETTINGS'])
 add_opt("memcompress", "Deshabilitar Memory Compression",
     "Desactiva compresion de RAM para gaming (requiere +16GB).", "Elite", "Medio",
