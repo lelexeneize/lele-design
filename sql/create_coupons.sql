@@ -75,7 +75,8 @@ END;
 $$;
 
 -- 5. RPC: redeem_coupon (SECURITY DEFINER — runs as admin)
-CREATE OR REPLACE FUNCTION redeem_coupon(p_code TEXT)
+-- p_user_id es opcional, si no se pasa usa auth.uid()
+CREATE OR REPLACE FUNCTION redeem_coupon(p_code TEXT, p_user_id UUID DEFAULT NULL)
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -83,12 +84,12 @@ SET search_path = public
 AS $$
 DECLARE
   v_coupon coupons%ROWTYPE;
-  v_user_id UUID := auth.uid();
+  v_user_id UUID := COALESCE(p_user_id, auth.uid());
   v_license_key TEXT;
   v_prefix TEXT;
   v_seg TEXT;
 BEGIN
-  -- Must be authenticated
+  -- Must be authenticated or have user_id
   IF v_user_id IS NULL THEN
     RETURN jsonb_build_object('success', false, 'error', 'No autenticado');
   END IF;
